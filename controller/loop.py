@@ -26,12 +26,20 @@ def run(config) -> bool:
         print(f"[controller] Cloning remote repository {config.repo_path} to {config.local_repo_path}...")
         from utils.git_remote import clone_repo
         import shutil
+        import stat
         if os.path.exists(config.local_repo_path):
             try:
+                # Remove read-only attributes on Windows before deleting
+                for root, dirs, files in os.walk(config.local_repo_path):
+                    for momo in dirs:
+                        os.chmod(os.path.join(root, momo), stat.S_IWRITE)
+                    for momo in files:
+                        os.chmod(os.path.join(root, momo), stat.S_IWRITE)
                 shutil.rmtree(config.local_repo_path)
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"[controller] Warning: failed to clean up directory: {e}")
         github_token = os.environ.get("GITHUB_TOKEN")
+
         clone_repo(config.repo_path, config.local_repo_path, github_token)
         print("[controller] Cloning completed.")
 
