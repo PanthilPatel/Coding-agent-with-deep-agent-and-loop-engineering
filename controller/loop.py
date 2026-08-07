@@ -19,6 +19,26 @@ def build_instruction(goal: str, last_output_tail: str, force_new_strategy: bool
     return "\n\n".join(parts)
 
 
+def print_execution_summary(state, success: bool, iterations_run: int) -> None:
+    print("\n" + "="*60)
+    print("                     EXECUTION SUMMARY")
+    print("="*60)
+    print(f"Overall Status:      {'SUCCESS (Code is now error-free)' if success else 'FAILED (Tests are still failing)'}")
+    print(f"Iterations Run:      {iterations_run}")
+    print("\nChanges Performed by Iteration:")
+    for record in state.iterations:
+        # handle both dict and object formats
+        it_num = record.get("iteration") if isinstance(record, dict) else getattr(record, "iteration", "?")
+        summary = record.get("worker_summary") if isinstance(record, dict) else getattr(record, "worker_summary", "No summary")
+        passed = record.get("test_passed") if isinstance(record, dict) else getattr(record, "test_passed", False)
+        status_str = "PASSED" if passed else "FAILED"
+        print(f"\n  [Iteration {it_num}] - Verification tests {status_str}")
+        for line in summary.split("\n"):
+            if line.strip():
+                print(f"    {line.strip()}")
+    print("="*60 + "\n")
+
+
 def run(config) -> bool:
     """Run the controller loop. Returns True if the goal was met, False
     if the loop stopped due to a limit without success."""
@@ -52,10 +72,13 @@ def run(config) -> bool:
     start_time = time.time()
     last_output_tail = ""
     force_new_strategy = False
+    iterations_run = 0
 
     for i in range(1, config.max_iterations + 1):
+        iterations_run = i
         if time.time() - start_time > config.max_seconds:
             print(f"[controller] Stopping: max_seconds ({config.max_seconds}) exceeded.")
+            print_execution_summary(state, False, iterations_run)
             return False
 
         print(f"\n[controller] Iteration {i}/{config.max_iterations}")
@@ -73,6 +96,7 @@ def run(config) -> bool:
             approve = input("Commit this change? [y/N] ").strip().lower()
             if approve != "y":
                 print("[controller] Change rejected by user; stopping.")
+                print_execution_summary(state, False, iterations_run)
                 return False
 
         commit_hash = commit_iteration(
@@ -95,6 +119,7 @@ def run(config) -> bool:
             state.note_success()
             save_state(state_path, state)
             print(f"\n[controller] Goal met after {i} iteration(s).")
+            print_execution_summary(state, True, iterations_run)
             if config.is_remote:
                 print(f"[controller] Pushing changes to remote...")
                 from utils.git_remote import push_to_remote
@@ -111,4 +136,5 @@ def run(config) -> bool:
         save_state(state_path, state)
 
     print(f"\n[controller] Stopping: max_iterations ({config.max_iterations}) reached without success.")
+    print_execution_summary(state, False, iterations_run)
     return False
