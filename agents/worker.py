@@ -24,26 +24,15 @@ class TerminalLogCallbackHandler(BaseCallbackHandler):
 
     def on_llm_start(self, serialized, prompts, **kwargs):
         msg = "[agent] Calling LLM to analyze and plan..."
-        print(msg)
         self._log_to_file(msg)
 
     def on_tool_start(self, serialized, input_str, **kwargs):
         name = serialized.get("name", "tool")
-        # Print a clean, uncluttered message to the terminal
-        print(f"[agent] -> Executing tool '{name}'")
-        # Log the full detailed input to the log file
         self._log_to_file(f"[agent] -> Executing tool '{name}' with input: {input_str}")
 
     def on_tool_end(self, output, **kwargs):
         out_str = str(output).strip()
-        # Log the full tool output to the log file
         self._log_to_file(f"[agent] <- Tool returned: {out_str}")
-        
-        # Print a short preview in the terminal to keep it clean
-        preview = out_str
-        if len(preview) > 160:
-            preview = preview[:160] + "..."
-        print(f"[agent] <- Tool returned: {preview}")
 
 REVIEWER_SUBAGENT = SubAgent(
     name="reviewer",
@@ -118,4 +107,4 @@ def run_worker_turn(agent, instruction: str) -> str:
     last = messages[-1]
     if isinstance(last, dict):
         return last.get("content", "") or ""
-    return getattr(last, "content", "") or ""
+    return getattr(last, "content", "") or ""
