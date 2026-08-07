@@ -86,7 +86,7 @@ def build_worker_agent(repo_path: str, model_name: str = "gemma4", llm_provider:
     """
     model = _build_model(model_name, llm_provider)
     backend = FilesystemBackend(root_dir=repo_path)
-    
+     
     agent = create_deep_agent(
         model=model,
         system_prompt=WORKER_SYSTEM_PROMPT,
