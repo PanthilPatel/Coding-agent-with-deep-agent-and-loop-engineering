@@ -24,10 +24,12 @@ class TerminalLogCallbackHandler(BaseCallbackHandler):
 
     def on_llm_start(self, serialized, prompts, **kwargs):
         msg = "[agent] Calling LLM to analyze and plan..."
+        print(msg)
         self._log_to_file(msg)
 
     def on_tool_start(self, serialized, input_str, **kwargs):
         name = serialized.get("name", "tool")
+        print(f"[agent] -> Executing tool '{name}'")
         self._log_to_file(f"[agent] -> Executing tool '{name}' with input: {input_str}")
 
     def on_tool_end(self, output, **kwargs):
@@ -99,7 +101,10 @@ def run_worker_turn(agent, instruction: str) -> str:
     """
     result = agent.invoke(
         {"messages": [{"role": "user", "content": instruction}]},
-        config={"callbacks": [TerminalLogCallbackHandler()]}
+        config={
+            "callbacks": [TerminalLogCallbackHandler()],
+            "recursion_limit": 25
+        }
     )
     messages = result.get("messages", [])
     if not messages:
@@ -108,3 +113,4 @@ def run_worker_turn(agent, instruction: str) -> str:
     if isinstance(last, dict):
         return last.get("content", "") or ""
     return getattr(last, "content", "") or ""
+
