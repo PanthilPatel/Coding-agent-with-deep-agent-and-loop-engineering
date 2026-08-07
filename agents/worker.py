@@ -99,18 +99,27 @@ def run_worker_turn(agent, instruction: str) -> str:
     """Invoke the worker agent with a single instruction and return the 
     text of its final response.
     """
-    result = agent.invoke(
-        {"messages": [{"role": "user", "content": instruction}]},
-        config={
-            "callbacks": [TerminalLogCallbackHandler()],
-            "recursion_limit": 25
-        }
-    )
-    messages = result.get("messages", [])
-    if not messages:
-        return ""
-    last = messages[-1]
-    if isinstance(last, dict):
-        return last.get("content", "") or ""
-    return getattr(last, "content", "") or ""
+    from langgraph.errors import GraphRecursionError
+    try:
+        result = agent.invoke(
+            {"messages": [{"role": "user", "content": instruction}]},
+            config={
+                "callbacks": [TerminalLogCallbackHandler()],
+                "recursion_limit": 25
+            }
+        )
+        messages = result.get("messages", [])
+        if not messages:
+            return ""
+        last = messages[-1]
+        if isinstance(last, dict):
+            return last.get("content", "") or ""
+        return getattr(last, "content", "") or ""
+    except GraphRecursionError:
+        print("\n[worker] Warning: Agent hit recursion limit of 25 steps (potential loop). Aborting turn.")
+        return "Agent hit recursion limit of 25 steps due to repeating operations."
+    except Exception as e:
+        print(f"\n[worker] Error during execution: {e}")
+        return f"Agent failed with error: {e}"
+
 
