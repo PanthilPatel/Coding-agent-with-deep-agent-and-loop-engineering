@@ -1,0 +1,8 @@
+deepagents>=0.1.0
+langchain
+langgraph
+python-dotenv
+gitpython
+fastapi
+uvicorn
+langchain-ollama>=0.3.0

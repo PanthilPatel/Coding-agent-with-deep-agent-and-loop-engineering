@@ -1,0 +1,20 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Local configuration / Environment variables
+.env
+.env.local
+
+# IDE / Editor configuration
+.vscode/
+.idea/
+
+# Agent logs directory
+agent_logs/
+workspace_clones/
+state.json
+test_output.txt
