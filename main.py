@@ -28,6 +28,16 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Print verbose/debug execution logs to the terminal",
     )
+    parser.add_argument(
+        "--lint-cmd",
+        default=None,
+        help="Optional lint/type-check command to run after each iteration (e.g. 'flake8 .'). When not set, no lint step runs.",
+    )
+    parser.add_argument(
+        "--skills-dir",
+        default=None,
+        help="Path to the skills directory (default: 'skills/' relative to the project root).",
+    )
     return parser.parse_args()
 
 def main() -> None:
@@ -44,6 +54,8 @@ def main() -> None:
         "max_seconds": args.max_seconds,
         "require_approval": args.require_approval,
         "model_name": args.model,
+        "lint_cmd": args.lint_cmd,
+        "skills_dir": args.skills_dir,
     }
     if args.llm_provider is not None:
         config_kwargs["llm_provider"] = args.llm_provider

@@ -1,5 +1,6 @@
 import os
 from dataclasses import dataclass
+from typing import Optional
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -18,6 +19,8 @@ class Config:
 
     is_remote: bool = False
     local_repo_path: str = ""
+    lint_cmd: Optional[str] = None
+    skills_dir: Optional[str] = None
 
     def __post_init__(self) -> None:
         if self.llm_provider == "ollama_cloud":

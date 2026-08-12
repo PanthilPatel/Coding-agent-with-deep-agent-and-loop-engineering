@@ -78,8 +78,23 @@ def _build_model(model_name: str, llm_provider: str = "ollama_cloud"):
         headers={"Authorization": f"Bearer {os.environ['OLLAMA_API_KEY']}"}
     )
 
-def build_worker_agent(repo_path: str, model_name: str = "gemma4", llm_provider: str = "ollama_cloud"):
+def build_worker_agent(
+    repo_path: str,
+    model_name: str = "gemma4",
+    llm_provider: str = "ollama_cloud",
+    extra_tools: list = None,
+):
     """Construct the deep agent worker, scoped to 'repo_path'.
+
+    Args:
+        repo_path:    Absolute path to the target repository.
+        model_name:   Name of the Ollama model to use.
+        llm_provider: LLM provider identifier (currently only 'ollama_cloud').
+        extra_tools:  Additional LangChain BaseTool instances to register
+                      alongside the FilesystemBackend's built-in tools.
+                      Passed as ``tools=`` to ``create_deep_agent()`` —
+                      parameter name confirmed from deepagents 0.7.5 source.
+                      When None (default), no extra tools are added.
 
     Returns a LangGraph-compiled agent that can be invoked with 
     'agent.invoke({"messages": [...]})'.
@@ -89,6 +104,7 @@ def build_worker_agent(repo_path: str, model_name: str = "gemma4", llm_provider:
      
     agent = create_deep_agent(
         model=model,
+        tools=extra_tools if extra_tools else None,
         system_prompt=WORKER_SYSTEM_PROMPT,
         subagents=[REVIEWER_SUBAGENT],
         backend=backend,
