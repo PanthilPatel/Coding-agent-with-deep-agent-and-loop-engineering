@@ -21,6 +21,8 @@ class Config:
     local_repo_path: str = ""
     lint_cmd: Optional[str] = None
     skills_dir: Optional[str] = None
+    mcp_config_path: Optional[str] = None
+
 
     def __post_init__(self) -> None:
         if self.llm_provider == "ollama_cloud":

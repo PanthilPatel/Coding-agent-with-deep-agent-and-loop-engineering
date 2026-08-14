@@ -1,3 +1,20 @@
+"""Controller loop — the main orchestration module.
+
+The ``run()`` function drives the entire agent lifecycle:
+  1. Setup: clone (if remote), checkout branch, build worker agent, select skill.
+  2. Iterate: instruct worker → run tests → optional lint → commit → evaluate.
+  3. Terminate: on success, time-out, iteration limit, user rejection, or error.
+
+Logging convention (all output goes to stdout):
+  [controller] — loop-level events (iterations, termination, clone/push)
+  [worker]     — worker-turn summaries (first 300 chars of agent response)
+  [tests]      — test execution result: passed=<bool> returncode=<int>
+  [lint]       — lint execution result: passed=<bool> returncode=<int>
+  [git]        — commit events
+  [diff]       — diff display before user approval prompt
+  [SKILL]      — skill selection result (name or 'No matching skill found')
+"""
+
 import os
 import time
 from agents.worker import build_worker_agent, run_worker_turn
@@ -7,8 +24,9 @@ from controller.state import (
     save_state,
     IterationRecord,
     TerminationReason,
-    build_evaluator_result,
 )
+from controller.evaluator import evaluate_iteration
+from controller.router import decide_next_step
 from utils.git_utils import ensure_work_branch, get_diff, commit_iteration
 from skills import select_skill
 
@@ -19,6 +37,20 @@ def build_instruction(
     force_new_strategy: bool,
     skill_content: str = "",
 ) -> str:
+    """Compose the instruction string sent to the worker agent each iteration.
+
+    Args:
+        goal:             The user-specified goal for this run.
+        last_output_tail: The tail of the most recent test output (empty on
+                          the first iteration).
+        force_new_strategy: When True, appends a directive telling the agent
+                            to abandon its previous approach.
+        skill_content:    Optional procedure text from the selected SKILL.md.
+
+    Returns:
+        A newline-separated instruction string ready to pass to
+        ``run_worker_turn()``.
+    """
     parts = [f"Goal: {goal}"]
     if skill_content:
         parts.append(f"Approach guide (follow this procedure):\n{skill_content}")
@@ -34,6 +66,17 @@ def build_instruction(
 
 
 def print_execution_summary(state, success: bool, iterations_run: int) -> None:
+    """Print a human-readable summary of the run to stdout.
+
+    Called once at the end of every code path that terminates the loop
+    (success, timeout, max-iterations, user rejection, tool error).
+
+    Args:
+        state:          The final ``RunState`` (used for termination_reason
+                        and the per-iteration records).
+        success:        True if the goal was met, False otherwise.
+        iterations_run: How many iterations completed before termination.
+    """
     print("\n" + "="*60)
     print("                     EXECUTION SUMMARY")
     print("="*60)
@@ -89,6 +132,12 @@ def run(config) -> bool:
 
         state_path = os.path.join(config.local_repo_path, config.state_file)
         state = load_state(state_path, config.goal)
+
+        # Ensure a clean slate for new runs: reset iterations and state trackers
+        # if this is a new run/goal rather than resuming an identical state
+        if state.goal != config.goal or state.termination_reason is not None:
+            from controller.state import RunState
+            state = RunState(goal=config.goal)
 
         ensure_work_branch(config.local_repo_path, "auto-agent-work")
         agent = build_worker_agent(config.local_repo_path, config.model_name, config.llm_provider)
@@ -157,12 +206,13 @@ def run(config) -> bool:
                 lint_result = run_lint(config.local_repo_path, config.lint_cmd)
                 print(f"[lint]  passed={lint_result.passed} returncode={lint_result.returncode}")
 
-            # Build structured evaluator result from objective signals
-            evaluator = build_evaluator_result(
+            # Build structured evaluator result from objective signals using controller.evaluator
+            evaluator = evaluate_iteration(
                 test_passed=result.passed,
                 test_output_tail=result.output_tail,
                 lint_passed=lint_result.passed if lint_result else None,
                 lint_output_tail=lint_result.output_tail if lint_result else None,
+                same_failure_count=state.same_failure_count,
             )
             state.set_evaluator_result(evaluator)
 
@@ -195,21 +245,40 @@ def run(config) -> bool:
             )
             state.add_iteration(record)
 
-            if result.passed:
-                state.note_success()
-                state.set_termination_reason(TerminationReason.SUCCESS)
-                save_state(state_path, state)
-                print(f"\n[controller] Goal met after {i} iteration(s).")
-                print_execution_summary(state, True, iterations_run)
-                if config.is_remote:
-                    print("[controller] Pushing changes to remote...")
-                    from utils.git_remote import push_to_remote
-                    try:
-                        push_to_remote(config.local_repo_path, "auto-agent-work")
-                        print("[controller] Successfully pushed 'auto-agent-work' branch to remote.")
-                    except Exception as e:
-                        print(f"[controller] Failed to push changes to remote: {e}")
-                return True
+            # Determine continuation decision using controller.router
+            elapsed_seconds = time.time() - start_time
+            router_decision = decide_next_step(
+                evaluator_result=evaluator,
+                current_iteration=i,
+                max_iterations=config.max_iterations,
+                elapsed_seconds=elapsed_seconds,
+                max_seconds=config.max_seconds,
+                same_failure_count=state.same_failure_count,
+            )
+
+            if not router_decision["continue"]:
+                reason = router_decision["termination_reason"] or TerminationReason.SUCCESS
+                if evaluator["is_correct"]:
+                    state.note_success()
+                    state.set_termination_reason(TerminationReason.SUCCESS)
+                    save_state(state_path, state)
+                    print(f"\n[controller] Goal met after {i} iteration(s).")
+                    print_execution_summary(state, True, iterations_run)
+                    if config.is_remote:
+                        print("[controller] Pushing changes to remote...")
+                        from utils.git_remote import push_to_remote
+                        try:
+                            push_to_remote(config.local_repo_path, "auto-agent-work")
+                            print("[controller] Successfully pushed 'auto-agent-work' branch to remote.")
+                        except Exception as e:
+                            print(f"[controller] Failed to push changes to remote: {e}")
+                    return True
+                else:
+                    state.set_termination_reason(reason)
+                    save_state(state_path, state)
+                    print(f"[controller] Router stopping: {reason}")
+                    print_execution_summary(state, False, iterations_run)
+                    return False
 
             signature = failure_signature(result)
             force_new_strategy = state.note_failure(signature)

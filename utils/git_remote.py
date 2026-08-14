@@ -1,5 +1,12 @@
+"""Git remote repository utility functions.
+
+Handles URL detection for remote Git repositories (HTTP/HTTPS, SSH, GitHub),
+authenticated cloning, and pushing committed agent work back to origin.
+"""
+
 import os
 import re
+from typing import Optional
 from git import Repo
 
 def is_git_url(path_or_url: str) -> bool:
@@ -15,7 +22,7 @@ def is_git_url(path_or_url: str) -> bool:
     ]
     return any(re.match(pattern, path_or_url) for pattern in git_url_patterns)
 
-def clone_repo(repo_url: str, dest_path: str, github_token: str = None) -> Repo:
+def clone_repo(repo_url: str, dest_path: str, github_token: Optional[str] = None) -> Repo:
     """Clone a remote repository to dest_path, injecting a token if provided."""
     # Ensure parent directory exists
     os.makedirs(os.path.dirname(dest_path), exist_ok=True)

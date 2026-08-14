@@ -1,3 +1,15 @@
+"""Worker agent module.
+
+Builds and runs the deep-agent worker that the controller loop invokes each
+iteration. The worker owns the LLM, the filesystem backend, and all registered
+tools; the controller only calls ``build_worker_agent()`` once at setup and
+``run_worker_turn()`` once per iteration.
+
+Logging convention:
+  [agent]  — LLM call and tool-execution events (from TerminalLogCallbackHandler)
+  [worker] — turn-level events (recursion limit, unhandled errors)
+"""
+
 import os
 import datetime
 from deepagents import create_deep_agent, SubAgent
@@ -53,8 +65,8 @@ REVIEWER_SUBAGENT = SubAgent(
     ),
 )
 
-WORKER_SYSTEM_PROMPT = """You are an autonomous coding agent working inside a 
-real repository on idsk. Your job is to achieve the given goal by reading and editing files directly.
+WORKER_SYSTEM_PROMPT = """You are an autonomous coding agent working inside a
+real repository on disk. Your job is to achieve the given goal by reading and editing files directly.
 
 Rules:
 - Always start by writing a short todo list breaking the goal into concrete
@@ -69,9 +81,17 @@ Rules:
   meaningfully different approach.
 - You do not run tests yourself; the controller will run them after you
   finish and report the results back to you on the next turn.
+- Once you have inspected the necessary files and performed any required edits, stop calling tools and provide your final response summary immediately.
 """
 
-def _build_model(model_name: str, llm_provider: str = "ollama_cloud"):
+def _build_model(model_name: str, llm_provider: str = "ollama_cloud") -> "ChatOllama":
+    """Instantiate and return the configured chat model.
+
+    Currently only ``ollama_cloud`` is supported.  The model connects to
+    the Ollama cloud endpoint using the ``OLLAMA_API_KEY`` environment
+    variable, which ``Config.__post_init__`` guarantees is set before this
+    function is called.
+    """
     return ChatOllama(
         model=model_name,
         base_url="https://ollama.com",

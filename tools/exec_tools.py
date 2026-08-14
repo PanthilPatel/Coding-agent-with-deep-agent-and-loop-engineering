@@ -12,7 +12,7 @@ built-in ``execute`` and ``grep`` tools (verified from deepagents 0.7.5
 source inspection).
 """
 
-from langchain_core.tools import tool
+from langchain_core.tools import tool   
 
 from controller.executor import run_tests as _run_tests
 from tools.base import log_tool_call, log_tool_result

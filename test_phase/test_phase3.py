@@ -28,8 +28,9 @@ from skills.loader import (
 # ---------------------------------------------------------------------------
 
 PROJECT_SKILLS_DIR = os.path.join(
-    os.path.dirname(__file__), "skills"
+    os.path.dirname(os.path.dirname(__file__)), "skills"
 )
+
 
 
 def make_skill_dir(tmp_path: pathlib.Path, name: str, content: str) -> pathlib.Path:
