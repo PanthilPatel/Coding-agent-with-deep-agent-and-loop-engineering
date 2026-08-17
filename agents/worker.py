@@ -11,11 +11,163 @@ Logging convention:
 """
 
 import os
+import json
+import re
 import datetime
 from deepagents import create_deep_agent, SubAgent
 from deepagents.backends import FilesystemBackend
+class PatchedFilesystemBackend(FilesystemBackend):
+    def __init__(self, root_dir, *args, **kwargs):
+        super().__init__(root_dir=root_dir, *args, **kwargs)
+        self.my_root_dir = root_dir
+
+    def _resolve_path(self, path: str) -> str:
+        cleaned_path = path.lstrip("/\\")
+        
+        normalized_repo = os.path.abspath(self.my_root_dir).replace("\\", "/").rstrip("/")
+        normalized_path = cleaned_path.replace("\\", "/")
+        
+        repo_parts = normalized_repo.split("/")
+        for i in range(len(repo_parts)):
+            suffix = "/".join(repo_parts[i:])
+            if suffix and normalized_path.startswith(suffix + "/"):
+                cleaned_path = normalized_path[len(suffix) + 1:]
+                break
+                
+        return super()._resolve_path(cleaned_path)
+
+    def write(self, file_path: str, content: str, *args, **kwargs):
+        base = os.path.basename(file_path).lower()
+        if base.startswith("test_") or base.endswith("_test.py") or "tests/" in file_path.replace("\\", "/"):
+            raise ValueError("Modifying, creating, or rewriting test files is strictly forbidden. You must only fix bugs in implementation source files (e.g. inventory.py, discounts.py).")
+        return super().write(file_path=file_path, content=content, *args, **kwargs)
+
+    def edit(self, file_path: str, old_string: str, new_string: str, replace_all: bool = False, *args, **kwargs):
+        base = os.path.basename(file_path).lower()
+        if base.startswith("test_") or base.endswith("_test.py") or "tests/" in file_path.replace("\\", "/"):
+            raise ValueError("Modifying or editing test files is strictly forbidden. You must only fix bugs in implementation source files (e.g. inventory.py, discounts.py).")
+        
+        # Clean line numbers from old_string and new_string if the agent copied them from file viewer
+        # Pattern matches: starts with spaces/digits, then digit(s), followed by a colon or spaces, e.g. "10   return tags"
+        def strip_line_prefix(s: str) -> str:
+            lines = s.splitlines()
+            cleaned_lines = []
+            for line in lines:
+                # Strip leading numbers (e.g. "10:  return tags" or "10    return tags")
+                cleaned = re.sub(r"^\s*\d+[:\s]\s*", "", line)
+                cleaned_lines.append(cleaned)
+            return "\n".join(cleaned_lines)
+
+        cleaned_old = strip_line_prefix(old_string)
+        cleaned_new = strip_line_prefix(new_string)
+
+        if cleaned_old == cleaned_new:
+            raise ValueError(
+                f"No-op edit detected: old_string matches new_string. "
+                f"You passed: '{old_string}'. Please make sure you are changing the code instead of replacing a line with itself."
+            )
+
+        return super().edit(file_path=file_path, old_string=cleaned_old, new_string=cleaned_new, replace_all=replace_all, *args, **kwargs)
+
+    def execute(self, command: str, *args, **kwargs) -> Any:
+        from deepagents.backends.protocol import ExecuteResponse
+        return ExecuteResponse(
+            output="[System Notice]: The controller automatically runs pytest after your turn. Do NOT call execute or pytest. Please edit the source files (inventory.py, discounts.py) to fix the bugs and summarize your changes to conclude.",
+            exit_code=0
+        )
 from langchain_ollama import ChatOllama
 from langchain_core.callbacks import BaseCallbackHandler
+from langchain_core.messages import AIMessage, BaseMessage
+from typing import List, Any
+
+class PatchedChatOllama(ChatOllama):
+    def _generate(self, *args, **kwargs):
+        result = super()._generate(*args, **kwargs)
+        for generation in result.generations:
+            generation.message = self._parse_fallback_tool_calls(generation.message)
+        return result
+
+    async def _agenerate(self, *args, **kwargs):
+        result = await super()._agenerate(*args, **kwargs)
+        for generation in result.generations:
+            generation.message = self._parse_fallback_tool_calls(generation.message)
+        return result
+
+    def _parse_fallback_tool_calls(self, response: BaseMessage) -> BaseMessage:
+        if not isinstance(response, AIMessage):
+            return response
+            
+        if response.tool_calls:
+            for tc in response.tool_calls:
+                args = tc.get("args", {})
+                name = tc.get("name")
+                if isinstance(args, dict):
+                    if name == "ls" and "path" not in args:
+                        keys = [k for k in args.keys() if isinstance(k, str) and not k.startswith("arg")]
+                        path_val = keys[0] if keys else "."
+                        if path_val in ("/path/to/repo", "/repo", "/", ""):
+                            path_val = "."
+                        tc["args"] = {"path": path_val}
+                    elif name in ("read_file", "edit_file", "write_file") and "file_path" not in args:
+                        if "path" in args:
+                            args["file_path"] = args.pop("path")
+            return response
+
+        content = response.content.strip()
+        if not content:
+            return response
+
+        # Try parsing JSON blocks: ```json ... ``` or directly {...}
+        json_str = None
+        if "```json" in content:
+            match = re.search(r"```json\s*([\s\S]*?)\s*```", content)
+            if match:
+                json_str = match.group(1).strip()
+        elif content.startswith("{") and content.endswith("}"):
+            json_str = content
+
+        if json_str:
+            try:
+                data = json.loads(json_str)
+                tool_calls = []
+                
+                # Check if it's a list of tool calls or a single one
+                items = data if isinstance(data, list) else [data]
+                    
+                for idx, item in enumerate(items):
+                    if isinstance(item, dict):
+                        name = item.get("name")
+                        args = item.get("arguments") or item.get("args") or {}
+                        if name:
+                            if isinstance(args, str):
+                                try:
+                                    args = json.loads(args)
+                                except Exception:
+                                    pass
+                            if isinstance(args, dict):
+                                if name == "ls" and "path" not in args:
+                                    keys = [k for k in args.keys() if isinstance(k, str) and not k.startswith("arg")]
+                                    path_val = keys[0] if keys else "."
+                                    if path_val in ("/path/to/repo", "/repo", "/", ""):
+                                        path_val = "."
+                                    args = {"path": path_val}
+                                elif name in ("read_file", "edit_file", "write_file") and "file_path" not in args:
+                                    if "path" in args:
+                                        args["file_path"] = args.pop("path")
+                            tool_calls.append({
+                                "name": name,
+                                "args": args,
+                                "id": item.get("id") or f"call_{name}_{idx}",
+                                "type": "tool_call"
+                            })
+                
+                if tool_calls:
+                    response.tool_calls = tool_calls
+                    print(f"\n[patched_model] Fallback parser successfully parsed tool calls: {tool_calls}")
+            except Exception as e:
+                print(f"\n[patched_model] Fallback parser failed to parse potential tool call: {e}")
+                
+        return response
 
 class TerminalLogCallbackHandler(BaseCallbackHandler):
     def __init__(self, log_dir: str = "agent_logs"):
@@ -35,9 +187,18 @@ class TerminalLogCallbackHandler(BaseCallbackHandler):
             pass
 
     def on_llm_start(self, serialized, prompts, **kwargs):
-        msg = "[agent] Calling LLM to analyze and plan..."
+        prompt_chars = sum(len(p) for p in prompts) if prompts else 0
+        est_tokens = prompt_chars // 4
+        msg = f"[agent] Calling LLM to analyze and plan... (prompt: ~{est_tokens} tokens / {prompt_chars} chars)"
         print(msg)
         self._log_to_file(msg)
+
+    def on_llm_new_token(self, token: str, **kwargs) -> None:
+        if token:
+            print(token, end="", flush=True)
+
+    def on_llm_end(self, response, **kwargs):
+        print()
 
     def on_tool_start(self, serialized, input_str, **kwargs):
         name = serialized.get("name", "tool")
@@ -66,42 +227,52 @@ REVIEWER_SUBAGENT = SubAgent(
 )
 
 WORKER_SYSTEM_PROMPT = """You are an autonomous coding agent working inside a
-real repository on disk. Your job is to achieve the given goal by reading and editing files directly.
+real repository on disk. Your job is to achieve the given goal by reading and editing source files directly.
 
 Rules:
-- Always start by writing a short todo list breaking the goal into concrete
-  steps, and keep it updated as you make progress.
-- Read the relevant files before editing them. Do not guess at code you 
-  have not read.
+- You must invoke tools (such as 'read_file', 'edit_file') directly to read or make changes to files. Do not simply describe your plans or write code blocks in your text responses; you must execute the tool calls to perform the work.
+- The working directory root is already the target repo. All file paths must be relative to current directory (e.g. 'inventory.py' or 'discounts.py', NOT '/examples/...').
+- CRITICAL: Never modify, overwrite, weaken, or create test files (any file matching test_*.py or *_test.py). Only fix bugs in the source/implementation files (e.g. inventory.py, discounts.py).
+- CRITICAL: When using 'read_file', the tool prefixes lines with line numbers for reference (e.g. ' 1  import pytest'). These numbers are NOT part of the actual file text. When using 'edit_file', do NOT include line numbers in old_string or new_string.
+- CRITICAL: You do NOT have a terminal or 'execute' tool. NEVER invoke 'execute' or try to run pytest. The controller will run tests automatically after your turn and report the results back to you.
+- Always start by writing a short todo list breaking the goal into concrete steps, and keep it updated as you make progress.
+- Read the relevant files before editing them. Do not guess at code you have not read.
 - Make the smallest change that could plausibly fix a reported issue.
-- After editing, briefly summarize what you changed and why, in one or two
-  sentences, so the controller can log it.
-- If you are given a previous failed attempt and told to change strategy,
-  do not repeat the same fix - analyze why it failed and try a 
-  meaningfully different approach.
-- You do not run tests yourself; the controller will run them after you
-  finish and report the results back to you on the next turn.
-- Once you have inspected the necessary files and performed any required edits, stop calling tools and provide your final response summary immediately.
+- After editing, briefly summarize what you changed and why, in one or two sentences, so the controller can log it.
+- Once you have inspected the necessary files and performed your source code edits, stop calling tools and provide your final response summary immediately.
 """
 
-def _build_model(model_name: str, llm_provider: str = "ollama_cloud") -> "ChatOllama":
+def _build_model(model_name: str, llm_provider: str = "ollama_cloud") -> "PatchedChatOllama":
     """Instantiate and return the configured chat model.
 
-    Currently only ``ollama_cloud`` is supported.  The model connects to
-    the Ollama cloud endpoint using the ``OLLAMA_API_KEY`` environment
-    variable, which ``Config.__post_init__`` guarantees is set before this
-    function is called.
+    Supports both ``ollama_cloud`` (remote) and ``ollama`` (local).
     """
-    return ChatOllama(
-        model=model_name,
-        base_url="https://ollama.com",
-        headers={"Authorization": f"Bearer {os.environ['OLLAMA_API_KEY']}"}
-    )
+    timeout = float(os.environ.get("OLLAMA_TIMEOUT", "120.0"))
+    num_ctx = int(os.environ.get("OLLAMA_NUM_CTX", "8192"))
+    if llm_provider == "ollama_cloud":
+        return PatchedChatOllama(
+            model=model_name,
+            base_url="https://ollama.com",
+            headers={"Authorization": f"Bearer {os.environ['OLLAMA_API_KEY']}"},
+            client_kwargs={"timeout": timeout},
+            sync_client_kwargs={"timeout": timeout},
+        )
+    elif llm_provider == "ollama":
+        base_url = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
+        return PatchedChatOllama(
+            model=model_name,
+            base_url=base_url,
+            num_ctx=num_ctx,
+            client_kwargs={"timeout": timeout},
+            sync_client_kwargs={"timeout": timeout},
+        )
+    else:
+        raise ValueError(f"Unsupported llm_provider: {llm_provider}")
 
 def build_worker_agent(
     repo_path: str,
-    model_name: str = "gemma4",
-    llm_provider: str = "ollama_cloud",
+    model_name: str = "qwen2.5-coder:7b",
+    llm_provider: str = "ollama",
     extra_tools: list = None,
 ):
     """Construct the deep agent worker, scoped to 'repo_path'.
@@ -109,7 +280,7 @@ def build_worker_agent(
     Args:
         repo_path:    Absolute path to the target repository.
         model_name:   Name of the Ollama model to use.
-        llm_provider: LLM provider identifier (currently only 'ollama_cloud').
+        llm_provider: LLM provider identifier ('ollama' or 'ollama_cloud').
         extra_tools:  Additional LangChain BaseTool instances to register
                       alongside the FilesystemBackend's built-in tools.
                       Passed as ``tools=`` to ``create_deep_agent()`` —
@@ -120,13 +291,12 @@ def build_worker_agent(
     'agent.invoke({"messages": [...]})'.
     """
     model = _build_model(model_name, llm_provider)
-    backend = FilesystemBackend(root_dir=repo_path)
+    backend = PatchedFilesystemBackend(root_dir=repo_path)
      
     agent = create_deep_agent(
         model=model,
         tools=extra_tools if extra_tools else None,
         system_prompt=WORKER_SYSTEM_PROMPT,
-        subagents=[REVIEWER_SUBAGENT],
         backend=backend,
     )
     return agent
@@ -141,7 +311,7 @@ def run_worker_turn(agent, instruction: str) -> str:
             {"messages": [{"role": "user", "content": instruction}]},
             config={
                 "callbacks": [TerminalLogCallbackHandler()],
-                "recursion_limit": 25
+                "recursion_limit": 60
             }
         )
         messages = result.get("messages", [])
@@ -152,9 +322,16 @@ def run_worker_turn(agent, instruction: str) -> str:
             return last.get("content", "") or ""
         return getattr(last, "content", "") or ""
     except GraphRecursionError:
-        print("\n[worker] Warning: Agent hit recursion limit of 25 steps (potential loop). Aborting turn.")
-        return "Agent hit recursion limit of 25 steps due to repeating operations."
+        print("\n[worker] Warning: Agent hit recursion limit of 60 steps (potential loop). Aborting turn.")
+        return "Agent hit recursion limit of 60 steps due to repeating operations."
     except Exception as e:
+        err_msg = str(e)
+        if "timed out" in err_msg.lower() or "timeout" in err_msg.lower():
+            print(f"\n[worker] Timeout Error: Request to Ollama timed out: {e}")
+            return f"Agent failed with timeout: Ollama LLM call exceeded timeout threshold ({e})."
+        if "localhost" in err_msg or "127.0.0.1" in err_msg or "connection" in err_msg.lower() or "connect" in err_msg.lower():
+            print(f"\n[worker] Connection Error: Could not connect to Ollama. Please ensure your local Ollama server is running (usually at http://localhost:11434). Detail: {e}")
+            return f"Agent failed with connection error: Could not connect to local Ollama. Please make sure the Ollama service is running locally on http://localhost:11434 and the model is pulled."
         print(f"\n[worker] Error during execution: {e}")
         return f"Agent failed with error: {e}"
 
