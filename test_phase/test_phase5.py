@@ -151,12 +151,13 @@ class TestBanner:
     """Verify the startup banner displays real registry counts."""
     
     def test_banner_shows_tool_count(self, sample_config, capsys):
-        """Banner should display the actual count from Phase 2 tool registry."""
+        """Banner should display the actual count from tool registry."""
         print_banner(sample_config)
         captured = capsys.readouterr()
         
-        # Phase 2 registry returns 5 tools
-        assert "Tools:        5" in captured.out
+        # Tool registry returns 10 tools (5 core + 5 terminal/filesystem)
+        assert "Tools:        10" in captured.out
+
     
     def test_banner_shows_model_name(self, sample_config, capsys):
         """Banner should display the configured model name."""

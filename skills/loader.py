@@ -25,12 +25,7 @@ Safety:
 import os
 import pathlib
 from dataclasses import dataclass, field
-from typing import Optional
-
-
-# ---------------------------------------------------------------------------
-# Data model
-# ---------------------------------------------------------------------------
+from typing import List, Optional
 
 @dataclass
 class SkillInfo:
@@ -49,18 +44,6 @@ class SkillInfo:
     def __bool__(self) -> bool:
         """A skill is truthy only when it has actual content."""
         return bool(self.content.strip())
-
-
-# ---------------------------------------------------------------------------
-# Keyword map — the deterministic selection mechanism
-# ---------------------------------------------------------------------------
-
-# Maps skill name → list of trigger keywords/phrases (all lower-cased).
-# The selector scores each skill by counting how many keyword tokens appear
-# in the task description; the skill with the highest score wins.
-#
-# To replace this with an LLM-based selector later, implement a function
-# with the same signature as ``_match_skill()`` and swap it in.
 
 _DEFAULT_KEYWORD_MAP: dict[str, list[str]] = {
     "debugging": [
@@ -116,11 +99,6 @@ def _match_skill(task: str, keyword_map: dict[str, list[str]]) -> Optional[str]:
         return None
     return best_name
 
-
-# ---------------------------------------------------------------------------
-# Skill loader
-# ---------------------------------------------------------------------------
-
 class SkillLoader:
     """Discovers and loads skills from a directory on disk.
 
@@ -151,10 +129,6 @@ class SkillLoader:
     def root(self) -> pathlib.Path:
         return self._root
 
-    # ------------------------------------------------------------------
-    # Discovery
-    # ------------------------------------------------------------------
-
     def list_available(self) -> list[str]:
         """Return the names of all skills that have a readable SKILL.md."""
         if not self._root.is_dir():
@@ -164,10 +138,6 @@ class SkillLoader:
             if entry.is_dir() and (entry / self.SKILL_FILENAME).is_file():
                 names.append(entry.name)
         return names
-
-    # ------------------------------------------------------------------
-    # Loading
-    # ------------------------------------------------------------------
 
     def load(self, skill_name: str) -> Optional[SkillInfo]:
         """Load a skill by name.
@@ -180,7 +150,6 @@ class SkillLoader:
         Returns None only when ``skill_name`` would escape the root
         directory (path-traversal attempt).
         """
-        # --- safety: resolve and check boundary ---
         skill_dir = (self._root / skill_name).resolve()
         try:
             skill_dir.relative_to(self._root)
@@ -215,10 +184,6 @@ class SkillLoader:
             print(f"[SKILL] WARNING: Could not read '{path}': {exc}")
             return ""
 
-    # ------------------------------------------------------------------
-    # Selection
-    # ------------------------------------------------------------------
-
     def select(
         self,
         task: str,
@@ -250,10 +215,83 @@ class SkillLoader:
 
         return self.load(matched_name)
 
+    def get_matching_skills(
+        self,
+        query_or_task: str,
+        keyword_map: Optional[dict] = None,
+    ) -> List[SkillInfo]:
+        """Return ALL skills whose keyword map has at least one match.
 
-# ---------------------------------------------------------------------------
-# Module-level convenience helpers
-# ---------------------------------------------------------------------------
+        Unlike ``select()`` (which returns only the single best match),
+        this method returns every skill that scores > 0 so that callers
+        can present multiple relevant guides in a multi-turn context.
+
+        Args:
+            query_or_task: Free-text description of the current subtask.
+            keyword_map:   Optional override for the keyword → skill mapping.
+                           Defaults to ``_DEFAULT_KEYWORD_MAP``.
+
+        Returns:
+            A list of ``SkillInfo`` objects for matching, available skills,
+            ordered by descending score (highest relevance first).  Empty
+            list when nothing matches or no skills are on disk.
+        """
+        kw_map = keyword_map if keyword_map is not None else _DEFAULT_KEYWORD_MAP
+        task_lower = query_or_task.lower()
+        available = self.list_available()
+
+        scored: List[tuple] = []
+        for skill_name, keywords in kw_map.items():
+            if skill_name not in available:
+                continue
+            score = sum(1 for kw in keywords if kw in task_lower)
+            if score > 0:
+                scored.append((score, skill_name))
+
+        scored.sort(key=lambda t: (-t[0], t[1]))
+
+        results: List[SkillInfo] = []
+        for _score, name in scored:
+            info = self.load(name)
+            if info and info.content.strip():
+                results.append(info)
+        return results
+
+    def get_prompt_injection(self, query_or_task: str) -> str:
+        """Build a formatted multi-skill prompt injection for *query_or_task*.
+
+        Gathers all matching skills (via ``get_matching_skills``) and
+        concatenates their SKILL.md content with clear separators so the
+        result can be appended directly to a system prompt.
+
+        Args:
+            query_or_task: Free-text description of the current subtask.
+
+        Returns:
+            A formatted string with each matched skill's content under a
+            named section header.  Returns an empty string when no skills
+            match or none have readable content.
+        """
+        matching = self.get_matching_skills(query_or_task)
+        if not matching:
+            return ""
+        sections = []
+        for skill in matching:
+            header = f"--- Skill: {skill.name} ---"
+            sections.append(f"{header}\n{skill.content}")
+        return "\n\n".join(sections)
+
+    def get_skill(self, name: str) -> Optional[SkillInfo]:
+        """Load a skill by exact name — thin wrapper around ``load()``.
+
+        Args:
+            name: The skill directory name (e.g. ``"debugging"``).
+
+        Returns:
+            A ``SkillInfo`` instance, or ``None`` if the name escapes the
+            skills root (path-traversal guard).
+        """
+        return self.load(name)
 
 def select_skill(
     task: str,

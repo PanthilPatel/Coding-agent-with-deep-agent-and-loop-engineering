@@ -317,8 +317,9 @@ class TestToolRegistry:
 
     def test_registry_returns_expected_tool_count(self):
         tools = build_tool_registry("/fake/repo", "pytest")
-        # run_tests_tool + git_status + git_diff + git_log + git_commit = 5
-        assert len(tools) == 5
+        # 5 original tools (run_tests_tool + git_status + git_diff + git_log + git_commit)
+        # + 5 Phase 1 terminal tools (execute_command, create_directory, move_file, delete_file, list_directory)
+        assert len(tools) == 10
 
     def test_all_tools_are_langchain_basetools(self):
         tools = build_tool_registry("/fake/repo", "pytest")

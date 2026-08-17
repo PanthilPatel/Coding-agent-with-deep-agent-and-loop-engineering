@@ -13,9 +13,9 @@ class Config:
     max_iterations: int = 5
     max_seconds: int = 1800
     require_approval: bool = False
-    model_name: str = "gemma4"
+    model_name: str = "qwen2.5-coder:7b"
     state_file: str = "state.json"
-    llm_provider: str = os.environ.get("LLM_PROVIDER", "ollama_cloud")
+    llm_provider: Optional[str] = None
 
     is_remote: bool = False
     local_repo_path: str = ""
@@ -25,9 +25,14 @@ class Config:
 
 
     def __post_init__(self) -> None:
+        if self.llm_provider is None:
+            self.llm_provider = os.environ.get("LLM_PROVIDER", "ollama")
+
         if self.llm_provider == "ollama_cloud":
             if not os.environ.get("OLLAMA_API_KEY"):
                 raise EnvironmentError("OLLAMA_API_KEY is not set.")
+        elif self.llm_provider == "ollama":
+            pass
         else:
             raise ValueError(f"Unknown llm_provider: {self.llm_provider}")
             

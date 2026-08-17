@@ -47,13 +47,10 @@ class PatchedFilesystemBackend(FilesystemBackend):
         if base.startswith("test_") or base.endswith("_test.py") or "tests/" in file_path.replace("\\", "/"):
             raise ValueError("Modifying or editing test files is strictly forbidden. You must only fix bugs in implementation source files (e.g. inventory.py, discounts.py).")
         
-        # Clean line numbers from old_string and new_string if the agent copied them from file viewer
-        # Pattern matches: starts with spaces/digits, then digit(s), followed by a colon or spaces, e.g. "10   return tags"
         def strip_line_prefix(s: str) -> str:
             lines = s.splitlines()
             cleaned_lines = []
             for line in lines:
-                # Strip leading numbers (e.g. "10:  return tags" or "10    return tags")
                 cleaned = re.sub(r"^\s*\d+[:\s]\s*", "", line)
                 cleaned_lines.append(cleaned)
             return "\n".join(cleaned_lines)
@@ -72,7 +69,7 @@ class PatchedFilesystemBackend(FilesystemBackend):
     def execute(self, command: str, *args, **kwargs) -> Any:
         from deepagents.backends.protocol import ExecuteResponse
         return ExecuteResponse(
-            output="[System Notice]: The controller automatically runs pytest after your turn. Do NOT call execute or pytest. Please edit the source files (inventory.py, discounts.py) to fix the bugs and summarize your changes to conclude.",
+            output="[System Notice]: Please use the 'execute_command' tool to run shell commands instead of backend 'execute'. Specify the command, cwd, and an appropriate risk_tier ('auto', 'confirm', or 'destructive').",
             exit_code=0
         )
 from langchain_ollama import ChatOllama
@@ -142,6 +139,7 @@ class PatchedChatOllama(ChatOllama):
                             if isinstance(args, str):
                                 try:
                                     args = json.loads(args)
+                                    pass
                                 except Exception:
                                     pass
                             if isinstance(args, dict):
@@ -189,7 +187,7 @@ class TerminalLogCallbackHandler(BaseCallbackHandler):
     def on_llm_start(self, serialized, prompts, **kwargs):
         prompt_chars = sum(len(p) for p in prompts) if prompts else 0
         est_tokens = prompt_chars // 4
-        msg = f"[agent] Calling LLM to analyze and plan... (prompt: ~{est_tokens} tokens / {prompt_chars} chars)"
+        msg = f"[AGENT] Calling LLM to analyze and plan... (prompt: ~{est_tokens} tokens / {prompt_chars} chars)"
         print(msg)
         self._log_to_file(msg)
 
@@ -202,12 +200,12 @@ class TerminalLogCallbackHandler(BaseCallbackHandler):
 
     def on_tool_start(self, serialized, input_str, **kwargs):
         name = serialized.get("name", "tool")
-        print(f"[agent] -> Executing tool '{name}'")
-        self._log_to_file(f"[agent] -> Executing tool '{name}' with input: {input_str}")
+        print(f"[TOOL] Executing tool '{name}'")
+        self._log_to_file(f"[TOOL] Executing tool '{name}' with input: {input_str}")
 
     def on_tool_end(self, output, **kwargs):
         out_str = str(output).strip()
-        self._log_to_file(f"[agent] <- Tool returned: {out_str}")
+        self._log_to_file(f"[RESULT] Tool returned: {out_str}")
 
 REVIEWER_SUBAGENT = SubAgent(
     name="reviewer",
@@ -227,20 +225,21 @@ REVIEWER_SUBAGENT = SubAgent(
 )
 
 WORKER_SYSTEM_PROMPT = """You are an autonomous coding agent working inside a
-real repository on disk. Your job is to achieve the given goal by reading and editing source files directly.
+real repository on disk. Your job is to achieve the given goal by inspecting the environment, executing commands, and reading/editing source files directly.
 
 Rules:
-- You must invoke tools (such as 'read_file', 'edit_file') directly to read or make changes to files. Do not simply describe your plans or write code blocks in your text responses; you must execute the tool calls to perform the work.
+- You must invoke tools directly to read, edit, execute, or manage files. Do not simply describe your plans in text responses; execute the tool calls to perform the work.
 - The working directory root is already the target repo. All file paths must be relative to current directory (e.g. 'inventory.py' or 'discounts.py', NOT '/examples/...').
 - CRITICAL: Never modify, overwrite, weaken, or create test files (any file matching test_*.py or *_test.py). Only fix bugs in the source/implementation files (e.g. inventory.py, discounts.py).
 - CRITICAL: When using 'read_file', the tool prefixes lines with line numbers for reference (e.g. ' 1  import pytest'). These numbers are NOT part of the actual file text. When using 'edit_file', do NOT include line numbers in old_string or new_string.
-- CRITICAL: You do NOT have a terminal or 'execute' tool. NEVER invoke 'execute' or try to run pytest. The controller will run tests automatically after your turn and report the results back to you.
+- Terminal & Execution: Use 'execute_command' to run shell commands, check compiler outputs, run sub-scripts, or inspect environment states. Always declare an appropriate risk_tier ('auto' for read/safe, 'confirm' for state-changing/moves, 'destructive' for deletions/resets). Observe exit codes and stderr to self-correct upon failures.
 - Always start by writing a short todo list breaking the goal into concrete steps, and keep it updated as you make progress.
 - Read the relevant files before editing them. Do not guess at code you have not read.
 - Make the smallest change that could plausibly fix a reported issue.
-- After editing, briefly summarize what you changed and why, in one or two sentences, so the controller can log it.
-- Once you have inspected the necessary files and performed your source code edits, stop calling tools and provide your final response summary immediately.
+- After editing or executing commands, briefly summarize what you changed and why, in one or two sentences, so the controller can log it.
+- Once you have completed the necessary operations and verified your work, conclude your turn with a clear final response summary.
 """
+
 
 def _build_model(model_name: str, llm_provider: str = "ollama_cloud") -> "PatchedChatOllama":
     """Instantiate and return the configured chat model.

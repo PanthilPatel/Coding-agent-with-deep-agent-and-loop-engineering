@@ -16,12 +16,12 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Ask for confirmation before each commit",
     )
-    parser.add_argument("--model", default="gemma4", help="Model name to use")
+    parser.add_argument("--model", default="qwen2.5-coder:7b", help="Model name to use")
     parser.add_argument(
         "--llm-provider",
-        choices=["ollama_cloud"],
-        default="ollama_cloud",
-        help="LLM provider to use",
+        choices=["ollama_cloud", "ollama"],
+        default=None,
+        help="LLM provider to use (defaults to LLM_PROVIDER env var, or 'ollama')",
     )
     parser.add_argument(
         "--verbose",
