@@ -32,6 +32,7 @@ from controller.state import (
 from controller.evaluator import evaluate_iteration, GeneralEvaluator, VerificationResult
 from controller.router import decide_next_step, RouterState
 from controller.permissions import PermissionHarness
+from controller.checkpoint import CheckpointManager
 from utils.git_utils import ensure_work_branch, get_diff, commit_iteration
 from skills import select_skill
 from tools import build_tool_registry
@@ -152,6 +153,8 @@ def run(config) -> bool:
 
         ensure_work_branch(config.local_repo_path, "auto-agent-work")
 
+        harness = PermissionHarness(interactive=False)
+
         # --- MCP initialization (Phase 4) ---
         # Bridge the async registry into the synchronous run() function.
         # Runs only when config.mcp_config_path is set; degrades gracefully on
@@ -165,7 +168,6 @@ def run(config) -> bool:
                 if registry.tools:
                     # Wrap every MCP tool with PermissionHarness.execute_guarded
                     # at "confirm" tier (no per-tool tier config exists yet).
-                    harness = PermissionHarness(interactive=False)
                     guarded_tools = []
                     for _tool in registry.tools:
                         # Build a guarded callable that captures the tool and
@@ -200,6 +202,7 @@ def run(config) -> bool:
             repo_path=config.local_repo_path,
             test_cmd=config.test_cmd,
             require_approval=config.require_approval,
+            harness=harness,
         )
         extra_tools = native_tools + mcp_tools if mcp_tools else native_tools
         agent = build_worker_agent(
@@ -219,6 +222,7 @@ def run(config) -> bool:
         else:
             print("[AGENT] [SKILL] No matching skill found — proceeding with base instructions.")
         state.set_skill(skill_name)
+        state.set_audit_log(list(harness.audit_log))
         save_state(state_path, state)
 
     except Exception as e:
@@ -238,6 +242,19 @@ def run(config) -> bool:
                 pass
         return False
 
+    checkpoint_mgr = CheckpointManager(config.local_repo_path)
+    initial_checkpoint = checkpoint_mgr.create_checkpoint(f"initial_state_{config.goal[:30]}")
+
+    def _save_state():
+        if harness is not None:
+            state.set_audit_log(list(harness.audit_log))
+            counts = {}
+            for entry in harness.audit_log:
+                name = entry.get("tool_name", "unknown")
+                counts[name] = counts.get(name, 0) + 1
+            state.set_tool_calls_count(counts)
+        save_state(state_path, state)
+
     start_time = time.time()
     last_output_tail = ""
     force_new_strategy = False
@@ -249,7 +266,7 @@ def run(config) -> bool:
         if time.time() - start_time > config.max_seconds:
             print(f"[ERROR] Stopping: max_seconds ({config.max_seconds}) exceeded.")
             state.set_termination_reason(TerminationReason.TIMEOUT)
-            save_state(state_path, state)
+            _save_state()
             print_execution_summary(state, False, iterations_run)
             if registry is not None:
                 try:
@@ -257,6 +274,7 @@ def run(config) -> bool:
                 except Exception:
                     pass
             return False
+
 
         print(f"\n[STEP] Iteration {i}/{config.max_iterations}")
 
@@ -274,7 +292,7 @@ def run(config) -> bool:
 
             # Record the plan (instruction sent to the worker) in state
             state.set_plan(instruction)
-            save_state(state_path, state)
+            _save_state()
             print(f"[PLAN] Instruction composed for iteration {i}")
 
             worker_summary = run_worker_turn(agent, instruction)
@@ -329,7 +347,7 @@ def run(config) -> bool:
                 if approve != "y":
                     print("[PERMISSION] Change rejected by user; stopping.")
                     state.set_termination_reason(TerminationReason.USER_REJECTED)
-                    save_state(state_path, state)
+                    _save_state()
                     print_execution_summary(state, False, iterations_run)
                     if registry is not None:
                         try:
@@ -371,6 +389,9 @@ def run(config) -> bool:
             if router_decision.state == RouterState.REPLAN:
                 print(f"[RECOVERY] Router triggered REPLAN: {router_decision.reason}")
                 error_feedback = f"Repeated failure occurred. Suggested action: {router_decision.suggested_action}"
+                # Discard dirty changes by rolling back to checkpoint
+                if initial_checkpoint:
+                    checkpoint_mgr.rollback_to_checkpoint(initial_checkpoint)
             elif router_decision.state == RouterState.RECOVER:
                 print(f"[RECOVERY] Router triggered RECOVER: {router_decision.reason}")
                 error_feedback = f"Previous iteration failed. Suggested action: {router_decision.suggested_action}"
@@ -382,7 +403,10 @@ def run(config) -> bool:
                 if evaluator_dict["is_correct"] or router_decision.state == RouterState.COMPLETE:
                     state.note_success()
                     state.set_termination_reason(TerminationReason.SUCCESS)
-                    save_state(state_path, state)
+                    _save_state()
+                    # Discard checkpoint reference since subtask completed cleanly
+                    if initial_checkpoint:
+                        checkpoint_mgr.discard_checkpoint(initial_checkpoint)
                     print(f"\n[DONE] Goal met after {i} iteration(s).")
                     print_execution_summary(state, True, iterations_run)
                     if config.is_remote:
@@ -401,7 +425,10 @@ def run(config) -> bool:
                     return True
                 else:
                     state.set_termination_reason(reason)
-                    save_state(state_path, state)
+                    _save_state()
+                    # Discard/Rollback since loop fails permanently
+                    if initial_checkpoint:
+                        checkpoint_mgr.rollback_to_checkpoint(initial_checkpoint)
                     print(f"[ERROR] Router stopping: {reason}")
                     print_execution_summary(state, False, iterations_run)
                     if registry is not None:
@@ -411,6 +438,7 @@ def run(config) -> bool:
                             pass
                     return False
 
+
             if not getattr(config, "verification_strategy", None):
                 signature = failure_signature(result)
                 force_new_strategy = state.note_failure(signature)
@@ -418,12 +446,12 @@ def run(config) -> bool:
                 force_new_strategy = False
 
             last_output_tail = output_tail
-            save_state(state_path, state)
+            _save_state()
 
         except Exception as e:
             print(f"\n[ERROR] ITERATION ERROR (iteration {i}): {e}")
             state.set_termination_reason(TerminationReason.TOOL_ERROR)
-            save_state(state_path, state)
+            _save_state()
             print_execution_summary(state, False, iterations_run)
             if registry is not None:
                 try:
@@ -434,7 +462,7 @@ def run(config) -> bool:
 
     print(f"\n[ERROR] Stopping: max_iterations ({config.max_iterations}) reached without success.")
     state.set_termination_reason(TerminationReason.MAX_ITERATIONS_SAFETY_LIMIT)
-    save_state(state_path, state)
+    _save_state()
     print_execution_summary(state, False, iterations_run)
     # Always close MCP registry connections before returning.
     if registry is not None:
@@ -443,4 +471,5 @@ def run(config) -> bool:
         except Exception:
             pass
     return False
+
 

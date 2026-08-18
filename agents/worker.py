@@ -232,9 +232,11 @@ Rules:
 - The working directory root is already the target repo. All file paths must be relative to current directory (e.g. 'inventory.py' or 'discounts.py', NOT '/examples/...').
 - CRITICAL: Never modify, overwrite, weaken, or create test files (any file matching test_*.py or *_test.py). Only fix bugs in the source/implementation files (e.g. inventory.py, discounts.py).
 - CRITICAL: When using 'read_file', the tool prefixes lines with line numbers for reference (e.g. ' 1  import pytest'). These numbers are NOT part of the actual file text. When using 'edit_file', do NOT include line numbers in old_string or new_string.
+- CRITICAL: NEVER run 'pip install pytest' or try to install packages when a test fails. Pytest is already installed and functional. Exit code 1 means your code has a bug that you must fix.
+- CRITICAL: When using edit_file, ensure 'new_string' is strictly different from 'old_string'.
+- CRITICAL: Always read the failing test file and the corresponding source file before attempting any edit. Do not guess at code you have not read.
 - Terminal & Execution: Use 'execute_command' to run shell commands, check compiler outputs, run sub-scripts, or inspect environment states. Always declare an appropriate risk_tier ('auto' for read/safe, 'confirm' for state-changing/moves, 'destructive' for deletions/resets). Observe exit codes and stderr to self-correct upon failures.
 - Always start by writing a short todo list breaking the goal into concrete steps, and keep it updated as you make progress.
-- Read the relevant files before editing them. Do not guess at code you have not read.
 - Make the smallest change that could plausibly fix a reported issue.
 - After editing or executing commands, briefly summarize what you changed and why, in one or two sentences, so the controller can log it.
 - Once you have completed the necessary operations and verified your work, conclude your turn with a clear final response summary.

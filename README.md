@@ -151,6 +151,11 @@ Type a task description to execute, or 'exit'/'quit' to stop.
 | `--skills-dir` | `None` | Custom path to skills folder (defaults to `skills/`). |
 | `--mcp-config-path` | `None` | Path to MCP server configuration JSON file (`mcp.json`). |
 | `--verbose` | `False` | Enables verbose LangChain debug output. |
+| `--benchmark` | `False` | Enables automated E2E benchmark harness. |
+| `--benchmark-dir` | `my-buggy-test-repo/examples` | Directory containing target benchmark repos. |
+| `--filter` | `None` | Comma-separated filters for benchmark repo names (e.g. `01,06`). |
+| `--benchmark-timeout` | `300` | Hard wall-clock timeout in seconds per benchmark run. |
+| `--output-dir` | `benchmark_results` | Directory to save JSON and Markdown reports. |
 
 ---
 
@@ -176,6 +181,21 @@ To connect external tools via MCP, pass a JSON configuration file via `--mcp-con
 
 ---
 
+### 3. Automated E2E Benchmark Suite (Phase 8)
+Run the benchmark harness across test repositories in isolated temporary sandbox environments:
+
+```bash
+# Run all benchmark example repositories
+python main.py --benchmark
+
+# Run specific filtered benchmarks with custom timeout and output directory
+python main.py --benchmark --benchmark-dir ./my-buggy-test-repo/examples --filter "01,06" --benchmark-timeout 180 --output-dir ./benchmark_results
+```
+
+Machine-readable JSON metrics (`benchmark_report.json`) and formatted summary Markdown reports (`benchmark_report.md`) are automatically saved to the output directory upon completion.
+
+---
+
 ## 🧪 Testing & Verification
 
 Run the comprehensive unit, characterization, integration, and end-to-end smoke test suite:
@@ -184,13 +204,14 @@ Run the comprehensive unit, characterization, integration, and end-to-end smoke 
 python -m pytest test_agent.py test_phase/ -v
 ```
 
-All 247 tests cover:
+All 509+ tests cover:
 - Core state serialization & backward compatibility
 - Tool registry & safety approval gates
 - Skill discovery, loading, and deterministic selection
 - MCP config parsing, interpolation, and graceful degradation
 - CLI flags & REPL banner/session isolation
 - Evaluator & Router policy boundaries
+- Automated E2E benchmark sandbox isolation, timeouts, and report generation
 - Full end-to-end smoke tests (real Git + real subprocesses + stubbed LLM)
 
 ---

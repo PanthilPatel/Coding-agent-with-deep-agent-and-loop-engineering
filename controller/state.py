@@ -47,6 +47,9 @@ class RunState:
     termination_reason: Optional[str] = None
     # Phase 3 addition
     selected_skill: Optional[str] = None
+    # Phase 8 additions
+    tool_calls_count: Optional[dict] = None
+    audit_log: Optional[list] = None
 
     # ------------------------------------------------------------------
     # Existing methods — unchanged
@@ -89,6 +92,14 @@ class RunState:
     def set_skill(self, skill_name: Optional[str]) -> None:
         """Record the name of the skill selected for this run."""
         self.selected_skill = skill_name
+
+    def set_tool_calls_count(self, counts: Optional[dict]) -> None:
+        """Record the count of guarded tool calls executed."""
+        self.tool_calls_count = counts
+
+    def set_audit_log(self, audit_log: Optional[list]) -> None:
+        """Record the audit log of guarded tool calls executed."""
+        self.audit_log = audit_log
 
 
 # ------------------------------------------------------------------
@@ -151,6 +162,9 @@ def load_state(path: str, goal: str) -> RunState:
         state.termination_reason = data.get("termination_reason", None)
         # Phase 3 new field — safe .get() so old JSON files load cleanly
         state.selected_skill = data.get("selected_skill", None)
+        # Phase 8 new fields — safe .get() so old JSON files load cleanly
+        state.tool_calls_count = data.get("tool_calls_count", None)
+        state.audit_log = data.get("audit_log", None)
         return state
     return RunState(goal=goal)
 

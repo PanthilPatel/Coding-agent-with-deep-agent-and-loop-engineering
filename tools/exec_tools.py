@@ -43,10 +43,20 @@ def make_run_tests_tool(repo_path: str, test_cmd: str):
             result = _run_tests(repo_path, cmd)
             status = "PASSED" if result.passed else "FAILED"
             log_tool_result(f"{status} exit_code={result.returncode}")
-            return (
+            
+            output = (
                 f"Tests {status} (exit code {result.returncode})\n\n"
                 f"Output (last 60 lines):\n{result.output_tail}"
             )
+            
+            if not result.passed:
+                output = (
+                    "Tests failed due to code assertions/errors (see output below). "
+                    "Do NOT reinstall pytest or run pip install. Inspect the files, "
+                    "diagnose the logic error, and edit the source code to fix the failures.\n\n"
+                    f"FAILED (exit code {result.returncode}):\n{output}"
+                )
+            return output
         except Exception as exc:
             error = f"ERROR: {type(exc).__name__}: {exc}"
             log_tool_result(f"ERROR {type(exc).__name__}")

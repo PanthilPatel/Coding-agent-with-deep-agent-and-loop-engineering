@@ -1,4 +1,4 @@
-﻿"""Terminal harness tools — Phase 1: General Tool System.
+"""Terminal harness tools — Phase 1: General Tool System.
 
 Provides:
 - execute_command     : Run arbitrary shell commands, return structured dict.
@@ -32,6 +32,20 @@ from tools.base import log_tool_call, log_tool_result
 # ---------------------------------------------------------------------------
 # execute_command
 # ---------------------------------------------------------------------------
+
+class FormattedCommandResult(dict):
+    """Subclass of dict that formats string representations with combined stdout and stderr."""
+    def __str__(self) -> str:
+        code = self.get("exit_code", -1)
+        stdout = self.get("stdout", "")
+        stderr = self.get("stderr", "")
+        status = self.get("status", "error")
+        status_str = "SUCCESS" if status == "success" else "FAILED"
+        return f"{status_str} (exit code {code}):\n{stdout}\n{stderr}"
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
 
 def execute_command(
     command: str,
@@ -107,7 +121,7 @@ def execute_command(
         result["status"] = "exception"
         log_tool_result(f"EXCEPTION {type(exc).__name__}")
 
-    return result
+    return FormattedCommandResult(result)
 
 
 # ---------------------------------------------------------------------------

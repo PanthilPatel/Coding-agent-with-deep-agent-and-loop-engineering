@@ -1,3 +1,4 @@
+
 """Skills package for the coding agent.
 
 Skills are reusable instruction sets that teach the agent HOW to approach

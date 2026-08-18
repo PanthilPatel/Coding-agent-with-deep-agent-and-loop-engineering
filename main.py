@@ -1,12 +1,15 @@
 import argparse
+import os
 import sys
 import langchain
 from config import Config
 from controller.loop import run
+from orchestrator.engine import DeepAgentOrchestrator
 
-def parse_args() -> argparse.Namespace:
+
+def parse_args(args=None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Autonomous fix-until-green coding agent")
-    parser.add_argument("--repo", required=True, help="Path to the target repository")
+    parser.add_argument("--repo", default=None, help="Path to the target repository")
     parser.add_argument("--goal", default=None, help="Goal for the agent to achieve (omitting enters interactive mode)")
     parser.add_argument("--test-cmd", default="pytest", help="Command used to run tests")
     parser.add_argument("--max-iterations", type=int, default=10)
@@ -43,13 +46,86 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Path to MCP configuration JSON file.",
     )
-    return parser.parse_args()
+    parser.add_argument(
+        "--decompose",
+        "--orchestrate",
+        dest="orchestrate",
+        action="store_true",
+        help="Decompose the goal into structured subtasks using DeepAgentOrchestrator",
+    )
+    parser.add_argument(
+        "--benchmark",
+        action="store_true",
+        help="Run the automated E2E benchmark suite across target repositories",
+    )
+    parser.add_argument(
+        "--benchmark-dir",
+        default="my-buggy-test-repo/examples",
+        help="Directory containing target benchmark repositories (default: 'my-buggy-test-repo/examples')",
+    )
+    parser.add_argument(
+        "--filter",
+        default=None,
+        help="Comma-separated filters for benchmark repo names (e.g. '01,06' or 'calculator')",
+    )
+    parser.add_argument(
+        "--benchmark-timeout",
+        type=int,
+        default=300,
+        help="Hard wall-clock timeout in seconds per benchmark run (default: 300)",
+    )
+    parser.add_argument(
+        "--output-dir",
+        default="benchmark_results",
+        help="Directory to save JSON and Markdown benchmark reports (default: 'benchmark_results')",
+    )
+    return parser.parse_args(args)
 
 def main() -> None:
     args = parse_args()
     
     if args.verbose:
         langchain.debug = True
+
+    # Benchmark Suite Mode
+    if args.benchmark:
+        from benchmarks.runner import BenchmarkRunner
+        from benchmarks.reporter import BenchmarkReporter
+
+        filter_names = None
+        if args.filter:
+            filter_names = [f.strip() for f in args.filter.split(",") if f.strip()]
+
+        runner = BenchmarkRunner()
+        results = runner.run_suite(
+            benchmark_dir=args.benchmark_dir,
+            filter_names=filter_names,
+            goal=args.goal,
+            timeout=args.benchmark_timeout,
+            test_cmd=args.test_cmd,
+            model_name=args.model,
+            llm_provider=args.llm_provider,
+            max_iterations=args.max_iterations,
+            lint_cmd=args.lint_cmd,
+            skills_dir=args.skills_dir,
+            mcp_config_path=args.mcp_config_path,
+        )
+
+        reporter = BenchmarkReporter()
+        os.makedirs(args.output_dir, exist_ok=True)
+        json_path = os.path.join(args.output_dir, "benchmark_report.json")
+        md_path = os.path.join(args.output_dir, "benchmark_report.md")
+        reporter.generate_json(results, json_path)
+        reporter.generate_markdown(results, md_path)
+        reporter.print_summary(results)
+        print(f"[BENCHMARK] Reports saved to '{os.path.abspath(args.output_dir)}'")
+
+        all_passed = all(r.passed for r in results) if results else True
+        return sys.exit(0 if all_passed else 1)
+
+    if not args.repo:
+        print("Error: --repo is required when not in --benchmark mode.", file=sys.stderr)
+        return sys.exit(2)
         
     config_kwargs = {
         "repo_path": args.repo,
@@ -66,19 +142,22 @@ def main() -> None:
         config_kwargs["mcp_config_path"] = args.mcp_config_path
     if args.llm_provider is not None:
         config_kwargs["llm_provider"] = args.llm_provider
-
         
     config = Config(**config_kwargs)
 
     if not args.goal:
         from cli.interactive import run_interactive
         run_interactive(config)
-        sys.exit(0)
+        return sys.exit(0)
+
+    if getattr(args, "orchestrate", False):
+        orchestrator = DeepAgentOrchestrator(config)
+        result = orchestrator.run()
+        return sys.exit(0 if result.get("success", False) else 1)
 
     success = run(config)
-    sys.exit(0 if success else 1)
+    return sys.exit(0 if success else 1)
 
 
 if __name__ == "__main__":
     main()
-
