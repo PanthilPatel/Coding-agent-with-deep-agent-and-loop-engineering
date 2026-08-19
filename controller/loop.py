@@ -44,6 +44,7 @@ def build_instruction(
     force_new_strategy: bool,
     skill_content: str = "",
     error_feedback: str = "",
+    prior_attempts: list = None,
 ) -> str:
     """Compose the instruction string sent to the worker agent each iteration.
 
@@ -61,6 +62,10 @@ def build_instruction(
         ``run_worker_turn()``.
     """
     parts = [f"Goal: {goal}"]
+    
+    if prior_attempts:
+        parts.append("Prior attempts this run:\n" + "\n".join(f"- {attempt}" for attempt in prior_attempts))
+        
     if skill_content:
         parts.append(f"Approach guide (follow this procedure):\n{skill_content}")
     if error_feedback:
@@ -279,6 +284,7 @@ def run(config) -> bool:
     force_new_strategy = False
     error_feedback = ""
     iterations_run = 0
+    consecutive_failures = 0
 
     for i in range(1, config.max_iterations + 1):
         iterations_run = i
@@ -301,12 +307,36 @@ def run(config) -> bool:
         # PER-ITERATION — worker turn, test/verification run, optional lint, commit
         # ------------------------------------------------------------------
         try:
+            prior_attempts = []
+            if state.iterations:
+                for idx, record_dict in enumerate(state.iterations):
+                    it_num = record_dict.get("iteration", "?")
+                    w_summ = record_dict.get("worker_summary", "").strip()
+                    passed = record_dict.get("test_passed", False)
+                    tail = record_dict.get("test_output_tail", "")
+                    
+                    if passed:
+                        status_str = "tests passed"
+                    else:
+                        sig = tail.strip().split('\n')[-1][:100] if tail.strip() else "tests failed"
+                        status_str = f"tests failed ({sig})"
+                        
+                    is_recent = (len(state.iterations) - idx) <= 2
+                    if is_recent:
+                        prior_attempts.append(f"Iteration {it_num}: {w_summ} -> {status_str}")
+                    else:
+                        one_line_summ = w_summ.split('\n')[0][:80]
+                        if len(one_line_summ) < len(w_summ):
+                            one_line_summ += "..."
+                        prior_attempts.append(f"Iteration {it_num}: {one_line_summ} -> {status_str}")
+
             instruction = build_instruction(
                 config.goal,
                 last_output_tail,
                 force_new_strategy,
                 skill_content,
                 error_feedback=error_feedback,
+                prior_attempts=prior_attempts,
             )
 
             # Record the plan (instruction sent to the worker) in state
@@ -412,11 +442,18 @@ def run(config) -> bool:
             )
             previous_worker_summary = worker_summary
 
+            if evaluator_dict.get("is_correct"):
+                consecutive_failures = 0
+            else:
+                consecutive_failures += 1
+
             # Check if router triggered replanning or error recovery
             if router_decision.state == RouterState.REPLAN:
                 print(f"[RECOVERY] Router triggered REPLAN: {router_decision.reason}")
                 error_feedback = f"Repeated failure occurred. Suggested action: {router_decision.suggested_action}"
                 force_new_strategy = True
+                consecutive_failures = max(consecutive_failures, 2)
+                
                 # Discard dirty changes by rolling back to checkpoint
                 if initial_checkpoint:
                     checkpoint_mgr.rollback_to_checkpoint(initial_checkpoint)
@@ -427,6 +464,22 @@ def run(config) -> bool:
             else:
                 error_feedback = ""
                 force_new_strategy = False
+                
+            if consecutive_failures >= 2 and not getattr(agent, "escalated_to_nvidia", False):
+                nvidia_api_key = os.environ.get("NVIDIA_API_KEY", "").strip()
+                if nvidia_api_key:
+                    nvidia_model = os.environ.get("NVIDIA_MODEL", "nvidia/nemotron-3-ultra-550b-a55b")
+                    print(f"[AGENT] Escalating to NVIDIA NIM ({nvidia_model}) after 2 consecutive failed iterations.")
+                    agent = build_worker_agent(
+                        config.local_repo_path,
+                        nvidia_model,
+                        "nvidia",
+                        extra_tools=extra_tools,
+                    )
+                    setattr(agent, "escalated_to_nvidia", True)
+                else:
+                    print("[AGENT] NVIDIA_API_KEY not found in environment — skipping escalation, continuing with local model.")
+                    setattr(agent, "escalated_to_nvidia", True)
 
             if not router_decision.should_continue or router_decision.state == RouterState.COMPLETE:
                 reason = router_decision.termination_reason or TerminationReason.SUCCESS

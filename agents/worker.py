@@ -14,6 +14,7 @@ import os
 import json
 import re
 import datetime
+from typing import List, Any
 from deepagents import create_deep_agent, SubAgent
 from deepagents.backends import FilesystemBackend
 class PatchedFilesystemBackend(FilesystemBackend):
@@ -45,7 +46,7 @@ class PatchedFilesystemBackend(FilesystemBackend):
     def write(self, file_path: str, content: str, *args, **kwargs):
         base = os.path.basename(file_path).lower()
         if base.startswith("test_") or base.endswith("_test.py") or "tests/" in file_path.replace("\\", "/"):
-            raise ValueError("Modifying, creating, or rewriting test files is strictly forbidden. You must only fix bugs in implementation source files (e.g. inventory.py, discounts.py).")
+            raise ValueError("Modifying, creating, or rewriting test files is strictly forbidden. You must only fix bugs in the actual source/implementation files in this repository (not test files).")
         res = super().write(file_path=file_path, content=content, *args, **kwargs)
         from langgraph.errors import GraphRecursionError
         raise GraphRecursionError("[SHORT_CIRCUIT] File write completed successfully. Ending turn.")
@@ -53,7 +54,7 @@ class PatchedFilesystemBackend(FilesystemBackend):
     def edit(self, file_path: str, old_string: str, new_string: str, replace_all: bool = False, *args, **kwargs):
         base = os.path.basename(file_path).lower()
         if base.startswith("test_") or base.endswith("_test.py") or "tests/" in file_path.replace("\\", "/"):
-            raise ValueError("Modifying or editing test files is strictly forbidden. You must only fix bugs in implementation source files (e.g. inventory.py, discounts.py).")
+            raise ValueError("Modifying or editing test files is strictly forbidden. You must only fix bugs in the actual source/implementation files in this repository (not test files).")
         
         def strip_line_prefix(s: str) -> str:
             lines = s.splitlines()
@@ -85,7 +86,6 @@ class PatchedFilesystemBackend(FilesystemBackend):
 from langchain_ollama import ChatOllama
 from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.messages import AIMessage, BaseMessage
-from typing import List, Any
 
 class PatchedChatOllama(ChatOllama):
     def _generate(self, *args, **kwargs):
@@ -124,13 +124,19 @@ class PatchedChatOllama(ChatOllama):
         if not content:
             return response
 
-        # Try parsing JSON blocks: ```json ... ``` or directly {...}
+        # Try parsing JSON blocks: ```json ... ```, ``` ... ``` or directly {...}
         json_str = None
         if "```json" in content:
             match = re.search(r"```json\s*([\s\S]*?)\s*```", content)
             if match:
                 json_str = match.group(1).strip()
-        elif content.startswith("{") and content.endswith("}"):
+        elif "```" in content:
+            match = re.search(r"```\s*([\s\S]*?)\s*```", content)
+            if match:
+                json_str = match.group(1).strip()
+                if not (json_str.startswith("{") or json_str.startswith("[")):
+                    json_str = None
+        if not json_str and content.startswith("{") and content.endswith("}"):
             json_str = content
 
         parsed_by_regex = False
@@ -280,8 +286,9 @@ WORKER_SYSTEM_PROMPT = """You are an autonomous coding agent working inside a
 real repository on disk. Your job is to achieve the given goal by inspecting the environment, executing commands, and reading/editing source files directly.
 
 Rules:
+- STEP 1 (REQUIRED): Before reading or editing any file, you MUST call list_directory on the repo root (".") to see what actually exists here.
 - You must invoke tools directly to read, edit, execute, or manage files. Do not simply describe your plans in text responses; execute the tool calls to perform the work.
-- The working directory root is already the target repo. All file paths must be relative to current directory (e.g. 'inventory.py' or 'discounts.py', NOT '/examples/...').
+- The working directory root is already the target repo. All file paths must be relative to current directory.
 - CRITICAL: Keep actions minimal. Complete your diagnosis and code edit in 2 to 4 steps.
 - CRITICAL: Once you have edited the buggy file with `edit_file`, DO NOT run more exploratory tools. Immediately provide a brief 1-sentence summary and conclude your turn so the evaluator can verify the fix.
 - CRITICAL: After successfully calling edit_file, STOP immediately so the test runner can evaluate your changes.
@@ -289,7 +296,7 @@ Rules:
 ```json
 {"name": "edit_file", "arguments": {"file_path": "calculator.py", "old_string": "'^': power", "new_string": "'**': power"}}
 ```
-- CRITICAL: Never modify, overwrite, weaken, or create test files (any file matching test_*.py or *_test.py). Only fix bugs in the source/implementation files (e.g. inventory.py, discounts.py).
+- CRITICAL: NEVER modify test files (e.g. test_*.py). Only edit implementation files in the repository.
 - CRITICAL: When using 'read_file', the tool prefixes lines with line numbers for reference (e.g. ' 1  import pytest'). These numbers are NOT part of the actual file text. When using 'edit_file', do NOT include line numbers in old_string or new_string.
 - CRITICAL: NEVER run 'pip install pytest' or try to install packages when a test fails. Pytest is already installed and functional. Exit code 1 means your code has a bug that you must fix.
 - CRITICAL: When using edit_file, ensure 'new_string' is strictly different from 'old_string'.
@@ -302,7 +309,7 @@ Rules:
 """
 
 
-def _build_model(model_name: str, llm_provider: str = "ollama_cloud") -> "PatchedChatOllama":
+def _build_model(model_name: str, llm_provider: str = "ollama_cloud") -> Any:
     """Instantiate and return the configured chat model.
 
     Supports both ``ollama_cloud`` (remote) and ``ollama`` (local).
@@ -325,6 +332,17 @@ def _build_model(model_name: str, llm_provider: str = "ollama_cloud") -> "Patche
             num_ctx=num_ctx,
             client_kwargs={"timeout": timeout},
             sync_client_kwargs={"timeout": timeout},
+        )
+    elif llm_provider == "nvidia":
+        from langchain_openai import ChatOpenAI
+        api_key = os.environ.get("NVIDIA_API_KEY")
+        model = os.environ.get("NVIDIA_MODEL", "nvidia/nemotron-3-ultra-550b-a55b")
+        return ChatOpenAI(
+            model=model,
+            api_key=api_key,
+            base_url="https://integrate.api.nvidia.com/v1",
+            temperature=0.2,
+            max_tokens=4096,
         )
     else:
         raise ValueError(f"Unsupported llm_provider: {llm_provider}")
@@ -371,7 +389,7 @@ def run_worker_turn(agent, instruction: str) -> str:
             {"messages": [{"role": "user", "content": instruction}]},
             config={
                 "callbacks": [TerminalLogCallbackHandler()],
-                "recursion_limit": 8
+                "recursion_limit": 30
             }
         )
         messages = result.get("messages", [])
@@ -385,8 +403,8 @@ def run_worker_turn(agent, instruction: str) -> str:
         if "[SHORT_CIRCUIT]" in str(gre):
             print("\n[worker] Short-circuit triggered: Code edit/write completed. Ending turn immediately.")
             return "File changes made successfully. Turn completed."
-        print("\n[worker] Warning: Agent hit recursion limit of 8 steps (potential loop). Aborting turn.")
-        return "Agent hit recursion limit of 8 steps due to repeating operations."
+        print("\n[worker] Warning: Agent hit recursion limit of 30 steps (potential loop). Aborting turn.")
+        return "Agent hit recursion limit of 30 steps due to repeating operations."
     except Exception as e:
         err_msg = str(e)
         if "[SHORT_CIRCUIT]" in err_msg:
