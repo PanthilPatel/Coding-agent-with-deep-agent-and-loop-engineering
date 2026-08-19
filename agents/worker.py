@@ -34,13 +34,21 @@ class PatchedFilesystemBackend(FilesystemBackend):
                 cleaned_path = normalized_path[len(suffix) + 1:]
                 break
                 
+        # If the LLM passed a path prefixed with an example directory name, strip it if the file exists directly in root
+        if not os.path.exists(os.path.join(self.my_root_dir, cleaned_path)):
+            base_filename = os.path.basename(cleaned_path)
+            if os.path.exists(os.path.join(self.my_root_dir, base_filename)):
+                cleaned_path = base_filename
+
         return super()._resolve_path(cleaned_path)
 
     def write(self, file_path: str, content: str, *args, **kwargs):
         base = os.path.basename(file_path).lower()
         if base.startswith("test_") or base.endswith("_test.py") or "tests/" in file_path.replace("\\", "/"):
             raise ValueError("Modifying, creating, or rewriting test files is strictly forbidden. You must only fix bugs in implementation source files (e.g. inventory.py, discounts.py).")
-        return super().write(file_path=file_path, content=content, *args, **kwargs)
+        res = super().write(file_path=file_path, content=content, *args, **kwargs)
+        from langgraph.errors import GraphRecursionError
+        raise GraphRecursionError("[SHORT_CIRCUIT] File write completed successfully. Ending turn.")
 
     def edit(self, file_path: str, old_string: str, new_string: str, replace_all: bool = False, *args, **kwargs):
         base = os.path.basename(file_path).lower()
@@ -64,7 +72,9 @@ class PatchedFilesystemBackend(FilesystemBackend):
                 f"You passed: '{old_string}'. Please make sure you are changing the code instead of replacing a line with itself."
             )
 
-        return super().edit(file_path=file_path, old_string=cleaned_old, new_string=cleaned_new, replace_all=replace_all, *args, **kwargs)
+        res = super().edit(file_path=file_path, old_string=cleaned_old, new_string=cleaned_new, replace_all=replace_all, *args, **kwargs)
+        from langgraph.errors import GraphRecursionError
+        raise GraphRecursionError("[SHORT_CIRCUIT] File edit completed successfully. Ending turn.")
 
     def execute(self, command: str, *args, **kwargs) -> Any:
         from deepagents.backends.protocol import ExecuteResponse
@@ -123,11 +133,12 @@ class PatchedChatOllama(ChatOllama):
         elif content.startswith("{") and content.endswith("}"):
             json_str = content
 
+        parsed_by_regex = False
+        tool_calls = []
+
         if json_str:
             try:
                 data = json.loads(json_str)
-                tool_calls = []
-                
                 # Check if it's a list of tool calls or a single one
                 items = data if isinstance(data, list) else [data]
                     
@@ -139,7 +150,6 @@ class PatchedChatOllama(ChatOllama):
                             if isinstance(args, str):
                                 try:
                                     args = json.loads(args)
-                                    pass
                                 except Exception:
                                     pass
                             if isinstance(args, dict):
@@ -158,12 +168,54 @@ class PatchedChatOllama(ChatOllama):
                                 "id": item.get("id") or f"call_{name}_{idx}",
                                 "type": "tool_call"
                             })
-                
-                if tool_calls:
-                    response.tool_calls = tool_calls
-                    print(f"\n[patched_model] Fallback parser successfully parsed tool calls: {tool_calls}")
             except Exception as e:
-                print(f"\n[patched_model] Fallback parser failed to parse potential tool call: {e}")
+                # If strict JSON parse fails, try heuristic regex matching for edit_file / read_file
+                print(f"\n[patched_model] Strict JSON load failed: {e}. Attempting heuristic regex repair...")
+                # Match edit_file or read_file from content or json_str
+                # Try to extract the tool name
+                tool_name_match = re.search(r'"name"\s*:\s*"([^"]+)"', json_str or content)
+                if tool_name_match:
+                    tool_name = tool_name_match.group(1)
+                    if tool_name in ("edit_file", "read_file", "write_file"):
+                        # Extract arguments keys
+                        args = {}
+                        # Match file_path: "file_path"\s*:\s*"(.*?)"
+                        fp_match = re.search(r'"file_path"\s*:\s*"([^"]+)"', json_str or content)
+                        if fp_match:
+                            args["file_path"] = fp_match.group(1)
+                        
+                        if tool_name == "edit_file":
+                            # Use greedy dotall patterns or lookaheads to extract string contents even if they contain unescaped chars
+                            # "old_string"\s*:\s*"(.*?)"\s*,\s*"new_string"
+                            old_match = re.search(r'"old_string"\s*:\s*"(.*?)"\s*,\s*"new_string"', json_str or content, re.DOTALL)
+                            new_match = re.search(r'"new_string"\s*:\s*"(.*?)"\s*(?:\}\s*\}|\}\s*\]|\}$)', json_str or content, re.DOTALL)
+                            if old_match and new_match:
+                                args["old_string"] = old_match.group(1)
+                                args["new_string"] = new_match.group(1)
+                            else:
+                                # Alternative weaker fallback matching if the structure is slightly different
+                                old_match = re.search(r'"old_string"\s*:\s*"(.*?)"', json_str or content, re.DOTALL)
+                                new_match = re.search(r'"new_string"\s*:\s*"(.*?)"', json_str or content, re.DOTALL)
+                                if old_match:
+                                    args["old_string"] = old_match.group(1)
+                                if new_match:
+                                    args["new_string"] = new_match.group(1)
+                                    
+                        if "file_path" in args:
+                            tool_calls.append({
+                                "name": tool_name,
+                                "args": args,
+                                "id": f"call_regex_{tool_name}",
+                                "type": "tool_call"
+                            })
+                            parsed_by_regex = True
+
+        if tool_calls:
+            response.tool_calls = tool_calls
+            if parsed_by_regex:
+                print(f"\n[patched_model] Regex fallback parser successfully repaired tool calls: {tool_calls}")
+            else:
+                print(f"\n[patched_model] Fallback parser successfully parsed tool calls: {tool_calls}")
                 
         return response
 
@@ -230,6 +282,13 @@ real repository on disk. Your job is to achieve the given goal by inspecting the
 Rules:
 - You must invoke tools directly to read, edit, execute, or manage files. Do not simply describe your plans in text responses; execute the tool calls to perform the work.
 - The working directory root is already the target repo. All file paths must be relative to current directory (e.g. 'inventory.py' or 'discounts.py', NOT '/examples/...').
+- CRITICAL: Keep actions minimal. Complete your diagnosis and code edit in 2 to 4 steps.
+- CRITICAL: Once you have edited the buggy file with `edit_file`, DO NOT run more exploratory tools. Immediately provide a brief 1-sentence summary and conclude your turn so the evaluator can verify the fix.
+- CRITICAL: After successfully calling edit_file, STOP immediately so the test runner can evaluate your changes.
+- CRITICAL: All argument values in tool calls MUST be valid JSON strings with proper escaping. Always wrap code strings in standard double quotes. Example:
+```json
+{"name": "edit_file", "arguments": {"file_path": "calculator.py", "old_string": "'^': power", "new_string": "'**': power"}}
+```
 - CRITICAL: Never modify, overwrite, weaken, or create test files (any file matching test_*.py or *_test.py). Only fix bugs in the source/implementation files (e.g. inventory.py, discounts.py).
 - CRITICAL: When using 'read_file', the tool prefixes lines with line numbers for reference (e.g. ' 1  import pytest'). These numbers are NOT part of the actual file text. When using 'edit_file', do NOT include line numbers in old_string or new_string.
 - CRITICAL: NEVER run 'pip install pytest' or try to install packages when a test fails. Pytest is already installed and functional. Exit code 1 means your code has a bug that you must fix.
@@ -312,7 +371,7 @@ def run_worker_turn(agent, instruction: str) -> str:
             {"messages": [{"role": "user", "content": instruction}]},
             config={
                 "callbacks": [TerminalLogCallbackHandler()],
-                "recursion_limit": 60
+                "recursion_limit": 8
             }
         )
         messages = result.get("messages", [])
@@ -322,11 +381,17 @@ def run_worker_turn(agent, instruction: str) -> str:
         if isinstance(last, dict):
             return last.get("content", "") or ""
         return getattr(last, "content", "") or ""
-    except GraphRecursionError:
-        print("\n[worker] Warning: Agent hit recursion limit of 60 steps (potential loop). Aborting turn.")
-        return "Agent hit recursion limit of 60 steps due to repeating operations."
+    except GraphRecursionError as gre:
+        if "[SHORT_CIRCUIT]" in str(gre):
+            print("\n[worker] Short-circuit triggered: Code edit/write completed. Ending turn immediately.")
+            return "File changes made successfully. Turn completed."
+        print("\n[worker] Warning: Agent hit recursion limit of 8 steps (potential loop). Aborting turn.")
+        return "Agent hit recursion limit of 8 steps due to repeating operations."
     except Exception as e:
         err_msg = str(e)
+        if "[SHORT_CIRCUIT]" in err_msg:
+            print("\n[worker] Short-circuit triggered: Code edit/write completed. Ending turn immediately.")
+            return "File changes made successfully. Turn completed."
         if "timed out" in err_msg.lower() or "timeout" in err_msg.lower():
             print(f"\n[worker] Timeout Error: Request to Ollama timed out: {e}")
             return f"Agent failed with timeout: Ollama LLM call exceeded timeout threshold ({e})."

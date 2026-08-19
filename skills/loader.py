@@ -24,6 +24,7 @@ Safety:
 
 import os
 import pathlib
+import re
 from dataclasses import dataclass, field
 from typing import List, Optional
 
@@ -81,8 +82,8 @@ def _match_skill(task: str, keyword_map: dict[str, list[str]]) -> Optional[str]:
     """Return the name of the best-matching skill for ``task``, or None.
 
     Scoring:
-    - For each skill, count how many of its keywords are present in the
-      lower-cased task string.
+    - For each skill, count how many of its keywords match with word boundaries
+      in the lower-cased task string (excluding file extensions like status.txt).
     - The skill with the highest count wins.
     - Ties are broken by the order in ``keyword_map`` (Python dict insertion
       order is stable in 3.7+).
@@ -91,7 +92,11 @@ def _match_skill(task: str, keyword_map: dict[str, list[str]]) -> Optional[str]:
     task_lower = task.lower()
     scores: dict[str, int] = {}
     for skill_name, keywords in keyword_map.items():
-        score = sum(1 for kw in keywords if kw in task_lower)
+        score = sum(
+            1
+            for kw in keywords
+            if re.search(rf"\b{re.escape(kw.lower())}\b(?!\.[a-zA-Z0-9_-]+)", task_lower)
+        )
         scores[skill_name] = score
 
     best_name = max(scores, key=lambda k: scores[k])
@@ -244,7 +249,11 @@ class SkillLoader:
         for skill_name, keywords in kw_map.items():
             if skill_name not in available:
                 continue
-            score = sum(1 for kw in keywords if kw in task_lower)
+            score = sum(
+                1
+                for kw in keywords
+                if re.search(rf"\b{re.escape(kw.lower())}\b(?!\.[a-zA-Z0-9_-]+)", task_lower)
+            )
             if score > 0:
                 scored.append((score, skill_name))
 

@@ -292,6 +292,10 @@ class TestSkillSelector:
         result = _match_skill("I need a banana split", custom_map)
         assert result == "custom_skill"
 
+    def test_status_txt_does_not_match_git_skill(self):
+        result = _match_skill("Create a file named status.txt containing 'SYSTEM_OK'", _DEFAULT_KEYWORD_MAP)
+        assert result is None or result != "git"
+
 
 # ---------------------------------------------------------------------------
 # 6. SkillLoader.select() — end-to-end selection

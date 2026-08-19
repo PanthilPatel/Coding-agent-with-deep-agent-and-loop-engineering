@@ -1,4 +1,4 @@
-﻿"""test_loop_recovery.py — Phase 5: Multi-Step Loop Engineering & Error Recovery tests.
+"""test_loop_recovery.py — Phase 5: Multi-Step Loop Engineering & Error Recovery tests.
 
 Covers:
 - RouterState enum and decide_next_step transitions (CONTINUE, REPLAN, RECOVER, COMPLETE, FAILED).
@@ -97,6 +97,21 @@ class TestRouterTransitions:
         )
         assert decision.state == RouterState.CONTINUE
         assert decision.should_continue is True
+
+    def test_replan_transition_on_repeated_worker_summary(self):
+        eval_res = {"is_correct": False}
+        decision = decide_next_step(
+            eval_res,
+            current_iteration=2,
+            max_iterations=5,
+            elapsed_seconds=10,
+            max_seconds=100,
+            worker_summary="Created status.txt with SYSTEM_OK content.",
+            previous_worker_summary="Created status.txt with SYSTEM_OK content.",
+        )
+        assert decision.state == RouterState.REPLAN
+        assert decision.should_continue is True
+        assert "Near-identical worker output" in decision.reason
 
     def test_dict_backwards_compatibility(self):
         eval_res = {"is_correct": True}
@@ -223,3 +238,39 @@ class TestStandardizedLoggingTags:
             # Verify required standardized tags
             for tag in ["[STEP]", "[PLAN]", "[AGENT]", "[VERIFY]", "[RESULT]", "[DONE]"]:
                 assert tag in captured, f"Expected tag {tag} in stdout"
+
+    def test_loop_replan_on_repeated_worker_summary(self, tmp_path, capsys):
+        from controller.loop import run
+        from config import Config
+        from controller.state import RunState
+        
+        cfg = Config(repo_path=str(tmp_path), goal="fix bug", max_iterations=3)
+        
+        summaries = [
+            "Attempted fix on calculate() by changing return value.",
+            "Attempted fix on calculate() by changing return value.",
+            "Completely different approach using refactored method.",
+        ]
+        
+        with patch("controller.loop.load_state", return_value=RunState(goal="fix bug")), \
+             patch("controller.loop.save_state"), \
+             patch("controller.loop.ensure_work_branch"), \
+             patch("controller.loop.build_worker_agent", return_value=MagicMock()), \
+             patch("controller.loop.run_worker_turn", side_effect=summaries) as mock_worker, \
+             patch("controller.loop.run_tests", side_effect=[
+                 MagicMock(passed=False, returncode=1, output_tail="Fail 1"),
+                 MagicMock(passed=False, returncode=1, output_tail="Fail 2"),
+                 MagicMock(passed=True, returncode=0, output_tail="All passed"),
+             ]), \
+             patch("controller.loop.commit_iteration", return_value="abc12345"):
+            
+            success = run(cfg)
+            assert success is True
+            captured = capsys.readouterr().out
+            assert "[RECOVERY] Router triggered REPLAN: Near-identical worker output detected" in captured
+            # Check that iteration 3 received updated instruction with force_new_strategy
+            assert mock_worker.call_count == 3
+            iter3_instruction = mock_worker.call_args_list[2][0][1]
+            assert "Do not repeat the same approach" in iter3_instruction
+            assert "Error recovery note:" in iter3_instruction
+            assert "Repeated failure occurred." in iter3_instruction

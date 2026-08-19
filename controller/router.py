@@ -4,6 +4,7 @@ Weighs evaluator output against run safety limits (iterations, time, repeated fa
 to determine whether to continue the execution loop, replan, recover, or terminate.
 """
 
+import difflib
 from dataclasses import dataclass
 from enum import Enum
 from typing import Optional, TypedDict, Dict, Any, Union
@@ -77,6 +78,8 @@ def decide_next_step(
     max_seconds: float,
     same_failure_count: int = 0,
     max_same_failures: Optional[int] = None,
+    worker_summary: Optional[str] = None,
+    previous_worker_summary: Optional[str] = None,
 ) -> RoutingDecision:
     """Decide whether to continue the loop, recover/replan, or stop.
 
@@ -146,6 +149,18 @@ def decide_next_step(
             reason=f"Reached maximum iteration limit ({current_iteration}/{max_iterations}).",
             termination_reason=TerminationReason.MAX_ITERATIONS_SAFETY_LIMIT,
         )
+
+    # If repeating near-identical worker summary / approach, trigger REPLAN immediately
+    if worker_summary and previous_worker_summary:
+        ratio = difflib.SequenceMatcher(None, worker_summary.strip(), previous_worker_summary.strip()).ratio()
+        if ratio > 0.9:
+            return RoutingDecision(
+                state=RouterState.REPLAN,
+                should_continue=True,
+                reason=f"Near-identical worker output detected (similarity {ratio:.2f} > 0.9). No progress made.",
+                suggested_action="Force strategy change and discard previous failing approach.",
+                termination_reason=None,
+            )
 
     # If repeating the exact same failure (>=2 times), trigger REPLAN
     if same_failure_count >= 2:

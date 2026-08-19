@@ -212,6 +212,24 @@ def run(config) -> bool:
             extra_tools=extra_tools,
         )
 
+        # --- Verification Strategy Inference ---
+        # Automatically infer verification strategy if not already explicitly set
+        if not getattr(config, "verification_strategy", None):
+            from orchestrator.planner import GoalPlanner
+            planner = GoalPlanner()
+            inferred_strategy, inferred_kwargs = planner._infer_verification(config.goal)
+            if inferred_strategy:
+                # Adjust relative file/directory paths to be relative to local_repo_path if not absolute
+                eval_kwargs = dict(inferred_kwargs)
+                if "path" in eval_kwargs and not os.path.isabs(eval_kwargs["path"]):
+                    eval_kwargs["path"] = os.path.join(config.local_repo_path, eval_kwargs["path"])
+                if inferred_strategy == "test_suite":
+                    eval_kwargs.setdefault("test_cmd", config.test_cmd)
+                    eval_kwargs.setdefault("repo_path", config.local_repo_path)
+                setattr(config, "verification_strategy", inferred_strategy)
+                setattr(config, "verification_kwargs", eval_kwargs)
+                print(f"[VERIFY] Inferred verification strategy: '{inferred_strategy}' with kwargs {eval_kwargs}")
+
         # --- Skill selection (once per run, before the iteration loop) ---
         skills_dir = config.skills_dir if config.skills_dir else "skills"
         skill = select_skill(config.goal, skills_dir=skills_dir)
@@ -257,6 +275,7 @@ def run(config) -> bool:
 
     start_time = time.time()
     last_output_tail = ""
+    previous_worker_summary = None
     force_new_strategy = False
     error_feedback = ""
     iterations_run = 0
@@ -321,7 +340,12 @@ def run(config) -> bool:
                 state.set_evaluator_result(evaluator_dict)
             else:
                 # Standard / legacy test execution
-                result = run_tests(config.local_repo_path, config.test_cmd)
+                target_test_path = getattr(config, "target_test_path", None)
+                result = run_tests(
+                    config.local_repo_path,
+                    config.test_cmd,
+                    target_test_path=target_test_path,
+                )
                 passed = result.passed
                 output_tail = result.output_tail
                 print(f"[VERIFY] Tests passed={result.passed} returncode={result.returncode}")
@@ -383,20 +407,26 @@ def run(config) -> bool:
                 elapsed_seconds=elapsed_seconds,
                 max_seconds=config.max_seconds,
                 same_failure_count=state.same_failure_count,
+                worker_summary=worker_summary,
+                previous_worker_summary=previous_worker_summary,
             )
+            previous_worker_summary = worker_summary
 
             # Check if router triggered replanning or error recovery
             if router_decision.state == RouterState.REPLAN:
                 print(f"[RECOVERY] Router triggered REPLAN: {router_decision.reason}")
                 error_feedback = f"Repeated failure occurred. Suggested action: {router_decision.suggested_action}"
+                force_new_strategy = True
                 # Discard dirty changes by rolling back to checkpoint
                 if initial_checkpoint:
                     checkpoint_mgr.rollback_to_checkpoint(initial_checkpoint)
             elif router_decision.state == RouterState.RECOVER:
                 print(f"[RECOVERY] Router triggered RECOVER: {router_decision.reason}")
                 error_feedback = f"Previous iteration failed. Suggested action: {router_decision.suggested_action}"
+                force_new_strategy = False
             else:
                 error_feedback = ""
+                force_new_strategy = False
 
             if not router_decision.should_continue or router_decision.state == RouterState.COMPLETE:
                 reason = router_decision.termination_reason or TerminationReason.SUCCESS
@@ -441,9 +471,8 @@ def run(config) -> bool:
 
             if not getattr(config, "verification_strategy", None):
                 signature = failure_signature(result)
-                force_new_strategy = state.note_failure(signature)
-            else:
-                force_new_strategy = False
+                state_force = state.note_failure(signature)
+                force_new_strategy = force_new_strategy or state_force
 
             last_output_tail = output_tail
             _save_state()

@@ -22,6 +22,7 @@ class Config:
     lint_cmd: Optional[str] = None
     skills_dir: Optional[str] = None
     mcp_config_path: Optional[str] = None
+    target_test_path: Optional[str] = None
 
 
     def __post_init__(self) -> None:

@@ -123,11 +123,11 @@ class GoalPlanner:
         text_lower = text.lower()
         matched = []
         for skill_name in available_skills:
-            if skill_name.lower() in text_lower:
+            if re.search(rf"\b{re.escape(skill_name.lower())}\b(?!\.[a-zA-Z0-9_-]+)", text_lower):
                 matched.append(skill_name)
                 continue
             keywords = _DEFAULT_KEYWORD_MAP.get(skill_name, [])
-            if any(kw in text_lower for kw in keywords):
+            if any(re.search(rf"\b{re.escape(kw.lower())}\b(?!\.[a-zA-Z0-9_-]+)", text_lower) for kw in keywords):
                 matched.append(skill_name)
         return matched
 
@@ -247,7 +247,7 @@ class GoalPlanner:
         if dir_match:
             return ("directory_exists", {"path": dir_match.group(1)})
 
-        if "test" in desc_lower or "pytest" in desc_lower:
+        if "test_suite" in desc_lower:
             return ("test_suite", {})
 
         return (None, {})

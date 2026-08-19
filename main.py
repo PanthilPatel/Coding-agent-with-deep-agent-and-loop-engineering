@@ -47,6 +47,11 @@ def parse_args(args=None) -> argparse.Namespace:
         help="Path to MCP configuration JSON file.",
     )
     parser.add_argument(
+        "--target-test-path",
+        default=None,
+        help="Explicit target path/rootdir for pytest execution to prevent test collection leak.",
+    )
+    parser.add_argument(
         "--decompose",
         "--orchestrate",
         dest="orchestrate",
@@ -137,6 +142,7 @@ def main() -> None:
         "model_name": args.model,
         "lint_cmd": args.lint_cmd,
         "skills_dir": args.skills_dir,
+        "target_test_path": args.target_test_path,
     }
     if getattr(args, "mcp_config_path", None) is not None:
         config_kwargs["mcp_config_path"] = args.mcp_config_path
