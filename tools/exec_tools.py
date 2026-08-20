@@ -58,7 +58,7 @@ def make_run_tests_tool(repo_path: str, test_cmd: str):
                 )
             return output
         except Exception as exc:
-            error = f"ERROR: {type(exc).__name__}: {exc}"
+            error = f"Tool Error: ERROR {type(exc).__name__}: {exc}. Please check your arguments and try again."
             log_tool_result(f"ERROR {type(exc).__name__}")
             return error
 

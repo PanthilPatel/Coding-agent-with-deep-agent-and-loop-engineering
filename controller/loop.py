@@ -525,13 +525,20 @@ def run(config) -> bool:
                 if nvidia_api_key:
                     nvidia_model = os.environ.get("NVIDIA_MODEL", "nvidia/nemotron-3-ultra-550b-a55b")
                     print(f"[AGENT] Escalating to NVIDIA NIM ({nvidia_model}) after 2 consecutive failed iterations.")
-                    agent = build_worker_agent(
-                        config.local_repo_path,
-                        nvidia_model,
-                        "nvidia",
-                        extra_tools=extra_tools,
-                    )
-                    setattr(agent, "escalated_to_nvidia", True)
+                    try:
+                        agent = build_worker_agent(
+                            config.local_repo_path,
+                            nvidia_model,
+                            "nvidia",
+                            extra_tools=extra_tools,
+                        )
+                        setattr(agent, "escalated_to_nvidia", True)
+                    except (ImportError, ModuleNotFoundError) as e:
+                        print(f"[WARNING] langchain_openai is not installed; skipping escalation, continuing with local model. Details: {e}")
+                        setattr(agent, "escalated_to_nvidia", True)
+                    except Exception as e:
+                        print(f"[WARNING] Escalation failed: {e}; continuing with local model.")
+                        setattr(agent, "escalated_to_nvidia", True)
                 else:
                     print("[AGENT] NVIDIA_API_KEY not found in environment — skipping escalation, continuing with local model.")
                     setattr(agent, "escalated_to_nvidia", True)

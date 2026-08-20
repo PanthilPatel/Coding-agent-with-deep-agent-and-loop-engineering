@@ -44,17 +44,24 @@ class PatchedFilesystemBackend(FilesystemBackend):
         return super()._resolve_path(cleaned_path)
 
     def write(self, file_path: str, content: str, *args, **kwargs):
+        from deepagents.backends.protocol import WriteResult
         base = os.path.basename(file_path).lower()
         if base.startswith("test_") or base.endswith("_test.py") or "tests/" in file_path.replace("\\", "/"):
-            raise ValueError("Modifying, creating, or rewriting test files is strictly forbidden. You must only fix bugs in the actual source/implementation files in this repository (not test files).")
-        res = super().write(file_path=file_path, content=content, *args, **kwargs)
-        from langgraph.errors import GraphRecursionError
-        raise GraphRecursionError("[SHORT_CIRCUIT] File write completed successfully. Ending turn.")
+            return WriteResult(error="Error: Modifying or editing test files is strictly forbidden. You must only fix bugs in the actual source/implementation files in this repository.")
+        try:
+            res = super().write(file_path=file_path, content=content, *args, **kwargs)
+            from langgraph.errors import GraphRecursionError
+            raise GraphRecursionError("[SHORT_CIRCUIT] File write completed successfully. Ending turn.")
+        except Exception as e:
+            if "[SHORT_CIRCUIT]" in str(e):
+                raise
+            return WriteResult(error=f"Tool Error: {e}. Please check your arguments and try again.")
 
     def edit(self, file_path: str, old_string: str, new_string: str, replace_all: bool = False, *args, **kwargs):
+        from deepagents.backends.protocol import EditResult
         base = os.path.basename(file_path).lower()
         if base.startswith("test_") or base.endswith("_test.py") or "tests/" in file_path.replace("\\", "/"):
-            raise ValueError("Modifying or editing test files is strictly forbidden. You must only fix bugs in the actual source/implementation files in this repository (not test files).")
+            return EditResult(error="Error: Modifying or editing test files is strictly forbidden. You must only fix bugs in the actual source/implementation files in this repository.")
         
         def strip_line_prefix(s: str) -> str:
             lines = s.splitlines()
@@ -68,14 +75,57 @@ class PatchedFilesystemBackend(FilesystemBackend):
         cleaned_new = strip_line_prefix(new_string)
 
         if cleaned_old == cleaned_new:
-            raise ValueError(
-                f"No-op edit detected: old_string matches new_string. "
-                f"You passed: '{old_string}'. Please make sure you are changing the code instead of replacing a line with itself."
-            )
+            return EditResult(error="Tool Error: No-op edit detected: old_string matches new_string. Please check your arguments and try again.")
 
-        res = super().edit(file_path=file_path, old_string=cleaned_old, new_string=cleaned_new, replace_all=replace_all, *args, **kwargs)
-        from langgraph.errors import GraphRecursionError
-        raise GraphRecursionError("[SHORT_CIRCUIT] File edit completed successfully. Ending turn.")
+        try:
+            resolved_path = self._resolve_path(file_path)
+            if not os.path.exists(resolved_path):
+                return EditResult(error=f"Tool Error: File not found: {file_path}. Please check your arguments and try again.")
+            
+            with open(resolved_path, "r", encoding="utf-8", errors="ignore") as f:
+                file_content = f.read()
+                
+            if cleaned_old not in file_content:
+                return EditResult(error=f"Error: 'old_string' was not found in {file_path}. Please read the file first to ensure exact string and whitespace matching.")
+
+            res = super().edit(file_path=file_path, old_string=cleaned_old, new_string=cleaned_new, replace_all=replace_all, *args, **kwargs)
+            from langgraph.errors import GraphRecursionError
+            raise GraphRecursionError("[SHORT_CIRCUIT] File edit completed successfully. Ending turn.")
+        except Exception as e:
+            if "[SHORT_CIRCUIT]" in str(e):
+                raise
+            return EditResult(error=f"Tool Error: {e}. Please check your arguments and try again.")
+
+    def delete(self, file_path: str, *args, **kwargs):
+        from deepagents.backends.protocol import DeleteResult
+        base = os.path.basename(file_path).lower()
+        if base.startswith("test_") or base.endswith("_test.py") or "tests/" in file_path.replace("\\", "/"):
+            return DeleteResult(error="Error: Modifying or editing test files is strictly forbidden. You must only fix bugs in the actual source/implementation files in this repository.")
+        try:
+            return super().delete(file_path, *args, **kwargs)
+        except Exception as e:
+            return DeleteResult(error=f"Tool Error: {e}. Please check your arguments and try again.")
+
+    def read(self, file_path: str, *args, **kwargs):
+        from deepagents.backends.protocol import ReadResult
+        try:
+            return super().read(file_path, *args, **kwargs)
+        except Exception as e:
+            return ReadResult(error=f"Tool Error: {e}. Please check your arguments and try again.")
+
+    def ls(self, *args, **kwargs):
+        from deepagents.backends.protocol import LsResult
+        try:
+            return super().ls(*args, **kwargs)
+        except Exception as e:
+            return LsResult(error=f"Tool Error: {e}. Please check your arguments and try again.")
+
+    def grep(self, *args, **kwargs):
+        from deepagents.backends.protocol import GrepResult
+        try:
+            return super().grep(*args, **kwargs)
+        except Exception as e:
+            return GrepResult(error=f"Tool Error: {e}. Please check your arguments and try again.")
 
     def execute(self, command: str, *args, **kwargs) -> Any:
         from deepagents.backends.protocol import ExecuteResponse

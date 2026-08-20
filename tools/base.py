@@ -40,7 +40,7 @@ def safe_tool(func):
         try:
             return func(*args, **kwargs)
         except Exception as exc:
-            error_msg = f"ERROR: {type(exc).__name__}: {exc}"
+            error_msg = f"Tool Error: ERROR {type(exc).__name__}: {exc}. Please check your arguments and try again."
             log_tool_result(f"ERROR tool={func.__name__} exc={type(exc).__name__}")
             return error_msg
     return wrapper

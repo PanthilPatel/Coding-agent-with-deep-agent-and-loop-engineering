@@ -44,7 +44,7 @@ def make_git_status_tool(repo_path: str):
             log_tool_result("OK")
             return result
         except Exception as exc:
-            error = f"ERROR: {type(exc).__name__}: {exc}"
+            error = f"Tool Error: ERROR {type(exc).__name__}: {exc}. Please check your arguments and try again."
             log_tool_result(f"ERROR {type(exc).__name__}")
             return error
 
@@ -69,7 +69,7 @@ def make_git_diff_tool(repo_path: str):
             log_tool_result("OK")
             return result
         except Exception as exc:
-            error = f"ERROR: {type(exc).__name__}: {exc}"
+            error = f"Tool Error: ERROR {type(exc).__name__}: {exc}. Please check your arguments and try again."
             log_tool_result(f"ERROR {type(exc).__name__}")
             return error
 
@@ -104,7 +104,7 @@ def make_git_log_tool(repo_path: str):
             log_tool_result("OK")
             return result
         except Exception as exc:
-            error = f"ERROR: {type(exc).__name__}: {exc}"
+            error = f"Tool Error: ERROR {type(exc).__name__}: {exc}. Please check your arguments and try again."
             log_tool_result(f"ERROR {type(exc).__name__}")
             return error
 
@@ -148,7 +148,7 @@ def make_git_commit_tool(repo_path: str, require_approval: bool):
                 log_tool_result("OK nothing_to_commit")
             return result
         except Exception as exc:
-            error = f"ERROR: {type(exc).__name__}: {exc}"
+            error = f"Tool Error: ERROR {type(exc).__name__}: {exc}. Please check your arguments and try again."
             log_tool_result(f"ERROR {type(exc).__name__}")
             return error
 
