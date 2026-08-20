@@ -520,11 +520,20 @@ def run(config) -> bool:
                 error_feedback = ""
                 force_new_strategy = False
                 
-            if consecutive_failures >= 2 and not getattr(agent, "escalated_to_nvidia", False):
+            is_recursion_limit = "recursion limit" in worker_summary.lower()
+            should_escalate = (
+                (is_recursion_limit or consecutive_failures >= 2)
+                and not getattr(agent, "escalated_to_nvidia", False)
+            )
+
+            if should_escalate:
                 nvidia_api_key = os.environ.get("NVIDIA_API_KEY", "").strip()
                 if nvidia_api_key:
                     nvidia_model = os.environ.get("NVIDIA_MODEL", "nvidia/nemotron-3-ultra-550b-a55b")
-                    print(f"[AGENT] Escalating to NVIDIA NIM ({nvidia_model}) after 2 consecutive failed iterations.")
+                    if is_recursion_limit:
+                        print(f"[AGENT] Escalating to NVIDIA NIM ({nvidia_model}) immediately after agent hit recursion limit.")
+                    else:
+                        print(f"[AGENT] Escalating to NVIDIA NIM ({nvidia_model}) after 2 consecutive failed iterations.")
                     try:
                         agent = build_worker_agent(
                             config.local_repo_path,
