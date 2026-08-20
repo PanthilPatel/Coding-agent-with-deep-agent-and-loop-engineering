@@ -46,6 +46,7 @@ def build_instruction(
     error_feedback: str = "",
     prior_attempts: list = None,
     last_returncode: int = None,
+    is_test_driven: bool = True,
 ) -> str:
     """Compose the instruction string sent to the worker agent each iteration.
 
@@ -57,6 +58,7 @@ def build_instruction(
                             to abandon its previous approach.
         skill_content:    Optional procedure text from the selected SKILL.md.
         error_feedback:   Optional error recovery feedback from previous failures.
+        is_test_driven:   When True, includes pytest-specific rules.
 
     Returns:
         A newline-separated instruction string ready to pass to
@@ -73,14 +75,17 @@ def build_instruction(
         parts.append(f"Error recovery note:\n{error_feedback}")
     if last_output_tail:
         if last_returncode is not None and last_returncode != 0:
-            parts.append(
-                f"[PREVIOUS RUN FAILED - RETURN CODE {last_returncode}]\n"
-                f"Pytest failure traceback:\n{last_output_tail}\n\n"
-                "Instructions:\n"
-                "1. Carefully inspect the failing assertions and traceback above.\n"
-                "2. Edit ONLY the source code files to resolve the failure.\n"
-                "3. NEVER edit test files."
-            )
+            if is_test_driven:
+                parts.append(
+                    f"[PREVIOUS RUN FAILED - RETURN CODE {last_returncode}]\n"
+                    f"Pytest failure traceback:\n{last_output_tail}\n\n"
+                    "Instructions:\n"
+                    "1. Carefully inspect the failing assertions and traceback above.\n"
+                    "2. Edit ONLY the source code files to resolve the failure.\n"
+                    "3. NEVER edit test files."
+                )
+            else:
+                parts.append(f"Previous verification feedback:\n{last_output_tail}")
         else:
             parts.append(f"Latest verification output:\n{last_output_tail}")
     if force_new_strategy:
@@ -359,6 +364,11 @@ def run(config) -> bool:
             # ------------------------------------------------------------------
             iteration_checkpoint = checkpoint_mgr.create_checkpoint(f"pre_iter_{i}")
 
+            is_test_driven = (
+                getattr(config, "verification_strategy", None) == "test_suite"
+                or (not getattr(config, "verification_strategy", None) and GoalPlanner().classify_goal_type(config.goal) == "test_driven")
+            )
+
             instruction = build_instruction(
                 config.goal,
                 last_output_tail,
@@ -367,6 +377,7 @@ def run(config) -> bool:
                 error_feedback=error_feedback,
                 prior_attempts=prior_attempts,
                 last_returncode=last_returncode,
+                is_test_driven=is_test_driven,
             )
 
             # Record the plan (instruction sent to the worker) in state
@@ -386,7 +397,66 @@ def run(config) -> bool:
             verification_strategy = getattr(config, "verification_strategy", None)
             lint_result = None
 
-            if isinstance(verification_strategy, str) and verification_strategy.strip():
+            if verification_strategy == "reviewer_approval" or (not is_test_driven and not verification_strategy):
+                # Non-test-driven hybrid flow:
+                # 1. Reviewer subagent first-pass sanity check
+                # 2. If rejected and no retry used yet: give worker 1 corrective retry
+                # 3. Always prompt human approval gate before commit
+                from agents.worker import review_diff
+                curr_diff = get_diff(config.local_repo_path)
+                reviewer_approved, reviewer_reason = review_diff(
+                    diff=curr_diff,
+                    goal=config.goal,
+                    model_name=config.model_name,
+                    llm_provider=config.llm_provider,
+                )
+                print(f"[REVIEWER] Verdict: {'APPROVE' if reviewer_approved else 'REJECT'} — {reviewer_reason}")
+
+                if not reviewer_approved and consecutive_failures == 0:
+                    # Allow exactly 1 corrective retry turn
+                    print(f"[REVIEWER] First-pass rejected. Retrying 1 corrective turn with feedback.")
+                    passed = False
+                    output_tail = f"Reviewer subagent feedback: {reviewer_reason}"
+                    last_returncode = 1
+                    evaluator_dict = {
+                        "is_correct": False,
+                        "score": 0.0,
+                        "issues": ["reviewer_rejected"],
+                        "critical_gaps": ["reviewer_rejection"],
+                        "feedback": reviewer_reason,
+                    }
+                    state.set_evaluator_result(evaluator_dict)
+                else:
+                    # Proceed to human approval gate
+                    passed = reviewer_approved
+                    output_tail = reviewer_reason
+                    last_returncode = 0 if reviewer_approved else 1
+                    evaluator_dict = {
+                        "is_correct": True,
+                        "score": 1.0,
+                        "issues": [],
+                        "critical_gaps": [],
+                        "feedback": reviewer_reason,
+                    }
+                    state.set_evaluator_result(evaluator_dict)
+
+                    # Always require human confirmation for non-test-driven completion
+                    diff = curr_diff or get_diff(config.local_repo_path)
+                    print(f"\n[PERMISSION] Code diff inspection for goal completion:\n{diff[:2000]}\n")
+                    approve = input("Approve and commit this change? [y/N] ").strip().lower()
+                    if approve != "y":
+                        print("[PERMISSION] Change rejected by user; stopping.")
+                        state.set_termination_reason(TerminationReason.USER_REJECTED)
+                        _save_state()
+                        print_execution_summary(state, False, iterations_run)
+                        if registry is not None:
+                            try:
+                                asyncio.run(registry.close())
+                            except Exception:
+                                pass
+                        return False
+
+            elif isinstance(verification_strategy, str) and verification_strategy.strip():
                 # Generalized verification engine
                 eval_kwargs = getattr(config, "verification_kwargs", {})
                 gen_evaluator = GeneralEvaluator()
@@ -404,6 +474,22 @@ def run(config) -> bool:
                     "feedback": v_result.evidence,
                 }
                 state.set_evaluator_result(evaluator_dict)
+
+                if config.require_approval:
+                    diff = get_diff(config.local_repo_path)
+                    print(f"\n[PERMISSION] Code diff inspection:\n{diff[:2000]}\n")
+                    approve = input("Commit this change? [y/N] ").strip().lower()
+                    if approve != "y":
+                        print("[PERMISSION] Change rejected by user; stopping.")
+                        state.set_termination_reason(TerminationReason.USER_REJECTED)
+                        _save_state()
+                        print_execution_summary(state, False, iterations_run)
+                        if registry is not None:
+                            try:
+                                asyncio.run(registry.close())
+                            except Exception:
+                                pass
+                        return False
             else:
                 # Standard / legacy test execution
                 target_test_path = getattr(config, "target_test_path", None)
@@ -431,21 +517,21 @@ def run(config) -> bool:
                 )
                 state.set_evaluator_result(evaluator_dict)
 
-            if config.require_approval:
-                diff = get_diff(config.local_repo_path)
-                print(f"\n[PERMISSION] Code diff inspection:\n{diff[:2000]}\n")
-                approve = input("Commit this change? [y/N] ").strip().lower()
-                if approve != "y":
-                    print("[PERMISSION] Change rejected by user; stopping.")
-                    state.set_termination_reason(TerminationReason.USER_REJECTED)
-                    _save_state()
-                    print_execution_summary(state, False, iterations_run)
-                    if registry is not None:
-                        try:
-                            asyncio.run(registry.close())
-                        except Exception:
-                            pass
-                    return False
+                if config.require_approval:
+                    diff = get_diff(config.local_repo_path)
+                    print(f"\n[PERMISSION] Code diff inspection:\n{diff[:2000]}\n")
+                    approve = input("Commit this change? [y/N] ").strip().lower()
+                    if approve != "y":
+                        print("[PERMISSION] Change rejected by user; stopping.")
+                        state.set_termination_reason(TerminationReason.USER_REJECTED)
+                        _save_state()
+                        print_execution_summary(state, False, iterations_run)
+                        if registry is not None:
+                            try:
+                                asyncio.run(registry.close())
+                            except Exception:
+                                pass
+                        return False
 
             # Capture diff BEFORE commit so it reflects what the agent changed this iteration.
             # get_diff() returns the staged+unstaged diff against HEAD; after commit it returns
@@ -593,9 +679,14 @@ def run(config) -> bool:
                     return False
 
 
-            if not getattr(config, "verification_strategy", None):
-                signature = failure_signature(result)
-                state_force = state.note_failure(signature)
+            if is_test_driven and not getattr(config, "verification_strategy", None):
+                result_obj = locals().get("result")
+                if result_obj is not None:
+                    signature = failure_signature(result_obj)
+                    state_force = state.note_failure(signature)
+                    force_new_strategy = force_new_strategy or state_force
+            elif not evaluator_dict.get("is_correct"):
+                state_force = state.note_failure(output_tail[:100] if output_tail else "verification failed")
                 force_new_strategy = force_new_strategy or state_force
 
             last_output_tail = output_tail

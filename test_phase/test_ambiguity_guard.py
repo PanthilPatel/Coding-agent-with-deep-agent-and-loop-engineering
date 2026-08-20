@@ -1,7 +1,12 @@
 """Unit tests for ambiguity guard in PatchedFilesystemBackend."""
 
+import os
+import sys
 import pytest
 from langgraph.errors import GraphRecursionError
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
 from agents.worker import PatchedFilesystemBackend
 
 

@@ -230,6 +230,25 @@ class GoalPlanner:
 
         return []
 
+    def classify_goal_type(self, goal: str) -> str:
+        """Classify a goal into 'test_driven' vs 'non_test_driven'.
+
+        - 'test_driven': goals centered around tests, assertions, bug fixes, or pytest failures.
+        - 'non_test_driven': feature additions, refactoring, documentation, exploratory tasks, etc.
+        """
+        g_lower = goal.lower().strip()
+        test_driven_patterns = [
+            r"\b(?:fix|resolve|repair|debug|investigate|correct)\b.*?\b(?:test|tests|assertion|traceback|failure|bug|failing|error|crash)\b",
+            r"\b(?:debug|traceback|crash|assertionerror)\b",
+            r"\b(?:make|get)\b.*?\b(?:pass|passing|green)\b",
+            r"\b(?:failing|failed|broken)\s+(?:tests?|suites?|unit tests?)\b",
+            r"\b(?:unit\s+tests?|pytest|unittest|test_suite|tests?)\b",
+            r"\ball\s+tests?\s+pass\b",
+        ]
+        if any(re.search(pat, g_lower) for pat in test_driven_patterns):
+            return "test_driven"
+        return "non_test_driven"
+
     def _infer_verification(self, description: str) -> tuple[Optional[str], Dict[str, Any]]:
         """Infer an explicit verification strategy and kwargs from subtask description."""
         desc_lower = description.lower()

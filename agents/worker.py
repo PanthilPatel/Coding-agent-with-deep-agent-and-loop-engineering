@@ -498,6 +498,59 @@ class TerminalLogCallbackHandler(BaseCallbackHandler):
         out_str = str(output).strip()
         self._log_to_file(f"[RESULT] Tool returned: {out_str}")
 
+REVIEWER_SUBAGENT = SubAgent(
+    name="reviewer",
+    description=(
+        "Reviews a code diff for correctness, style, and whether it "
+        "actually addresses the reported goal. Does not edit files itself; "
+        "only comments."
+    ),
+    system_prompt=(
+        "You are a careful code reviewer. You will be given a diff and the goal "
+        "it was meant to achieve. Check whether the diff plausibly achieved the "
+        "goal, whether it introduces obvious bugs or regressions, and whether it "
+        "follows existing code style. Respond with either 'APPROVE' followed by a "
+        "one-line reason, or 'REJECT' followed by a specific, actionable reason."
+    ),
+)
+
+
+def review_diff(
+    diff: str,
+    goal: str,
+    model_name: str = "qwen2.5-coder:7b",
+    llm_provider: str = "ollama",
+) -> tuple[bool, str]:
+    """Invoke the REVIEWER_SUBAGENT to sanity check a code diff against the goal.
+
+    Returns:
+        (approved: bool, reason: str)
+    """
+    if not diff or not diff.strip():
+        return True, "No changes detected."
+
+    reviewer_sys_prompt = REVIEWER_SUBAGENT.get("system_prompt") if isinstance(REVIEWER_SUBAGENT, dict) else getattr(REVIEWER_SUBAGENT, "system_prompt", "")
+    prompt = (
+        f"{reviewer_sys_prompt}\n\n"
+        f"Goal: {goal}\n\n"
+        f"Diff:\n{diff[:4000]}\n\n"
+        "Please provide your verdict ('APPROVE' or 'REJECT' followed by reason):"
+    )
+
+    try:
+        model = _build_model(model_name, llm_provider)
+        response = model.invoke(prompt)
+        text = response.content if hasattr(response, "content") else str(response)
+        text_str = text.strip() if isinstance(text, str) else str(text).strip()
+        
+        if "REJECT" in text_str.upper() and not text_str.upper().startswith("APPROVE"):
+            return False, text_str
+        return True, text_str
+    except Exception as e:
+        print(f"[REVIEWER] Reviewer subagent error: {e}. Defaulting to approval.")
+        return True, f"Reviewer subagent error: {e}"
+
+
 WORKER_SYSTEM_PROMPT = """You are an autonomous coding agent working inside a
 real repository on disk. Your job is to achieve the given goal by inspecting the environment, executing commands, and reading/editing source files directly.
 
@@ -506,12 +559,10 @@ Rules:
 - You must invoke tools directly to read, edit, execute, or manage files. Do not simply describe your plans in text responses; execute the tool calls to perform the work.
 - The working directory root is already the target repo. All file paths must be relative to current directory.
 - CRITICAL: Keep actions minimal. Complete your diagnosis and code edit in 2 to 4 steps.
-- CRITICAL: Once you have edited the buggy file with `edit_file`, DO NOT run more exploratory tools. Immediately provide a brief 1-sentence summary and conclude your turn so the evaluator can verify the fix.
-- CRITICAL: After successfully calling edit_file, STOP immediately so the test runner can evaluate your changes.
+- CRITICAL: Once you have edited the relevant file with `edit_file`, DO NOT run more exploratory tools. Immediately provide a brief 1-sentence summary and conclude your turn so your changes can be verified.
 - CRITICAL: All argument values in tool calls MUST be valid JSON strings with proper escaping. Always wrap code strings in standard double quotes. Example:
   {"file_path": "foo.py", "old_string": "def bar():\\n    return 1", "new_string": "def bar():\\n    return 2"}
   Never emit unescaped newlines inside JSON string arguments.
-- If a test command is available, you can run tests to verify your fix before concluding.
 - Do NOT guess or hallucinate file paths; always list or read files first.
 """
 
