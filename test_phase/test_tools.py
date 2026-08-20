@@ -376,3 +376,23 @@ class TestListDirectory:
         result = list_directory(str(tmp_path))
         names = [e["name"] for e in result["entries"]]
         assert names == sorted(names)
+
+
+class TestPatchedFilesystemBackend:
+    def test_edit_ambiguity_returns_error(self, tmp_path):
+        from agents.worker import PatchedFilesystemBackend
+        f = tmp_path / "foo.py"
+        f.write_text("x = 1\nx = 1\n", encoding="utf-8")
+        backend = PatchedFilesystemBackend(root_dir=str(tmp_path))
+        res = backend.edit(file_path="foo.py", old_string="x = 1", new_string="x = 2")
+        assert res.error is not None
+        assert "matched multiple locations" in res.error
+
+    def test_edit_not_found_returns_error(self, tmp_path):
+        from agents.worker import PatchedFilesystemBackend
+        f = tmp_path / "foo.py"
+        f.write_text("x = 1\n", encoding="utf-8")
+        backend = PatchedFilesystemBackend(root_dir=str(tmp_path))
+        res = backend.edit(file_path="foo.py", old_string="x = 5", new_string="x = 2")
+        assert res.error is not None
+        assert "was not found" in res.error

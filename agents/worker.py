@@ -88,6 +88,9 @@ class PatchedFilesystemBackend(FilesystemBackend):
             if cleaned_old not in file_content:
                 return EditResult(error=f"Error: 'old_string' was not found in {file_path}. Please read the file first to ensure exact string and whitespace matching.")
 
+            if file_content.count(cleaned_old) > 1:
+                return EditResult(error=f"Error: 'old_string' matched multiple locations in {file_path}. Please include surrounding lines (like function definitions or neighboring comments) in 'old_string' to make it unique.")
+
             res = super().edit(file_path=file_path, old_string=cleaned_old, new_string=cleaned_new, replace_all=replace_all, *args, **kwargs)
             from langgraph.errors import GraphRecursionError
             raise GraphRecursionError("[SHORT_CIRCUIT] File edit completed successfully. Ending turn.")
@@ -409,6 +412,7 @@ Rules:
 {"name": "edit_file", "arguments": {"file_path": "calculator.py", "old_string": "'^': power", "new_string": "'**': power"}}
 ```
 - CRITICAL: NEVER modify test files (e.g. test_*.py). Only edit implementation files in the repository.
+- CRITICAL: When editing files, always provide sufficient unique surrounding context (2-4 lines) in `old_string` to prevent ambiguous matching when identical lines exist elsewhere in the file.
 - CRITICAL: When using 'read_file', the tool prefixes lines with line numbers for reference (e.g. ' 1  import pytest'). These numbers are NOT part of the actual file text. When using 'edit_file', do NOT include line numbers in old_string or new_string.
 - CRITICAL: NEVER run 'pip install pytest' or try to install packages when a test fails. Pytest is already installed and functional. Exit code 1 means your code has a bug that you must fix.
 - CRITICAL: When using edit_file, ensure 'new_string' is strictly different from 'old_string'.
