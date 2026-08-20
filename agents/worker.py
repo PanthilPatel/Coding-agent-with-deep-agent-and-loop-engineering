@@ -613,38 +613,74 @@ def _build_model(model_name: str, llm_provider: str):
     else:
         raise ValueError(f"Unsupported llm_provider: {llm_provider}")
 
+MAX_AGENT_MD_CHARS = 20000
+
+
+def load_agent_md(repo_path: str) -> str:
+    """Read project conventions from AGENT.md at the target repository root if present.
+
+    Returns the formatted section string to append to the system prompt, or empty string.
+    Truncates if file exceeds MAX_AGENT_MD_CHARS with a warning.
+    """
+    if not repo_path:
+        return ""
+
+    agent_md_path = os.path.join(repo_path, "AGENT.md")
+    if not os.path.isfile(agent_md_path):
+        return ""
+
+    try:
+        with open(agent_md_path, "r", encoding="utf-8", errors="replace") as f:
+            content = f.read()
+
+        if len(content) > MAX_AGENT_MD_CHARS:
+            omitted = len(content) - MAX_AGENT_MD_CHARS
+            content = content[:MAX_AGENT_MD_CHARS] + f"\n\n[... AGENT.md truncated, {omitted} characters omitted ...]"
+            print(f"[AGENT] Warning: AGENT.md in '{repo_path}' is unusually large ({len(content) + omitted} chars) and was truncated.")
+
+        return f"\n\n## Project-specific notes (from AGENT.md)\n{content.strip()}"
+    except Exception as e:
+        print(f"[AGENT] Warning: Failed to read AGENT.md: {e}")
+        return ""
+
+
 def build_worker_agent(
     repo_path: str,
     model_name: str = "qwen2.5-coder:7b",
     llm_provider: str = "ollama",
     extra_tools: list = None,
     checkpointer=None,
+    custom_system_prompt: str = None,
 ):
     """Construct the deep agent worker, scoped to 'repo_path'.
 
     Args:
-        repo_path:    Absolute path to the target repository.
-        model_name:   Name of the Ollama model to use.
-        llm_provider: LLM provider identifier ('ollama' or 'ollama_cloud').
-        extra_tools:  Additional LangChain BaseTool instances to register
-                      alongside the FilesystemBackend's built-in tools.
-                      Passed as ``tools=`` to ``create_deep_agent()`` —
-                      parameter name confirmed from deepagents 0.7.5 source.
-                      When None (default), no extra tools are added.
-        checkpointer: Optional LangGraph checkpoint saver (e.g. MemorySaver)
-                      to persist conversation state across multiple turns.
-                      When None (default), no state checkpointing is performed.
+        repo_path:            Absolute path to the target repository.
+        model_name:           Name of the Ollama model to use.
+        llm_provider:         LLM provider identifier ('ollama' or 'ollama_cloud').
+        extra_tools:          Additional LangChain BaseTool instances to register
+                              alongside the FilesystemBackend's built-in tools.
+        checkpointer:         Optional LangGraph checkpoint saver (e.g. MemorySaver)
+                              to persist conversation state across multiple turns.
+        custom_system_prompt: Optional override or pre-built system prompt.
+                              If None, WORKER_SYSTEM_PROMPT is combined with AGENT.md if found.
 
     Returns a LangGraph-compiled agent that can be invoked with 
     'agent.invoke({"messages": [...]})'.
     """
     model = _build_model(model_name, llm_provider)
     backend = PatchedFilesystemBackend(root_dir=repo_path)
+    
+    if custom_system_prompt is not None:
+        effective_prompt = custom_system_prompt
+    else:
+        project_notes = load_agent_md(repo_path)
+        effective_prompt = WORKER_SYSTEM_PROMPT + project_notes
      
     agent = create_deep_agent(
         model=model,
         tools=extra_tools if extra_tools else None,
-        system_prompt=WORKER_SYSTEM_PROMPT,
+        system_prompt=effective_prompt,
         backend=backend,
         checkpointer=checkpointer,
     )
