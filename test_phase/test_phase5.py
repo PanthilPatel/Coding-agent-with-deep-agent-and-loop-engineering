@@ -244,16 +244,17 @@ class TestREPLLoop:
     """Verify the interactive prompt loop handles input correctly."""
     
     def test_repl_calls_run_for_each_task(self, sample_config):
-        """Each submitted task should invoke controller.loop.run()."""
-        # Simulate user input: two tasks, then exit
-        mock_input = mock.Mock(side_effect=["task one", "task two", "exit"])
+        """Each /run command should invoke controller.loop.run()."""
+        mock_input = mock.Mock(side_effect=["/run task one", "/run task two", "exit"])
         mock_run = MagicMock(return_value=True)
+        mock_agent = MagicMock()
         
-        with patch("builtins.input", mock_input):
-            with patch("cli.interactive.run_controller_loop", mock_run):
-                run_interactive(sample_config)
+        with patch("cli.interactive.build_worker_agent", return_value=mock_agent):
+            with patch("builtins.input", mock_input):
+                with patch("cli.interactive.run_controller_loop", mock_run):
+                    run_interactive(sample_config)
         
-        # Should have called run twice (once per task)
+        # Should have called run twice (once per /run command)
         assert mock_run.call_count == 2
         
         # Verify each call received a Config with the correct goal
@@ -263,60 +264,70 @@ class TestREPLLoop:
     
     def test_repl_handles_empty_lines(self, sample_config):
         """Empty lines should be ignored, not passed to run()."""
-        mock_input = mock.Mock(side_effect=["", "  ", "real task", "exit"])
+        mock_input = mock.Mock(side_effect=["", "  ", "/run real task", "exit"])
         mock_run = MagicMock(return_value=True)
+        mock_agent = MagicMock()
         
-        with patch("builtins.input", mock_input):
-            with patch("cli.interactive.run_controller_loop", mock_run):
-                run_interactive(sample_config)
+        with patch("cli.interactive.build_worker_agent", return_value=mock_agent):
+            with patch("builtins.input", mock_input):
+                with patch("cli.interactive.run_controller_loop", mock_run):
+                    run_interactive(sample_config)
         
-        # Only "real task" should invoke run
+        # Only "/run real task" should invoke run
         assert mock_run.call_count == 1
         assert mock_run.call_args[0][0].goal == "real task"
     
     def test_repl_exits_on_quit_command(self, sample_config):
         """The 'quit' command should exit the loop cleanly."""
-        mock_input = mock.Mock(side_effect=["task one", "quit"])
+        mock_input = mock.Mock(side_effect=["/run task one", "quit"])
         mock_run = MagicMock(return_value=True)
+        mock_agent = MagicMock()
         
-        with patch("builtins.input", mock_input):
-            with patch("cli.interactive.run_controller_loop", mock_run):
-                run_interactive(sample_config)
+        with patch("cli.interactive.build_worker_agent", return_value=mock_agent):
+            with patch("builtins.input", mock_input):
+                with patch("cli.interactive.run_controller_loop", mock_run):
+                    run_interactive(sample_config)
         
         # Should have run once before quit
         assert mock_run.call_count == 1
     
     def test_repl_exits_on_exit_command(self, sample_config):
         """The 'exit' command should exit the loop cleanly."""
-        mock_input = mock.Mock(side_effect=["task one", "exit"])
+        mock_input = mock.Mock(side_effect=["/run task one", "exit"])
         mock_run = MagicMock(return_value=True)
+        mock_agent = MagicMock()
         
-        with patch("builtins.input", mock_input):
-            with patch("cli.interactive.run_controller_loop", mock_run):
-                run_interactive(sample_config)
+        with patch("cli.interactive.build_worker_agent", return_value=mock_agent):
+            with patch("builtins.input", mock_input):
+                with patch("cli.interactive.run_controller_loop", mock_run):
+                    run_interactive(sample_config)
         
         assert mock_run.call_count == 1
     
     def test_repl_handles_eof(self, sample_config):
         """EOFError (Ctrl+D) should exit cleanly."""
-        mock_input = mock.Mock(side_effect=["task one", EOFError()])
+        mock_input = mock.Mock(side_effect=["/run task one", EOFError()])
         mock_run = MagicMock(return_value=True)
+        mock_agent = MagicMock()
         
-        with patch("builtins.input", mock_input):
-            with patch("cli.interactive.run_controller_loop", mock_run):
-                run_interactive(sample_config)
+        with patch("cli.interactive.build_worker_agent", return_value=mock_agent):
+            with patch("builtins.input", mock_input):
+                with patch("cli.interactive.run_controller_loop", mock_run):
+                    run_interactive(sample_config)
         
         # Should complete the one task before EOF
         assert mock_run.call_count == 1
     
     def test_repl_handles_keyboard_interrupt(self, sample_config):
         """KeyboardInterrupt (Ctrl+C) should exit cleanly."""
-        mock_input = mock.Mock(side_effect=["task one", KeyboardInterrupt()])
+        mock_input = mock.Mock(side_effect=["/run task one", KeyboardInterrupt()])
         mock_run = MagicMock(return_value=True)
+        mock_agent = MagicMock()
         
-        with patch("builtins.input", mock_input):
-            with patch("cli.interactive.run_controller_loop", mock_run):
-                run_interactive(sample_config)
+        with patch("cli.interactive.build_worker_agent", return_value=mock_agent):
+            with patch("builtins.input", mock_input):
+                with patch("cli.interactive.run_controller_loop", mock_run):
+                    run_interactive(sample_config)
         
         assert mock_run.call_count == 1
     
@@ -325,10 +336,12 @@ class TestREPLLoop:
         for exit_cmd in ["EXIT", "Exit", "QUIT", "Quit", "QuIt"]:
             mock_input = mock.Mock(side_effect=[exit_cmd])
             mock_run = MagicMock(return_value=True)
+            mock_agent = MagicMock()
             
-            with patch("builtins.input", mock_input):
-                with patch("cli.interactive.run_controller_loop", mock_run):
-                    run_interactive(sample_config)
+            with patch("cli.interactive.build_worker_agent", return_value=mock_agent):
+                with patch("builtins.input", mock_input):
+                    with patch("cli.interactive.run_controller_loop", mock_run):
+                        run_interactive(sample_config)
             
             # Should not call run (exit immediately)
             assert mock_run.call_count == 0
@@ -351,23 +364,42 @@ class TestMCPShutdown:
             mcp_config_path=temp_mcp_config,
         )
         
-        # Mock the MCP registry
-        mock_registry = MagicMock()
-        mock_registry_class = MagicMock(return_value=mock_registry)
-        
         mock_input = mock.Mock(side_effect=["exit"])
-        mock_run = MagicMock(return_value=True)
+        mock_registry_close = mock.AsyncMock()
+        mock_agent = MagicMock()
         
-        with patch("builtins.input", mock_input):
-            with patch("cli.interactive.run_controller_loop", mock_run):
-                with patch("mcp_agent.registry.MCPRegistry", mock_registry_class):
-                    run_interactive(config)
-        
-        # Verify registry was initialized
-        assert mock_registry_class.call_count == 1
+        with patch("cli.interactive.build_worker_agent", return_value=mock_agent):
+            with patch("builtins.input", mock_input):
+                with patch("mcp_agent.registry.MCPRegistry.close", mock_registry_close):
+                    with patch("mcp_agent.registry.MCPRegistry.initialize", mock.AsyncMock()):
+                        run_interactive(config)
         
         # Verify close was called
-        assert mock_registry.close.call_count > 0
+        mock_registry_close.assert_called_once()
+    
+    def test_shutdown_handles_mcp_errors_gracefully(
+        self, temp_repo, temp_mcp_config, monkeypatch, capsys
+    ):
+        """If MCP close() fails, it shouldn't crash the exit process."""
+        monkeypatch.setenv("OLLAMA_API_KEY", "test-key")
+        
+        config = Config(
+            repo_path=temp_repo,
+            goal="test",
+            mcp_config_path=temp_mcp_config,
+        )
+        
+        mock_input = mock.Mock(side_effect=["exit"])
+        mock_registry_close = mock.AsyncMock(side_effect=RuntimeError("MCP Close Failed"))
+        mock_agent = MagicMock()
+        
+        with patch("cli.interactive.build_worker_agent", return_value=mock_agent):
+            with patch("builtins.input", mock_input):
+                with patch("mcp_agent.registry.MCPRegistry.close", mock_registry_close):
+                    with patch("mcp_agent.registry.MCPRegistry.initialize", mock.AsyncMock()):
+                        run_interactive(config)
+        
+        # Just verify it completes without error
     
     def test_no_mcp_shutdown_when_not_configured(self, sample_config):
         """When MCP is not configured, no shutdown should be attempted."""
@@ -390,13 +422,15 @@ class TestStateIsolation:
     """Verify each task gets a fresh state."""
     
     def test_each_task_creates_new_config(self, sample_config):
-        """Each task should create a new Config instance with updated goal."""
-        mock_input = mock.Mock(side_effect=["task A", "task B", "exit"])
+        """Each /run task should create a new Config instance with updated goal."""
+        mock_input = mock.Mock(side_effect=["/run task A", "/run task B", "exit"])
         mock_run = MagicMock(return_value=True)
+        mock_agent = MagicMock()
         
-        with patch("builtins.input", mock_input):
-            with patch("cli.interactive.run_controller_loop", mock_run):
-                run_interactive(sample_config)
+        with patch("cli.interactive.build_worker_agent", return_value=mock_agent):
+            with patch("builtins.input", mock_input):
+                with patch("cli.interactive.run_controller_loop", mock_run):
+                    run_interactive(sample_config)
         
         # Get the Config objects passed to each run call
         configs = [call[0][0] for call in mock_run.call_args_list]

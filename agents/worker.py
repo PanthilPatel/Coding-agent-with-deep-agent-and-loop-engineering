@@ -392,10 +392,10 @@ class PatchedChatOllama(ChatOllama):
 # Using a dict (not a return-value change) so existing test mocks stay valid.
 _last_turn_token_usage: dict = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
 
-
 class TerminalLogCallbackHandler(BaseCallbackHandler):
-    def __init__(self, log_dir: str = "agent_logs"):
+    def __init__(self, log_dir: str = "agent_logs", cancellation_event=None):
         super().__init__()
+        self.cancellation_event = cancellation_event
         try:
             os.makedirs(log_dir, exist_ok=True)
         except Exception:
@@ -420,7 +420,14 @@ class TerminalLogCallbackHandler(BaseCallbackHandler):
         """Return a copy of the accumulated token totals for this turn."""
         return dict(self._turn_token_totals)
 
+    def _check_interrupted(self):
+        if self.cancellation_event is not None and self.cancellation_event.is_set():
+            # Interruption takes effect at the next tool-call/LLM-call boundary.
+            # Documented limitation: not instant mid-token cancellation.
+            raise InterruptedError("Turn interrupted by user.")
+
     def on_llm_start(self, serialized, prompts, **kwargs):
+        self._check_interrupted()
         prompt_chars = sum(len(p) for p in prompts) if prompts else 0
         est_tokens = prompt_chars // 4
         msg = f"[AGENT] Calling LLM to analyze and plan... (prompt: ~{est_tokens} tokens / {prompt_chars} chars)"
@@ -482,6 +489,7 @@ class TerminalLogCallbackHandler(BaseCallbackHandler):
             self._turn_token_totals["total_tokens"] += total_tokens
 
     def on_tool_start(self, serialized, input_str, **kwargs):
+        self._check_interrupted()
         name = serialized.get("name", "tool")
         print(f"[TOOL] Executing tool '{name}'")
         self._log_to_file(f"[TOOL] Executing tool '{name}' with input: {input_str}")
@@ -489,23 +497,6 @@ class TerminalLogCallbackHandler(BaseCallbackHandler):
     def on_tool_end(self, output, **kwargs):
         out_str = str(output).strip()
         self._log_to_file(f"[RESULT] Tool returned: {out_str}")
-
-REVIEWER_SUBAGENT = SubAgent(
-    name="reviewer",
-    description=(
-        "Reviews a code diff for correctness, style, and whether it "
-        "actually addresses the reported test failure. Does not edit "
-        "files itself; only comments."
-    ),
-    system_prompt=(
-        "You are a careful code reviewer. You will be given a diff and "
-        "the test failure it was meant to fix. Check whether the diff "
-        "plausibly fixed the failure, whether it introduces obvious bugs "
-        "or regressions, and whether it follows the existing code style. "
-        "Respond with either 'APPROVE' followed by a one-line reason, or "
-        "'REJECT' followed by a specific, actionable reason."
-    ),
-)
 
 WORKER_SYSTEM_PROMPT = """You are an autonomous coding agent working inside a
 real repository on disk. Your job is to achieve the given goal by inspecting the environment, executing commands, and reading/editing source files directly.
@@ -518,35 +509,33 @@ Rules:
 - CRITICAL: Once you have edited the buggy file with `edit_file`, DO NOT run more exploratory tools. Immediately provide a brief 1-sentence summary and conclude your turn so the evaluator can verify the fix.
 - CRITICAL: After successfully calling edit_file, STOP immediately so the test runner can evaluate your changes.
 - CRITICAL: All argument values in tool calls MUST be valid JSON strings with proper escaping. Always wrap code strings in standard double quotes. Example:
-```json
-{"name": "edit_file", "arguments": {"file_path": "calculator.py", "old_string": "'^': power", "new_string": "'**': power"}}
-```
-- CRITICAL: NEVER modify test files (e.g. test_*.py). Only edit implementation files in the repository.
-- CRITICAL: When editing files, always provide sufficient unique surrounding context (2-4 lines) in `old_string` to prevent ambiguous matching when identical lines exist elsewhere in the file.
-- CRITICAL: When using 'read_file', the tool prefixes lines with line numbers for reference (e.g. ' 1  import pytest'). These numbers are NOT part of the actual file text. When using 'edit_file', do NOT include line numbers in old_string or new_string.
-- CRITICAL: NEVER run 'pip install pytest' or try to install packages when a test fails. Pytest is already installed and functional. Exit code 1 means your code has a bug that you must fix.
-- CRITICAL: When using edit_file, ensure 'new_string' is strictly different from 'old_string'.
-- CRITICAL: Always read the failing test file and the corresponding source file before attempting any edit. Do not guess at code you have not read.
-- Terminal & Execution: Use 'execute_command' to run shell commands, check compiler outputs, run sub-scripts, or inspect environment states. Always declare an appropriate risk_tier ('auto' for read/safe, 'confirm' for state-changing/moves, 'destructive' for deletions/resets). Observe exit codes and stderr to self-correct upon failures.
-- Always start by writing a short todo list breaking the goal into concrete steps, and keep it updated as you make progress.
-- Make the smallest change that could plausibly fix a reported issue.
-- After editing or executing commands, briefly summarize what you changed and why, in one or two sentences, so the controller can log it.
-- Once you have completed the necessary operations and verified your work, conclude your turn with a clear final response summary.
+  {"file_path": "foo.py", "old_string": "def bar():\\n    return 1", "new_string": "def bar():\\n    return 2"}
+  Never emit unescaped newlines inside JSON string arguments.
+- If a test command is available, you can run tests to verify your fix before concluding.
+- Do NOT guess or hallucinate file paths; always list or read files first.
 """
 
+def _build_model(model_name: str, llm_provider: str):
+    """Factory helper to construct the LLM chat client based on provider."""
+    timeout_env = os.environ.get("OLLAMA_TIMEOUT", "60")
+    try:
+        timeout = float(timeout_env)
+    except ValueError:
+        timeout = 60.0
 
-def _build_model(model_name: str, llm_provider: str = "ollama_cloud") -> Any:
-    """Instantiate and return the configured chat model.
+    num_ctx_env = os.environ.get("OLLAMA_NUM_CTX", "16384")
+    try:
+        num_ctx = int(num_ctx_env)
+    except ValueError:
+        num_ctx = 16384
 
-    Supports both ``ollama_cloud`` (remote) and ``ollama`` (local).
-    """
-    timeout = float(os.environ.get("OLLAMA_TIMEOUT", "60.0"))  # Keep well below benchmark wall-clock timeout
-    num_ctx = int(os.environ.get("OLLAMA_NUM_CTX", "8192"))
     if llm_provider == "ollama_cloud":
+        api_key = os.environ.get("OLLAMA_API_KEY")
         return PatchedChatOllama(
             model=model_name,
             base_url="https://ollama.com",
-            headers={"Authorization": f"Bearer {os.environ['OLLAMA_API_KEY']}"},
+            api_key=api_key,
+            num_ctx=num_ctx,
             client_kwargs={"timeout": timeout},
             sync_client_kwargs={"timeout": timeout},
         )
@@ -578,6 +567,7 @@ def build_worker_agent(
     model_name: str = "qwen2.5-coder:7b",
     llm_provider: str = "ollama",
     extra_tools: list = None,
+    checkpointer=None,
 ):
     """Construct the deep agent worker, scoped to 'repo_path'.
 
@@ -590,6 +580,9 @@ def build_worker_agent(
                       Passed as ``tools=`` to ``create_deep_agent()`` —
                       parameter name confirmed from deepagents 0.7.5 source.
                       When None (default), no extra tools are added.
+        checkpointer: Optional LangGraph checkpoint saver (e.g. MemorySaver)
+                      to persist conversation state across multiple turns.
+                      When None (default), no state checkpointing is performed.
 
     Returns a LangGraph-compiled agent that can be invoked with 
     'agent.invoke({"messages": [...]})'.
@@ -602,10 +595,16 @@ def build_worker_agent(
         tools=extra_tools if extra_tools else None,
         system_prompt=WORKER_SYSTEM_PROMPT,
         backend=backend,
+        checkpointer=checkpointer,
     )
     return agent
 
-def run_worker_turn(agent, instruction: str) -> str:
+def run_worker_turn(
+    agent,
+    instruction: str,
+    thread_id: str = None,
+    cancellation_event=None,
+) -> str:
     """Invoke the worker agent with a single instruction and return the
     text of its final response.
 
@@ -613,20 +612,31 @@ def run_worker_turn(agent, instruction: str) -> str:
     written to the module-level ``_last_turn_token_usage`` dict after every
     exit path so that ``controller.loop`` can read it without a signature
     change (preserving all existing test-mock compatibility).
+
+    Args:
+        agent:              Compiled LangGraph deep agent instance.
+        instruction:        Instruction prompt string for this turn.
+        thread_id:          Optional thread ID string for session-persistent state.
+        cancellation_event: Optional threading.Event to interrupt long turns.
     """
     global _last_turn_token_usage
     # Reset side-channel before each turn
     _last_turn_token_usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
 
     from langgraph.errors import GraphRecursionError
-    handler = TerminalLogCallbackHandler()
+    handler = TerminalLogCallbackHandler(cancellation_event=cancellation_event)
+    
+    config_dict = {
+        "callbacks": [handler],
+        "recursion_limit": 30,
+    }
+    if thread_id:
+        config_dict["configurable"] = {"thread_id": thread_id}
+
     try:
         result = agent.invoke(
             {"messages": [{"role": "user", "content": instruction}]},
-            config={
-                "callbacks": [handler],
-                "recursion_limit": 30
-            }
+            config=config_dict,
         )
         # Publish token totals to side-channel before returning
         _last_turn_token_usage = handler.get_turn_token_totals()
@@ -637,6 +647,10 @@ def run_worker_turn(agent, instruction: str) -> str:
         if isinstance(last, dict):
             return last.get("content", "") or ""
         return getattr(last, "content", "") or ""
+    except InterruptedError:
+        _last_turn_token_usage = handler.get_turn_token_totals()
+        print("\n[worker] Turn interrupted by user.")
+        return "Turn interrupted by user."
     except GraphRecursionError as gre:
         _last_turn_token_usage = handler.get_turn_token_totals()
         if "[SHORT_CIRCUIT]" in str(gre):
@@ -650,6 +664,9 @@ def run_worker_turn(agent, instruction: str) -> str:
         if "[SHORT_CIRCUIT]" in err_msg:
             print("\n[worker] Short-circuit triggered: Code edit/write completed. Ending turn immediately.")
             return "File changes made successfully. Turn completed."
+        if "Turn interrupted by user" in err_msg or isinstance(e, InterruptedError):
+            print("\n[worker] Turn interrupted by user.")
+            return "Turn interrupted by user."
         timeout_keywords = ("timed out", "timeout", "read timeout", "connect timeout")
         if any(kw in err_msg.lower() for kw in timeout_keywords):
             timeout_val = os.environ.get("OLLAMA_TIMEOUT", "60")
@@ -660,5 +677,3 @@ def run_worker_turn(agent, instruction: str) -> str:
             return f"Agent failed with connection error: Could not connect to local Ollama. Please make sure the Ollama service is running locally on http://localhost:11434 and the model is pulled."
         print(f"\n[worker] Error during execution: {e}")
         return f"Agent failed with error: {e}"
-
-
