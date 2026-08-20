@@ -19,6 +19,7 @@ class TerminationReason:
     TOOL_ERROR = "tool_error"
     VERIFICATION_FAILED = "verification_failed"
     UNRECOVERABLE_ERROR = "unrecoverable_error"
+    NO_CHANGES_MADE = "no_changes_made"
 
 
 @dataclass

@@ -112,7 +112,8 @@ def print_execution_summary(state, success: bool, iterations_run: int) -> None:
     print("\n" + "="*60)
     print("                     EXECUTION SUMMARY")
     print("="*60)
-    print(f"Overall Status:      {'SUCCESS (Code is now error-free)' if success else 'FAILED (Tests are still failing)'}")
+    is_truly_successful = success and state.termination_reason == TerminationReason.SUCCESS
+    print(f"Overall Status:      {'SUCCESS (Code is now error-free)' if is_truly_successful else 'FAILED (Verification not met)'}")
     print(f"Iterations Run:      {iterations_run}")
     if state.termination_reason:
         print(f"Termination Reason:  {state.termination_reason}")
@@ -399,55 +400,31 @@ def run(config) -> bool:
 
             if verification_strategy == "reviewer_approval" or (not is_test_driven and not verification_strategy):
                 # Non-test-driven hybrid flow:
-                # 1. Reviewer subagent first-pass sanity check
-                # 2. If rejected and no retry used yet: give worker 1 corrective retry
-                # 3. Always prompt human approval gate before commit
+                # 1. Hard check: exclude state.json and check if any real changes exist.
                 from agents.worker import review_diff
                 curr_diff = get_diff(config.local_repo_path)
-                reviewer_approved, reviewer_reason = review_diff(
-                    diff=curr_diff,
-                    goal=config.goal,
-                    model_name=config.model_name,
-                    llm_provider=config.llm_provider,
-                )
-                print(f"[REVIEWER] Verdict: {'APPROVE' if reviewer_approved else 'REJECT'} — {reviewer_reason}")
 
-                if not reviewer_approved and consecutive_failures == 0:
-                    # Allow exactly 1 corrective retry turn
-                    print(f"[REVIEWER] First-pass rejected. Retrying 1 corrective turn with feedback.")
-                    passed = False
-                    output_tail = f"Reviewer subagent feedback: {reviewer_reason}"
-                    last_returncode = 1
-                    evaluator_dict = {
-                        "is_correct": False,
-                        "score": 0.0,
-                        "issues": ["reviewer_rejected"],
-                        "critical_gaps": ["reviewer_rejection"],
-                        "feedback": reviewer_reason,
-                    }
-                    state.set_evaluator_result(evaluator_dict)
-                else:
-                    # Proceed to human approval gate
-                    passed = reviewer_approved
-                    output_tail = reviewer_reason
-                    last_returncode = 0 if reviewer_approved else 1
-                    evaluator_dict = {
-                        "is_correct": True,
-                        "score": 1.0,
-                        "issues": [],
-                        "critical_gaps": [],
-                        "feedback": reviewer_reason,
-                    }
-                    state.set_evaluator_result(evaluator_dict)
-
-                    # Always require human confirmation for non-test-driven completion
-                    diff = curr_diff or get_diff(config.local_repo_path)
-                    print(f"\n[PERMISSION] Code diff inspection for goal completion:\n{diff[:2000]}\n")
-                    approve = input("Approve and commit this change? [y/N] ").strip().lower()
-                    if approve != "y":
-                        print("[PERMISSION] Change rejected by user; stopping.")
-                        state.set_termination_reason(TerminationReason.USER_REJECTED)
+                if not curr_diff or not curr_diff.strip():
+                    print("[REVIEWER] No real code changes detected in repository diff.")
+                    if consecutive_failures == 0:
+                        print("[REVIEWER] Retrying 1 corrective turn with feedback.")
+                        passed = False
+                        output_tail = "No code changes were made to repository files. You must use `edit_file` or `write_file` to modify target source files."
+                        last_returncode = 1
+                        evaluator_dict = {
+                            "is_correct": False,
+                            "score": 0.0,
+                            "issues": ["no_changes_made"],
+                            "critical_gaps": ["no_code_modifications"],
+                            "feedback": output_tail,
+                        }
+                        state.set_evaluator_result(evaluator_dict)
+                    else:
+                        print("[ERROR] No real code changes made after retry. Halting.")
+                        state.set_termination_reason(TerminationReason.NO_CHANGES_MADE)
                         _save_state()
+                        if initial_checkpoint:
+                            checkpoint_mgr.rollback_to_checkpoint(initial_checkpoint)
                         print_execution_summary(state, False, iterations_run)
                         if registry is not None:
                             try:
@@ -455,6 +432,72 @@ def run(config) -> bool:
                             except Exception:
                                 pass
                         return False
+                else:
+                    # Non-empty real diff exists
+                    reviewer_approved, reviewer_reason = review_diff(
+                        diff=curr_diff,
+                        goal=config.goal,
+                        model_name=config.model_name,
+                        llm_provider=config.llm_provider,
+                    )
+                    print(f"[REVIEWER] Verdict: {'APPROVE' if reviewer_approved else 'REJECT'} — {reviewer_reason}")
+
+                    if not reviewer_approved and consecutive_failures == 0:
+                        # Allow exactly 1 corrective retry turn
+                        print(f"[REVIEWER] First-pass rejected. Retrying 1 corrective turn with feedback.")
+                        passed = False
+                        output_tail = f"Reviewer subagent feedback: {reviewer_reason}"
+                        last_returncode = 1
+                        evaluator_dict = {
+                            "is_correct": False,
+                            "score": 0.0,
+                            "issues": ["reviewer_rejected"],
+                            "critical_gaps": ["reviewer_rejection"],
+                            "feedback": reviewer_reason,
+                        }
+                        state.set_evaluator_result(evaluator_dict)
+                    elif not reviewer_approved:
+                        print(f"[REVIEWER] Change rejected by reviewer subagent after retry: {reviewer_reason}")
+                        passed = False
+                        output_tail = f"Reviewer subagent rejected: {reviewer_reason}"
+                        last_returncode = 1
+                        evaluator_dict = {
+                            "is_correct": False,
+                            "score": 0.0,
+                            "issues": ["reviewer_rejected"],
+                            "critical_gaps": ["reviewer_rejection"],
+                            "feedback": reviewer_reason,
+                        }
+                        state.set_evaluator_result(evaluator_dict)
+                    else:
+                        # Reviewer approved: proceed to human approval gate
+                        passed = True
+                        output_tail = reviewer_reason
+                        last_returncode = 0
+                        evaluator_dict = {
+                            "is_correct": True,
+                            "score": 1.0,
+                            "issues": [],
+                            "critical_gaps": [],
+                            "feedback": reviewer_reason,
+                        }
+                        state.set_evaluator_result(evaluator_dict)
+
+                        # Always require human confirmation for non-test-driven completion
+                        diff = curr_diff
+                        print(f"\n[PERMISSION] Code diff inspection for goal completion:\n{diff[:2000]}\n")
+                        approve = input("Approve and commit this change? [y/N] ").strip().lower()
+                        if approve != "y":
+                            print("[PERMISSION] Change rejected by user; stopping.")
+                            state.set_termination_reason(TerminationReason.USER_REJECTED)
+                            _save_state()
+                            print_execution_summary(state, False, iterations_run)
+                            if registry is not None:
+                                try:
+                                    asyncio.run(registry.close())
+                                except Exception:
+                                    pass
+                            return False
 
             elif isinstance(verification_strategy, str) and verification_strategy.strip():
                 # Generalized verification engine

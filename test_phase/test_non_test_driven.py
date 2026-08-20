@@ -130,3 +130,51 @@ def test_non_test_driven_flow_rejected_by_human(tmp_path, capsys):
         assert success is False
         captured = capsys.readouterr().out
         assert "[PERMISSION] Change rejected by user; stopping." in captured
+
+
+def test_empty_diff_after_excluding_state_json_terminates_with_no_changes_made(tmp_path, capsys):
+    """Empty diff (e.g. only state.json changed) must trigger retry then NO_CHANGES_MADE failure."""
+    cfg = Config(
+        repo_path=str(tmp_path),
+        goal="add a size() method to the Stack class in structures.py",
+        max_iterations=3,
+    )
+
+    mock_agent = MagicMock()
+
+    with patch("controller.loop.load_state", return_value=RunState(goal=cfg.goal)), \
+         patch("controller.loop.save_state"), \
+         patch("controller.loop.ensure_work_branch"), \
+         patch("controller.loop.build_worker_agent", return_value=mock_agent), \
+         patch("controller.loop.run_worker_turn", return_value="Thought about change but didn't edit."), \
+         patch("controller.loop.get_diff", return_value=""), \
+         patch("controller.loop.commit_iteration", return_value=""):
+
+        success = run(cfg)
+
+        assert success is False
+        captured = capsys.readouterr().out
+        assert "[REVIEWER] No real code changes detected in repository diff." in captured
+        assert "[ERROR] No real code changes made after retry. Halting." in captured
+        assert "no_changes_made" in captured.lower()
+
+
+def test_git_utils_get_diff_excludes_state_json(tmp_path):
+    from git import Repo
+    from utils.git_utils import get_diff, commit_iteration
+
+    repo = Repo.init(str(tmp_path))
+    f1 = tmp_path / "hello.py"
+    f1.write_text("print('hello')")
+    repo.git.add(A=True)
+    repo.git.commit("-m", "initial")
+
+    # Now create state.json and modify hello.py
+    state_file = tmp_path / "state.json"
+    state_file.write_text('{"plan": "some plan"}')
+    f1.write_text("print('hello world')")
+
+    diff = get_diff(str(tmp_path))
+    assert "state.json" not in diff
+    assert "hello.py" in diff
+
