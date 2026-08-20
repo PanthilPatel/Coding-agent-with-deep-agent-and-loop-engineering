@@ -55,6 +55,382 @@ benchmarks/
 cli/
   __init__.py
   interactive.py
+coding-agent-testing-error-code/
+  .git/
+    hooks/
+      applypatch-msg.sample
+      commit-msg.sample
+      fsmonitor-watchman.sample
+      post-update.sample
+      pre-applypatch.sample
+      pre-commit.sample
+      pre-merge-commit.sample
+      pre-push.sample
+      pre-rebase.sample
+      pre-receive.sample
+      prepare-commit-msg.sample
+      push-to-checkout.sample
+      sendemail-validate.sample
+      update.sample
+    info/
+      exclude
+    logs/
+      refs/
+        heads/
+          main
+        remotes/
+          origin/
+            HEAD
+      HEAD
+    objects/
+      pack/
+        pack-114f56fec8d0cf7e07cac562090beb75b845444d.idx
+        pack-114f56fec8d0cf7e07cac562090beb75b845444d.pack
+        pack-114f56fec8d0cf7e07cac562090beb75b845444d.rev
+    refs/
+      heads/
+        main
+      remotes/
+        origin/
+          HEAD
+    config
+    description
+    HEAD
+    index
+    packed-refs
+  examples/
+    11_temperature_converter/
+      converter.py
+      pytest.ini
+      test_converter.py
+    12_stack_queue/
+      .git/
+        hooks/
+          applypatch-msg.sample
+          commit-msg.sample
+          fsmonitor-watchman.sample
+          post-update.sample
+          pre-applypatch.sample
+          pre-commit.sample
+          pre-merge-commit.sample
+          pre-push.sample
+          pre-rebase.sample
+          pre-receive.sample
+          prepare-commit-msg.sample
+          push-to-checkout.sample
+          sendemail-validate.sample
+          update.sample
+        info/
+          exclude
+        logs/
+          refs/
+            heads/
+              auto-agent-work
+          HEAD
+        objects/
+          00/
+            8b5e1836f31dc485818938e2c88af8e937cca8
+            979da282436fada4458e27fdae90ec5efd7e13
+          02/
+            77451a1950c5f3828cd7f2df4b64a685a4672b
+          03/
+            7534c40936721ae1c2eec3291c2e0eb6148dfc
+          0a/
+            eda63f2bcc0615f651494b77f9fc97baddf3eb
+          0c/
+            04a62a21a6c990bd36ce8384aa05284dbf967c
+          0d/
+            24e6953dc15b6e51a5c0ffc5c912c8bee92aa4
+          12/
+            e070eb0e867881891e6cf50844656af374e811
+          13/
+            0ab1459d8da598c95e8a031cf095698758d2e8
+          16/
+            2e1a68ea20ce725ae1eaa8678bdce3d4a14500
+          1b/
+            20f175d49956d8933fa496e3181fd23d96d81c
+            e8dacb48495cbdb1fb0710fc729e0ff03d8ddc
+          1c/
+            50ed775750e31b84d06d25bdaf4c6503f426f5
+          21/
+            9edd7629239bc8770375b9517ba2f33b035dd8
+          23/
+            3b6f790e63df0164cdb68f6236627c0eb66a11
+          24/
+            004cbbdf72137d63a5920c505c34be765198ef
+            67c5f755e8149f7581b6f288c674548b0a14e9
+          25/
+            0d637b166dbda4c9a8b9ece129da7df991217d
+            f2621b6777cc3c54d4a68decd6fb2acbd33f4e
+          27/
+            9d1a8747ea768040a68e39b129a899fa6c247f
+          29/
+            f74d615bf0c4cb03cb843ef3062f15222d5829
+          2b/
+            a0887208575cfdca8d12e79221acf85e123352
+          2c/
+            8961fd55517019f1d01b267cb547bff5b7b8ae
+            bd3d59e31d8c3df0a6dead57641b2382ee83f0
+          2d/
+            28dbf2b768edb29dc99803c9d75ac8263138bb
+          30/
+            2e687d3eb9995694ecfe551a3015e9a61488b2
+          31/
+            bf2c43784997b5537fccbc26eb42aee6b6ce75
+          33/
+            f62c848fff7d7887d1335b95fe7751663a62ae
+          37/
+            8ab055c51a1f0f56b6d7a4a91e58503590b069
+          3a/
+            c136ad3c06011a8a3e48fad58e32874ff25a4e
+          3b/
+            61b37707971bab71651586cb762cc09a7b3dfb
+          3c/
+            9667ca302e62f70930ac1752e8aa8f5a523aa2
+          3e/
+            f1915775fa2bc209de08bde9b50b16c90e6dc1
+          40/
+            6f4dd140e5a0606af0a871446d4d174e1e7561
+          44/
+            0ff3bf01d83675ac37922a89d0dfcd007e6b58
+            2fa0ce3e16f090b3d16e9bce680665b32a2bc0
+            a8b7b2bdc8e910af858ccd31ce02f09dc36eff
+            d51dde3b85cdc6ab4fc9779c035d4af6c99828
+            db4e36bd4ef42bff47d87e3e3acdf92fed2903
+          45/
+            855ef7eeec9ee0f51d18d6a9a2ab3587c85660
+          46/
+            95670fcbf727528f40c054a144acdb17e60b48
+          48/
+            27afdc5fb8de146b98dbc043762166e7788c15
+          49/
+            e185904ac5c56335cdf822caad7a56e2732028
+          4a/
+            724616a01a30dd48911272d07760da44309ef3
+          4c/
+            3458816ebb8e04cd7ad783a9dc9a5ef7227c35
+            938cd2b48e9b57ebff81b1ebdaa2751cea037b
+          4e/
+            dfbc69fe0bb20290fd580e10b55a0e2cbb04c3
+          51/
+            bcce78370f665cd675b8097b25b050e311e0df
+          52/
+            c54da5be2d779681721e8ea7cb66a175f688de
+          59/
+            6a2ee6b4895b1d29117712f716e73ca75ff58c
+          5b/
+            ef7615936d06404a752d5d159682a58dbfc27a
+          5c/
+            14643335e0ad2c075f741d6b24315d62fe3128
+            84560f0eddfdabc4b07443d9244c33934bbb93
+          60/
+            a2e665606a46d6722ac3f00afeb9ae0735feed
+            c0841f52eed7bdd1e609ca735fb7096774153e
+          63/
+            f00456b041163de09138017ae6dbe8fcf14a07
+          64/
+            6aaef030849d736797359b79c84fefb084d2ae
+          68/
+            b79ed13a8701ee9999b6de58dff9e27e25b687
+          6e/
+            09d77bc78d8de8b6fe129e08de090661cb6139
+          70/
+            018793d07b9853f1be5a8f9d1eee8de44b2db3
+            e963d490eb17341a95bdc453235e30d74a0b5f
+          75/
+            17e4d1063cea0174ad94ea135b51a758520580
+          76/
+            86dc451d26c2d240abf7f70182c5d0b712ce61
+            f44e8887cc93a8f213e10cb589c750c4b5d249
+          77/
+            4fab2174fc12f7f4ca61a751e7193d9ae5685e
+          78/
+            b141ce4f01c6f99c0b0cfe86314af0a0a22863
+          7d/
+            bbf92c5667ed993939938788287f2ed5d72c5f
+          7e/
+            519b7f7e9be33d7c106050dd08463046a30c6c
+          7f/
+            96da694066a4aaa6246363d19394a48b85281b
+            eef32ec28b94467d370d3af61d8da3cd262014
+          80/
+            9c4fb8c70211cd2f69e5411959befa3caa38b1
+          82/
+            a7f7ddfd84265306780e88cdcd0b54d04b8104
+          84/
+            182efa80f9883963737aee26b5030af9af3d64
+          85/
+            9ed87b2a840e3f2d2dd54d3e054181890b89a6
+            dbcd7449677a0e54974f51b5ff6a73135d0ee5
+          86/
+            b424bfdd97a470d7ce7f7c794efd7922b91ef4
+          87/
+            8e827fafd5db52c75bd2e2c4f057a0fbe5aab4
+          88/
+            d84c0247d111018c4f73455ff2d124f13f5649
+          8c/
+            09e5ea42c01cf4b06b5bd455edc35cd82eec36
+          8d/
+            6c6eddd7a8004a19fca7632d2a1b0bc2546286
+          8f/
+            9ce43600a3eb635955dbbfdc9563013a3f9567
+          91/
+            8c784295260d1ea87c537699a6b4732116e4fd
+          92/
+            ef9aa32cc8e80b80a0791b29a528fb519376cc
+          93/
+            ee436c7f57a55f1f50b123e98371ab50abef5b
+          94/
+            1e8a851d321eb6040142120d873b5975f5a3da
+          97/
+            1e17f9acdc5cbf53181724303b9ec649340ac5
+            864ea0b23adf0eb4d538cbe624edd075bb51e1
+          99/
+            4b8f1990eba41baf16176d54fc512bfa29aa30
+            c14910a6e024a93f63675086f9e65164fd69b7
+          9b/
+            23608c47e70663a4ff40b777648f6ae7a5020b
+            31f46021e7eb0be0d5ab0e7986ae2162425b08
+          9e/
+            2efc75d350213af0c8731c613fc064faa632d2
+          9f/
+            6fc4dc64b6bc07027f628284367f05b7c1d5ce
+            b3581e709fe2e370a0921f4047dc0309410293
+            ffd301565a1a67948d3897056387a744708e4d
+          a3/
+            b2b93c6027db5709fe73c9e355796f2445d61e
+          a5/
+            5a41499016f845df7fca4060b09488ec566613
+          a6/
+            8c314a18b29afe94e54ba3b7b5e75f3191fa3f
+          aa/
+            129ece392b8286d1693a6a7293b2b66d918614
+          ab/
+            049a5fa459c9935941720229088493a6033430
+          ac/
+            02690fb0af66b7aa751fc57413b69d57635e72
+            2cc5f1e65090c7f2c6060803425922136ae46d
+          ad/
+            278f3e5ed695be0b9dde493f5b10cdea87ed97
+          af/
+            4ff4abe56a76aa541910ce06f3c6bd3444ca08
+          b1/
+            cfa7bceb6b90e5203a2e27e361f11691734a47
+          b2/
+            3ac929ec18ae35e637d04c9edb487c27c269ea
+          b3/
+            5a639d95949e250fdf2152fe76da84d7ac9d29
+          b4/
+            dd5341672c25d0fdafde481619f5e1631f047f
+          b6/
+            6371ebf049b0d5ea30c5926e4378a06ec659da
+          b7/
+            52a92ab63b0b486ad56217cef7770db5ad3772
+          ba/
+            e33771a293e68ee029584c5bf2e57916a7818d
+          bc/
+            d2737be3515214d9705ff4372ba33a2cf78405
+          bd/
+            3a7013b22fb3473f89f9baa1de3a14d88e67a0
+          c5/
+            cde108530b783bb588ebfdca4956b6400776ab
+          c6/
+            79f0021403d9f1b66018b3a0b8789eb01c03f1
+            bf2101b97858c1cc7333602f905f25c93d0180
+            c1c17761878f3dcb9f0c39af68176cb573917d
+          c7/
+            50d34277fb131ab488f393af21b9cc1154bd28
+          c8/
+            41c82cdb41e73992621f172f83e7811ee4c85b
+            ac1ffdeee4ed6e829fa25592d874788a67b61a
+          cd/
+            01e6b4f5b6c3e218c1e171a6341b69b64e05e7
+          cf/
+            0b9b258a621c386697c8e48ab5849e4137e844
+          d0/
+            42c6cfb64aa6b795e6766f2565d17d809bb8a4
+          d1/
+            e799a3017d76770e74068424ededcd292b489b
+          d3/
+            a584563d8d81f77963eb6cce85fb737614fc68
+          d6/
+            0872a1155fcad2f4d2ea3cd74f7cdac2ff776c
+          d9/
+            dba2f4bc2b16cf706f9fdb06326fe0bddb353c
+            dc9337ef4d338fe3d63a65a1de7bfff6be7ec4
+          db/
+            5ec7de1ca06130272883000d52502b162df3fa
+          dc/
+            50508ed66b8dcbfa48d746a746e1e78cbcc818
+            c3a1df716001cbd7f7961fd120b1caf3c68569
+          de/
+            fe34d5e50b9963ca269e72c3c86df5ab6f5278
+          e0/
+            139e71ae9e71621e8d6d51f7a08a4b1e1692a0
+          e1/
+            428c38bfd20aa3f6af1bf7e80efbb26c4709ce
+          e2/
+            5df163770bc75a15b96b5f2297b1bfd1e319cb
+          e3/
+            73dda741f65532c902dedfe84a747ad7224f2e
+          e5/
+            951a77ad5bb4251c5be9a53f35ef14d675ab92
+            eb1eb8359dce68bf2b491174e8755e7d217539
+          e6/
+            e99860cc659fe7a4f6dee57cdfc72cd9dab6bf
+          e7/
+            49af6afe774502989eb1ace01fd777b7244ce0
+          e8/
+            1f04d1027f0d8141007b3b53a5bb85cb59603f
+          ed/
+            81aa4d1cd94993343ce8beed92fd3b3d909513
+          ef/
+            441baa3dd7f46d2284e26e81efd83f36ae13d5
+          f0/
+            0f0ab3dc4d6fdf4e7bbd04c419021e4d700d06
+            d3a28da657a3f68c00687b696a405595e1c450
+          f2/
+            7ad400badab37815c59b675c4d702c7c191b6d
+          f4/
+            fb48375f917d19b97b443882384a45584b1afc
+          fa/
+            69810b752e2c1f175e5d5132d6a9bd2efff008
+          fb/
+            44713e989408a75ef382a250043a2276a3cb11
+            60ea737df858c48bc5c7bc5db24200a2eff5b0
+            df383fe0ea0b18d8684c61c4dba9adda48e85f
+          fd/
+            ccad9dd9b05bce379599d18f466f24850a0133
+          fe/
+            8ecaf40645fb85bd94db0ae509c62d8091b573
+        refs/
+          heads/
+            auto-agent-work
+        config
+        description
+        HEAD
+        index
+        ORIG_HEAD
+      pytest.ini
+      structures.py
+      test_structures.py
+    13_url_shortener/
+      pytest.ini
+      shortener.py
+      test_shortener.py
+    14_grade_calculator/
+      grades.py
+      pytest.ini
+      test_grades.py
+    15_config_parser/
+      config.py
+      pytest.ini
+      test_config.py
+    16_prime_checker/
+      primes.py
+      pytest.ini
+      test_primes.py
+  README.md
 controller/
   __init__.py
   checkpoint.py
@@ -2749,24 +3125,22 @@ This section contains the contents of the repository's files.
 {
   "summary": {
     "total_runs": 1,
-    "passed": 1,
-    "failed": 0,
-    "pass_rate_percent": 100.0,
-    "avg_duration_seconds": 109.2,
-    "total_iterations": 1
+    "passed": 0,
+    "failed": 1,
+    "pass_rate_percent": 0.0,
+    "avg_duration_seconds": 146.06,
+    "total_iterations": 0
   },
   "results": [
     {
-      "repo_name": "10_shopping_cart",
+      "repo_name": "12_stack_queue",
       "goal": "Fix all bugs in source files so pytest passes. Do not modify test files.",
-      "passed": true,
-      "iterations": 1,
-      "duration_seconds": 109.2,
-      "tool_calls_count": {
-        "list_directory": 1
-      },
-      "error_message": null,
-      "subtasks_completed": 1,
+      "passed": false,
+      "iterations": 0,
+      "duration_seconds": 146.06,
+      "tool_calls_count": {},
+      "error_message": "Benchmark run did not reach success",
+      "subtasks_completed": 0,
       "total_subtasks": 1
     }
   ]
@@ -2779,22 +3153,2632 @@ This section contains the contents of the repository's files.
 ## 📊 Summary Metrics
 
 - **Total Runs:** 1
-- **Passed:** 1
-- **Failed:** 0
-- **Pass Rate:** 100.0%
-- **Average Duration:** 109.20s
-- **Total Iterations:** 1
+- **Passed:** 0
+- **Failed:** 1
+- **Pass Rate:** 0.0%
+- **Average Duration:** 146.06s
+- **Total Iterations:** 0
 
 ## 📋 Benchmark Results Table
 
 | Repository | Status | Iterations | Duration (s) | Guarded Tool Calls | Error / Notes |
 |:---|:---:|:---:|:---:|:---|:---|
-| `10_shopping_cart` | ✅ PASSED | 1 | 109.20 | list_directory: 1 | - |
+| `12_stack_queue` | ❌ FAILED | 0 | 146.06 | None | Benchmark run did not reach success |
 
 > **Note on Tool Calls:** The *Guarded Tool Calls* metric only covers tools routed through the
 > `PermissionHarness` confirmation gate (such as `execute_command`, `create_directory`, `move_file`,
 > `delete_file`, `list_directory`, and MCP tools). Native operations like `read_file`, `write_file`,
 > and `grep` operate directly in the agent backend and are excluded from this count.
+</file>
+
+<file path="coding-agent-testing-error-code/.git/hooks/applypatch-msg.sample">
+#!/bin/sh
+#
+# An example hook script to check the commit log message taken by
+# applypatch from an e-mail message.
+#
+# The hook should exit with non-zero status after issuing an
+# appropriate message if it wants to stop the commit.  The hook is
+# allowed to edit the commit message file.
+#
+# To enable this hook, rename this file to "applypatch-msg".
+
+. git-sh-setup
+commitmsg="$(git rev-parse --git-path hooks/commit-msg)"
+test -x "$commitmsg" && exec "$commitmsg" ${1+"$@"}
+:
+</file>
+
+<file path="coding-agent-testing-error-code/.git/hooks/commit-msg.sample">
+#!/bin/sh
+#
+# An example hook script to check the commit log message.
+# Called by "git commit" with one argument, the name of the file
+# that has the commit message.  The hook should exit with non-zero
+# status after issuing an appropriate message if it wants to stop the
+# commit.  The hook is allowed to edit the commit message file.
+#
+# To enable this hook, rename this file to "commit-msg".
+
+# Uncomment the below to add a Signed-off-by line to the message.
+# Doing this in a hook is a bad idea in general, but the prepare-commit-msg
+# hook is more suited to it.
+#
+# SOB=$(git var GIT_AUTHOR_IDENT | sed -n 's/^\(.*>\).*$/Signed-off-by: \1/p')
+# grep -qs "^$SOB" "$1" || echo "$SOB" >> "$1"
+
+# This example catches duplicate Signed-off-by lines.
+
+test "" = "$(grep '^Signed-off-by: ' "$1" |
+	 sort | uniq -c | sed -e '/^[ 	]*1[ 	]/d')" || {
+	echo >&2 Duplicate Signed-off-by lines.
+	exit 1
+}
+</file>
+
+<file path="coding-agent-testing-error-code/.git/hooks/fsmonitor-watchman.sample">
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use IPC::Open2;
+
+# An example hook script to integrate Watchman
+# (https://facebook.github.io/watchman/) with git to speed up detecting
+# new and modified files.
+#
+# The hook is passed a version (currently 2) and last update token
+# formatted as a string and outputs to stdout a new update token and
+# all files that have been modified since the update token. Paths must
+# be relative to the root of the working tree and separated by a single NUL.
+#
+# To enable this hook, rename this file to "query-watchman" and set
+# 'git config core.fsmonitor .git/hooks/query-watchman'
+#
+my ($version, $last_update_token) = @ARGV;
+
+# Uncomment for debugging
+# print STDERR "$0 $version $last_update_token\n";
+
+# Check the hook interface version
+if ($version ne 2) {
+	die "Unsupported query-fsmonitor hook version '$version'.\n" .
+	    "Falling back to scanning...\n";
+}
+
+my $git_work_tree = get_working_dir();
+
+my $retry = 1;
+
+my $json_pkg;
+eval {
+	require JSON::XS;
+	$json_pkg = "JSON::XS";
+	1;
+} or do {
+	require JSON::PP;
+	$json_pkg = "JSON::PP";
+};
+
+launch_watchman();
+
+sub launch_watchman {
+	my $o = watchman_query();
+	if (is_work_tree_watched($o)) {
+		output_result($o->{clock}, @{$o->{files}});
+	}
+}
+
+sub output_result {
+	my ($clockid, @files) = @_;
+
+	# Uncomment for debugging watchman output
+	# open (my $fh, ">", ".git/watchman-output.out");
+	# binmode $fh, ":utf8";
+	# print $fh "$clockid\n@files\n";
+	# close $fh;
+
+	binmode STDOUT, ":utf8";
+	print $clockid;
+	print "\0";
+	local $, = "\0";
+	print @files;
+}
+
+sub watchman_clock {
+	my $response = qx/watchman clock "$git_work_tree"/;
+	die "Failed to get clock id on '$git_work_tree'.\n" .
+		"Falling back to scanning...\n" if $? != 0;
+
+	return $json_pkg->new->utf8->decode($response);
+}
+
+sub watchman_query {
+	my $pid = open2(\*CHLD_OUT, \*CHLD_IN, 'watchman -j --no-pretty')
+	or die "open2() failed: $!\n" .
+	"Falling back to scanning...\n";
+
+	# In the query expression below we're asking for names of files that
+	# changed since $last_update_token but not from the .git folder.
+	#
+	# To accomplish this, we're using the "since" generator to use the
+	# recency index to select candidate nodes and "fields" to limit the
+	# output to file names only. Then we're using the "expression" term to
+	# further constrain the results.
+	my $last_update_line = "";
+	if (substr($last_update_token, 0, 1) eq "c") {
+		$last_update_token = "\"$last_update_token\"";
+		$last_update_line = qq[\n"since": $last_update_token,];
+	}
+	my $query = <<"	END";
+		["query", "$git_work_tree", {$last_update_line
+			"fields": ["name"],
+			"expression": ["not", ["dirname", ".git"]]
+		}]
+	END
+
+	# Uncomment for debugging the watchman query
+	# open (my $fh, ">", ".git/watchman-query.json");
+	# print $fh $query;
+	# close $fh;
+
+	print CHLD_IN $query;
+	close CHLD_IN;
+	my $response = do {local $/; <CHLD_OUT>};
+
+	# Uncomment for debugging the watch response
+	# open ($fh, ">", ".git/watchman-response.json");
+	# print $fh $response;
+	# close $fh;
+
+	die "Watchman: command returned no output.\n" .
+	"Falling back to scanning...\n" if $response eq "";
+	die "Watchman: command returned invalid output: $response\n" .
+	"Falling back to scanning...\n" unless $response =~ /^\{/;
+
+	return $json_pkg->new->utf8->decode($response);
+}
+
+sub is_work_tree_watched {
+	my ($output) = @_;
+	my $error = $output->{error};
+	if ($retry > 0 and $error and $error =~ m/unable to resolve root .* directory (.*) is not watched/) {
+		$retry--;
+		my $response = qx/watchman watch "$git_work_tree"/;
+		die "Failed to make watchman watch '$git_work_tree'.\n" .
+		    "Falling back to scanning...\n" if $? != 0;
+		$output = $json_pkg->new->utf8->decode($response);
+		$error = $output->{error};
+		die "Watchman: $error.\n" .
+		"Falling back to scanning...\n" if $error;
+
+		# Uncomment for debugging watchman output
+		# open (my $fh, ">", ".git/watchman-output.out");
+		# close $fh;
+
+		# Watchman will always return all files on the first query so
+		# return the fast "everything is dirty" flag to git and do the
+		# Watchman query just to get it over with now so we won't pay
+		# the cost in git to look up each individual file.
+		my $o = watchman_clock();
+		$error = $output->{error};
+
+		die "Watchman: $error.\n" .
+		"Falling back to scanning...\n" if $error;
+
+		output_result($o->{clock}, ("/"));
+		$last_update_token = $o->{clock};
+
+		eval { launch_watchman() };
+		return 0;
+	}
+
+	die "Watchman: $error.\n" .
+	"Falling back to scanning...\n" if $error;
+
+	return 1;
+}
+
+sub get_working_dir {
+	my $working_dir;
+	if ($^O =~ 'msys' || $^O =~ 'cygwin') {
+		$working_dir = Win32::GetCwd();
+		$working_dir =~ tr/\\/\//;
+	} else {
+		require Cwd;
+		$working_dir = Cwd::cwd();
+	}
+
+	return $working_dir;
+}
+</file>
+
+<file path="coding-agent-testing-error-code/.git/hooks/post-update.sample">
+#!/bin/sh
+#
+# An example hook script to prepare a packed repository for use over
+# dumb transports.
+#
+# To enable this hook, rename this file to "post-update".
+
+exec git update-server-info
+</file>
+
+<file path="coding-agent-testing-error-code/.git/hooks/pre-applypatch.sample">
+#!/bin/sh
+#
+# An example hook script to verify what is about to be committed
+# by applypatch from an e-mail message.
+#
+# The hook should exit with non-zero status after issuing an
+# appropriate message if it wants to stop the commit.
+#
+# To enable this hook, rename this file to "pre-applypatch".
+
+. git-sh-setup
+precommit="$(git rev-parse --git-path hooks/pre-commit)"
+test -x "$precommit" && exec "$precommit" ${1+"$@"}
+:
+</file>
+
+<file path="coding-agent-testing-error-code/.git/hooks/pre-commit.sample">
+#!/bin/sh
+#
+# An example hook script to verify what is about to be committed.
+# Called by "git commit" with no arguments.  The hook should
+# exit with non-zero status after issuing an appropriate message if
+# it wants to stop the commit.
+#
+# To enable this hook, rename this file to "pre-commit".
+
+if git rev-parse --verify HEAD >/dev/null 2>&1
+then
+	against=HEAD
+else
+	# Initial commit: diff against an empty tree object
+	against=$(git hash-object -t tree /dev/null)
+fi
+
+# If you want to allow non-ASCII filenames set this variable to true.
+allownonascii=$(git config --type=bool hooks.allownonascii)
+
+# Redirect output to stderr.
+exec 1>&2
+
+# Cross platform projects tend to avoid non-ASCII filenames; prevent
+# them from being added to the repository. We exploit the fact that the
+# printable range starts at the space character and ends with tilde.
+if [ "$allownonascii" != "true" ] &&
+	# Note that the use of brackets around a tr range is ok here, (it's
+	# even required, for portability to Solaris 10's /usr/bin/tr), since
+	# the square bracket bytes happen to fall in the designated range.
+	test $(git diff-index --cached --name-only --diff-filter=A -z $against |
+	  LC_ALL=C tr -d '[ -~]\0' | wc -c) != 0
+then
+	cat <<\EOF
+Error: Attempt to add a non-ASCII file name.
+
+This can cause problems if you want to work with people on other platforms.
+
+To be portable it is advisable to rename the file.
+
+If you know what you are doing you can disable this check using:
+
+  git config hooks.allownonascii true
+EOF
+	exit 1
+fi
+
+# If there are whitespace errors, print the offending file names and fail.
+exec git diff-index --check --cached $against --
+</file>
+
+<file path="coding-agent-testing-error-code/.git/hooks/pre-merge-commit.sample">
+#!/bin/sh
+#
+# An example hook script to verify what is about to be committed.
+# Called by "git merge" with no arguments.  The hook should
+# exit with non-zero status after issuing an appropriate message to
+# stderr if it wants to stop the merge commit.
+#
+# To enable this hook, rename this file to "pre-merge-commit".
+
+. git-sh-setup
+test -x "$GIT_DIR/hooks/pre-commit" &&
+        exec "$GIT_DIR/hooks/pre-commit"
+:
+</file>
+
+<file path="coding-agent-testing-error-code/.git/hooks/pre-push.sample">
+#!/bin/sh
+
+# An example hook script to verify what is about to be pushed.  Called by "git
+# push" after it has checked the remote status, but before anything has been
+# pushed.  If this script exits with a non-zero status nothing will be pushed.
+#
+# This hook is called with the following parameters:
+#
+# $1 -- Name of the remote to which the push is being done
+# $2 -- URL to which the push is being done
+#
+# If pushing without using a named remote those arguments will be equal.
+#
+# Information about the commits which are being pushed is supplied as lines to
+# the standard input in the form:
+#
+#   <local ref> <local oid> <remote ref> <remote oid>
+#
+# This sample shows how to prevent push of commits where the log message starts
+# with "WIP" (work in progress).
+
+remote="$1"
+url="$2"
+
+zero=$(git hash-object --stdin </dev/null | tr '[0-9a-f]' '0')
+
+while read local_ref local_oid remote_ref remote_oid
+do
+	if test "$local_oid" = "$zero"
+	then
+		# Handle delete
+		:
+	else
+		if test "$remote_oid" = "$zero"
+		then
+			# New branch, examine all commits
+			range="$local_oid"
+		else
+			# Update to existing branch, examine new commits
+			range="$remote_oid..$local_oid"
+		fi
+
+		# Check for WIP commit
+		commit=$(git rev-list -n 1 --grep '^WIP' "$range")
+		if test -n "$commit"
+		then
+			echo >&2 "Found WIP commit in $local_ref, not pushing"
+			exit 1
+		fi
+	fi
+done
+
+exit 0
+</file>
+
+<file path="coding-agent-testing-error-code/.git/hooks/pre-rebase.sample">
+#!/bin/sh
+#
+# Copyright (c) 2006, 2008 Junio C Hamano
+#
+# The "pre-rebase" hook is run just before "git rebase" starts doing
+# its job, and can prevent the command from running by exiting with
+# non-zero status.
+#
+# The hook is called with the following parameters:
+#
+# $1 -- the upstream the series was forked from.
+# $2 -- the branch being rebased (or empty when rebasing the current branch).
+#
+# This sample shows how to prevent topic branches that are already
+# merged to 'next' branch from getting rebased, because allowing it
+# would result in rebasing already published history.
+
+publish=next
+basebranch="$1"
+if test "$#" = 2
+then
+	topic="refs/heads/$2"
+else
+	topic=`git symbolic-ref HEAD` ||
+	exit 0 ;# we do not interrupt rebasing detached HEAD
+fi
+
+case "$topic" in
+refs/heads/??/*)
+	;;
+*)
+	exit 0 ;# we do not interrupt others.
+	;;
+esac
+
+# Now we are dealing with a topic branch being rebased
+# on top of master.  Is it OK to rebase it?
+
+# Does the topic really exist?
+git show-ref -q "$topic" || {
+	echo >&2 "No such branch $topic"
+	exit 1
+}
+
+# Is topic fully merged to master?
+not_in_master=`git rev-list --pretty=oneline ^master "$topic"`
+if test -z "$not_in_master"
+then
+	echo >&2 "$topic is fully merged to master; better remove it."
+	exit 1 ;# we could allow it, but there is no point.
+fi
+
+# Is topic ever merged to next?  If so you should not be rebasing it.
+only_next_1=`git rev-list ^master "^$topic" ${publish} | sort`
+only_next_2=`git rev-list ^master           ${publish} | sort`
+if test "$only_next_1" = "$only_next_2"
+then
+	not_in_topic=`git rev-list "^$topic" master`
+	if test -z "$not_in_topic"
+	then
+		echo >&2 "$topic is already up to date with master"
+		exit 1 ;# we could allow it, but there is no point.
+	else
+		exit 0
+	fi
+else
+	not_in_next=`git rev-list --pretty=oneline ^${publish} "$topic"`
+	/usr/bin/perl -e '
+		my $topic = $ARGV[0];
+		my $msg = "* $topic has commits already merged to public branch:\n";
+		my (%not_in_next) = map {
+			/^([0-9a-f]+) /;
+			($1 => 1);
+		} split(/\n/, $ARGV[1]);
+		for my $elem (map {
+				/^([0-9a-f]+) (.*)$/;
+				[$1 => $2];
+			} split(/\n/, $ARGV[2])) {
+			if (!exists $not_in_next{$elem->[0]}) {
+				if ($msg) {
+					print STDERR $msg;
+					undef $msg;
+				}
+				print STDERR " $elem->[1]\n";
+			}
+		}
+	' "$topic" "$not_in_next" "$not_in_master"
+	exit 1
+fi
+
+<<\DOC_END
+
+This sample hook safeguards topic branches that have been
+published from being rewound.
+
+The workflow assumed here is:
+
+ * Once a topic branch forks from "master", "master" is never
+   merged into it again (either directly or indirectly).
+
+ * Once a topic branch is fully cooked and merged into "master",
+   it is deleted.  If you need to build on top of it to correct
+   earlier mistakes, a new topic branch is created by forking at
+   the tip of the "master".  This is not strictly necessary, but
+   it makes it easier to keep your history simple.
+
+ * Whenever you need to test or publish your changes to topic
+   branches, merge them into "next" branch.
+
+The script, being an example, hardcodes the publish branch name
+to be "next", but it is trivial to make it configurable via
+$GIT_DIR/config mechanism.
+
+With this workflow, you would want to know:
+
+(1) ... if a topic branch has ever been merged to "next".  Young
+    topic branches can have stupid mistakes you would rather
+    clean up before publishing, and things that have not been
+    merged into other branches can be easily rebased without
+    affecting other people.  But once it is published, you would
+    not want to rewind it.
+
+(2) ... if a topic branch has been fully merged to "master".
+    Then you can delete it.  More importantly, you should not
+    build on top of it -- other people may already want to
+    change things related to the topic as patches against your
+    "master", so if you need further changes, it is better to
+    fork the topic (perhaps with the same name) afresh from the
+    tip of "master".
+
+Let's look at this example:
+
+		   o---o---o---o---o---o---o---o---o---o "next"
+		  /       /           /           /
+		 /   a---a---b A     /           /
+		/   /               /           /
+	       /   /   c---c---c---c B         /
+	      /   /   /             \         /
+	     /   /   /   b---b C     \       /
+	    /   /   /   /             \     /
+    ---o---o---o---o---o---o---o---o---o---o---o "master"
+
+
+A, B and C are topic branches.
+
+ * A has one fix since it was merged up to "next".
+
+ * B has finished.  It has been fully merged up to "master" and "next",
+   and is ready to be deleted.
+
+ * C has not merged to "next" at all.
+
+We would want to allow C to be rebased, refuse A, and encourage
+B to be deleted.
+
+To compute (1):
+
+	git rev-list ^master ^topic next
+	git rev-list ^master        next
+
+	if these match, topic has not merged in next at all.
+
+To compute (2):
+
+	git rev-list master..topic
+
+	if this is empty, it is fully merged to "master".
+
+DOC_END
+</file>
+
+<file path="coding-agent-testing-error-code/.git/hooks/pre-receive.sample">
+#!/bin/sh
+#
+# An example hook script to make use of push options.
+# The example simply echoes all push options that start with 'echoback='
+# and rejects all pushes when the "reject" push option is used.
+#
+# To enable this hook, rename this file to "pre-receive".
+
+if test -n "$GIT_PUSH_OPTION_COUNT"
+then
+	i=0
+	while test "$i" -lt "$GIT_PUSH_OPTION_COUNT"
+	do
+		eval "value=\$GIT_PUSH_OPTION_$i"
+		case "$value" in
+		echoback=*)
+			echo "echo from the pre-receive-hook: ${value#*=}" >&2
+			;;
+		reject)
+			exit 1
+		esac
+		i=$((i + 1))
+	done
+fi
+</file>
+
+<file path="coding-agent-testing-error-code/.git/hooks/prepare-commit-msg.sample">
+#!/bin/sh
+#
+# An example hook script to prepare the commit log message.
+# Called by "git commit" with the name of the file that has the
+# commit message, followed by the description of the commit
+# message's source.  The hook's purpose is to edit the commit
+# message file.  If the hook fails with a non-zero status,
+# the commit is aborted.
+#
+# To enable this hook, rename this file to "prepare-commit-msg".
+
+# This hook includes three examples. The first one removes the
+# "# Please enter the commit message..." help message.
+#
+# The second includes the output of "git diff --name-status -r"
+# into the message, just before the "git status" output.  It is
+# commented because it doesn't cope with --amend or with squashed
+# commits.
+#
+# The third example adds a Signed-off-by line to the message, that can
+# still be edited.  This is rarely a good idea.
+
+COMMIT_MSG_FILE=$1
+COMMIT_SOURCE=$2
+SHA1=$3
+
+/usr/bin/perl -i.bak -ne 'print unless(m/^. Please enter the commit message/..m/^#$/)' "$COMMIT_MSG_FILE"
+
+# case "$COMMIT_SOURCE,$SHA1" in
+#  ,|template,)
+#    /usr/bin/perl -i.bak -pe '
+#       print "\n" . `git diff --cached --name-status -r`
+# 	 if /^#/ && $first++ == 0' "$COMMIT_MSG_FILE" ;;
+#  *) ;;
+# esac
+
+# SOB=$(git var GIT_COMMITTER_IDENT | sed -n 's/^\(.*>\).*$/Signed-off-by: \1/p')
+# git interpret-trailers --in-place --trailer "$SOB" "$COMMIT_MSG_FILE"
+# if test -z "$COMMIT_SOURCE"
+# then
+#   /usr/bin/perl -i.bak -pe 'print "\n" if !$first_line++' "$COMMIT_MSG_FILE"
+# fi
+</file>
+
+<file path="coding-agent-testing-error-code/.git/hooks/push-to-checkout.sample">
+#!/bin/sh
+
+# An example hook script to update a checked-out tree on a git push.
+#
+# This hook is invoked by git-receive-pack(1) when it reacts to git
+# push and updates reference(s) in its repository, and when the push
+# tries to update the branch that is currently checked out and the
+# receive.denyCurrentBranch configuration variable is set to
+# updateInstead.
+#
+# By default, such a push is refused if the working tree and the index
+# of the remote repository has any difference from the currently
+# checked out commit; when both the working tree and the index match
+# the current commit, they are updated to match the newly pushed tip
+# of the branch. This hook is to be used to override the default
+# behaviour; however the code below reimplements the default behaviour
+# as a starting point for convenient modification.
+#
+# The hook receives the commit with which the tip of the current
+# branch is going to be updated:
+commit=$1
+
+# It can exit with a non-zero status to refuse the push (when it does
+# so, it must not modify the index or the working tree).
+die () {
+	echo >&2 "$*"
+	exit 1
+}
+
+# Or it can make any necessary changes to the working tree and to the
+# index to bring them to the desired state when the tip of the current
+# branch is updated to the new commit, and exit with a zero status.
+#
+# For example, the hook can simply run git read-tree -u -m HEAD "$1"
+# in order to emulate git fetch that is run in the reverse direction
+# with git push, as the two-tree form of git read-tree -u -m is
+# essentially the same as git switch or git checkout that switches
+# branches while keeping the local changes in the working tree that do
+# not interfere with the difference between the branches.
+
+# The below is a more-or-less exact translation to shell of the C code
+# for the default behaviour for git's push-to-checkout hook defined in
+# the push_to_deploy() function in builtin/receive-pack.c.
+#
+# Note that the hook will be executed from the repository directory,
+# not from the working tree, so if you want to perform operations on
+# the working tree, you will have to adapt your code accordingly, e.g.
+# by adding "cd .." or using relative paths.
+
+if ! git update-index -q --ignore-submodules --refresh
+then
+	die "Up-to-date check failed"
+fi
+
+if ! git diff-files --quiet --ignore-submodules --
+then
+	die "Working directory has unstaged changes"
+fi
+
+# This is a rough translation of:
+#
+#   head_has_history() ? "HEAD" : EMPTY_TREE_SHA1_HEX
+if git cat-file -e HEAD 2>/dev/null
+then
+	head=HEAD
+else
+	head=$(git hash-object -t tree --stdin </dev/null)
+fi
+
+if ! git diff-index --quiet --cached --ignore-submodules $head --
+then
+	die "Working directory has staged changes"
+fi
+
+if ! git read-tree -u -m "$commit"
+then
+	die "Could not update working tree to new HEAD"
+fi
+</file>
+
+<file path="coding-agent-testing-error-code/.git/hooks/sendemail-validate.sample">
+#!/bin/sh
+
+# An example hook script to validate a patch (and/or patch series) before
+# sending it via email.
+#
+# The hook should exit with non-zero status after issuing an appropriate
+# message if it wants to prevent the email(s) from being sent.
+#
+# To enable this hook, rename this file to "sendemail-validate".
+#
+# By default, it will only check that the patch(es) can be applied on top of
+# the default upstream branch without conflicts in a secondary worktree. After
+# validation (successful or not) of the last patch of a series, the worktree
+# will be deleted.
+#
+# The following config variables can be set to change the default remote and
+# remote ref that are used to apply the patches against:
+#
+#   sendemail.validateRemote (default: origin)
+#   sendemail.validateRemoteRef (default: HEAD)
+#
+# Replace the TODO placeholders with appropriate checks according to your
+# needs.
+
+validate_cover_letter () {
+	file="$1"
+	# TODO: Replace with appropriate checks (e.g. spell checking).
+	true
+}
+
+validate_patch () {
+	file="$1"
+	# Ensure that the patch applies without conflicts.
+	git am -3 "$file" || return
+	# TODO: Replace with appropriate checks for this patch
+	# (e.g. checkpatch.pl).
+	true
+}
+
+validate_series () {
+	# TODO: Replace with appropriate checks for the whole series
+	# (e.g. quick build, coding style checks, etc.).
+	true
+}
+
+# main -------------------------------------------------------------------------
+
+if test "$GIT_SENDEMAIL_FILE_COUNTER" = 1
+then
+	remote=$(git config --default origin --get sendemail.validateRemote) &&
+	ref=$(git config --default HEAD --get sendemail.validateRemoteRef) &&
+	worktree=$(mktemp --tmpdir -d sendemail-validate.XXXXXXX) &&
+	git worktree add -fd --checkout "$worktree" "refs/remotes/$remote/$ref" &&
+	git config --replace-all sendemail.validateWorktree "$worktree"
+else
+	worktree=$(git config --get sendemail.validateWorktree)
+fi || {
+	echo "sendemail-validate: error: failed to prepare worktree" >&2
+	exit 1
+}
+
+unset GIT_DIR GIT_WORK_TREE
+cd "$worktree" &&
+
+if grep -q "^diff --git " "$1"
+then
+	validate_patch "$1"
+else
+	validate_cover_letter "$1"
+fi &&
+
+if test "$GIT_SENDEMAIL_FILE_COUNTER" = "$GIT_SENDEMAIL_FILE_TOTAL"
+then
+	git config --unset-all sendemail.validateWorktree &&
+	trap 'git worktree remove -ff "$worktree"' EXIT &&
+	validate_series
+fi
+</file>
+
+<file path="coding-agent-testing-error-code/.git/hooks/update.sample">
+#!/bin/sh
+#
+# An example hook script to block unannotated tags from entering.
+# Called by "git receive-pack" with arguments: refname sha1-old sha1-new
+#
+# To enable this hook, rename this file to "update".
+#
+# Config
+# ------
+# hooks.allowunannotated
+#   This boolean sets whether unannotated tags will be allowed into the
+#   repository.  By default they won't be.
+# hooks.allowdeletetag
+#   This boolean sets whether deleting tags will be allowed in the
+#   repository.  By default they won't be.
+# hooks.allowmodifytag
+#   This boolean sets whether a tag may be modified after creation. By default
+#   it won't be.
+# hooks.allowdeletebranch
+#   This boolean sets whether deleting branches will be allowed in the
+#   repository.  By default they won't be.
+# hooks.denycreatebranch
+#   This boolean sets whether remotely creating branches will be denied
+#   in the repository.  By default this is allowed.
+#
+
+# --- Command line
+refname="$1"
+oldrev="$2"
+newrev="$3"
+
+# --- Safety check
+if [ -z "$GIT_DIR" ]; then
+	echo "Don't run this script from the command line." >&2
+	echo " (if you want, you could supply GIT_DIR then run" >&2
+	echo "  $0 <ref> <oldrev> <newrev>)" >&2
+	exit 1
+fi
+
+if [ -z "$refname" -o -z "$oldrev" -o -z "$newrev" ]; then
+	echo "usage: $0 <ref> <oldrev> <newrev>" >&2
+	exit 1
+fi
+
+# --- Config
+allowunannotated=$(git config --type=bool hooks.allowunannotated)
+allowdeletebranch=$(git config --type=bool hooks.allowdeletebranch)
+denycreatebranch=$(git config --type=bool hooks.denycreatebranch)
+allowdeletetag=$(git config --type=bool hooks.allowdeletetag)
+allowmodifytag=$(git config --type=bool hooks.allowmodifytag)
+
+# check for no description
+projectdesc=$(sed -e '1q' "$GIT_DIR/description")
+case "$projectdesc" in
+"Unnamed repository"* | "")
+	echo "*** Project description file hasn't been set" >&2
+	exit 1
+	;;
+esac
+
+# --- Check types
+# if $newrev is 0000...0000, it's a commit to delete a ref.
+zero=$(git hash-object --stdin </dev/null | tr '[0-9a-f]' '0')
+if [ "$newrev" = "$zero" ]; then
+	newrev_type=delete
+else
+	newrev_type=$(git cat-file -t $newrev)
+fi
+
+case "$refname","$newrev_type" in
+	refs/tags/*,commit)
+		# un-annotated tag
+		short_refname=${refname##refs/tags/}
+		if [ "$allowunannotated" != "true" ]; then
+			echo "*** The un-annotated tag, $short_refname, is not allowed in this repository" >&2
+			echo "*** Use 'git tag [ -a | -s ]' for tags you want to propagate." >&2
+			exit 1
+		fi
+		;;
+	refs/tags/*,delete)
+		# delete tag
+		if [ "$allowdeletetag" != "true" ]; then
+			echo "*** Deleting a tag is not allowed in this repository" >&2
+			exit 1
+		fi
+		;;
+	refs/tags/*,tag)
+		# annotated tag
+		if [ "$allowmodifytag" != "true" ] && git rev-parse $refname > /dev/null 2>&1
+		then
+			echo "*** Tag '$refname' already exists." >&2
+			echo "*** Modifying a tag is not allowed in this repository." >&2
+			exit 1
+		fi
+		;;
+	refs/heads/*,commit)
+		# branch
+		if [ "$oldrev" = "$zero" -a "$denycreatebranch" = "true" ]; then
+			echo "*** Creating a branch is not allowed in this repository" >&2
+			exit 1
+		fi
+		;;
+	refs/heads/*,delete)
+		# delete branch
+		if [ "$allowdeletebranch" != "true" ]; then
+			echo "*** Deleting a branch is not allowed in this repository" >&2
+			exit 1
+		fi
+		;;
+	refs/remotes/*,commit)
+		# tracking branch
+		;;
+	refs/remotes/*,delete)
+		# delete tracking branch
+		if [ "$allowdeletebranch" != "true" ]; then
+			echo "*** Deleting a tracking branch is not allowed in this repository" >&2
+			exit 1
+		fi
+		;;
+	*)
+		# Anything else (is there anything else?)
+		echo "*** Update hook: unknown type of update to ref $refname of type $newrev_type" >&2
+		exit 1
+		;;
+esac
+
+# --- Finished
+exit 0
+</file>
+
+<file path="coding-agent-testing-error-code/.git/info/exclude">
+# git ls-files --others --exclude-from=.git/info/exclude
+# Lines that start with '#' are comments.
+# For a project mostly in C, the following would be a good set of
+# exclude patterns (uncomment them if you want to use them):
+# *.[oa]
+# *~
+</file>
+
+<file path="coding-agent-testing-error-code/.git/logs/refs/heads/main">
+0000000000000000000000000000000000000000 0bfdbf760b4d84f010cfb5dbd64df6e49032e1bd Test User <test@example.com> 1787203840 +0530	clone: from https://github.com/PanthilPatel/coding-agent-testing-error-code.git
+</file>
+
+<file path="coding-agent-testing-error-code/.git/logs/refs/remotes/origin/HEAD">
+0000000000000000000000000000000000000000 0bfdbf760b4d84f010cfb5dbd64df6e49032e1bd Test User <test@example.com> 1787203840 +0530	clone: from https://github.com/PanthilPatel/coding-agent-testing-error-code.git
+</file>
+
+<file path="coding-agent-testing-error-code/.git/logs/HEAD">
+0000000000000000000000000000000000000000 0bfdbf760b4d84f010cfb5dbd64df6e49032e1bd Test User <test@example.com> 1787203840 +0530	clone: from https://github.com/PanthilPatel/coding-agent-testing-error-code.git
+</file>
+
+<file path="coding-agent-testing-error-code/.git/refs/heads/main">
+0bfdbf760b4d84f010cfb5dbd64df6e49032e1bd
+</file>
+
+<file path="coding-agent-testing-error-code/.git/refs/remotes/origin/HEAD">
+ref: refs/remotes/origin/main
+</file>
+
+<file path="coding-agent-testing-error-code/.git/config">
+[core]
+	repositoryformatversion = 0
+	filemode = false
+	bare = false
+	logallrefupdates = true
+	symlinks = false
+	ignorecase = true
+[remote "origin"]
+	url = https://github.com/PanthilPatel/coding-agent-testing-error-code.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "main"]
+	remote = origin
+	merge = refs/heads/main
+</file>
+
+<file path="coding-agent-testing-error-code/.git/description">
+Unnamed repository; edit this file 'description' to name the repository.
+</file>
+
+<file path="coding-agent-testing-error-code/.git/HEAD">
+ref: refs/heads/main
+</file>
+
+<file path="coding-agent-testing-error-code/.git/packed-refs">
+# pack-refs with: peeled fully-peeled sorted 
+0bfdbf760b4d84f010cfb5dbd64df6e49032e1bd refs/remotes/origin/main
+0bfdbf760b4d84f010cfb5dbd64df6e49032e1bd refs/remotes/origin/master
+</file>
+
+<file path="coding-agent-testing-error-code/examples/11_temperature_converter/converter.py">
+"""Temperature conversion utilities.
+
+Contains a LOGIC ERROR: celsius_to_fahrenheit uses the wrong
+multiplier/offset, so results are numerically wrong (not a crash).
+"""
+
+
+def celsius_to_fahrenheit(c: float) -> float:
+    # BUG: should be (c * 9/5) + 32
+    return (c * 5 / 9) + 32
+
+
+def fahrenheit_to_celsius(f: float) -> float:
+    return (f - 32) * 5 / 9
+
+
+def celsius_to_kelvin(c: float) -> float:
+    return c + 273.15
+
+
+def kelvin_to_celsius(k: float) -> float:
+    return k - 273.15
+</file>
+
+<file path="coding-agent-testing-error-code/examples/11_temperature_converter/pytest.ini">
+[pytest]
+rootdir = .
+</file>
+
+<file path="coding-agent-testing-error-code/examples/11_temperature_converter/test_converter.py">
+from converter import (
+    celsius_to_fahrenheit,
+    fahrenheit_to_celsius,
+    celsius_to_kelvin,
+    kelvin_to_celsius,
+)
+
+
+def test_celsius_to_fahrenheit_freezing():
+    assert celsius_to_fahrenheit(0) == 32
+
+
+def test_celsius_to_fahrenheit_boiling():
+    assert celsius_to_fahrenheit(100) == 212
+
+
+def test_fahrenheit_to_celsius_freezing():
+    assert fahrenheit_to_celsius(32) == 0
+
+
+def test_celsius_to_kelvin():
+    assert celsius_to_kelvin(0) == 273.15
+
+
+def test_kelvin_to_celsius():
+    assert kelvin_to_celsius(273.15) == 0
+</file>
+
+<file path="coding-agent-testing-error-code/examples/12_stack_queue/.git/hooks/applypatch-msg.sample">
+#!/bin/sh
+#
+# An example hook script to check the commit log message taken by
+# applypatch from an e-mail message.
+#
+# The hook should exit with non-zero status after issuing an
+# appropriate message if it wants to stop the commit.  The hook is
+# allowed to edit the commit message file.
+#
+# To enable this hook, rename this file to "applypatch-msg".
+
+. git-sh-setup
+commitmsg="$(git rev-parse --git-path hooks/commit-msg)"
+test -x "$commitmsg" && exec "$commitmsg" ${1+"$@"}
+:
+</file>
+
+<file path="coding-agent-testing-error-code/examples/12_stack_queue/.git/hooks/commit-msg.sample">
+#!/bin/sh
+#
+# An example hook script to check the commit log message.
+# Called by "git commit" with one argument, the name of the file
+# that has the commit message.  The hook should exit with non-zero
+# status after issuing an appropriate message if it wants to stop the
+# commit.  The hook is allowed to edit the commit message file.
+#
+# To enable this hook, rename this file to "commit-msg".
+
+# Uncomment the below to add a Signed-off-by line to the message.
+# Doing this in a hook is a bad idea in general, but the prepare-commit-msg
+# hook is more suited to it.
+#
+# SOB=$(git var GIT_AUTHOR_IDENT | sed -n 's/^\(.*>\).*$/Signed-off-by: \1/p')
+# grep -qs "^$SOB" "$1" || echo "$SOB" >> "$1"
+
+# This example catches duplicate Signed-off-by lines.
+
+test "" = "$(grep '^Signed-off-by: ' "$1" |
+	 sort | uniq -c | sed -e '/^[ 	]*1[ 	]/d')" || {
+	echo >&2 Duplicate Signed-off-by lines.
+	exit 1
+}
+</file>
+
+<file path="coding-agent-testing-error-code/examples/12_stack_queue/.git/hooks/fsmonitor-watchman.sample">
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use IPC::Open2;
+
+# An example hook script to integrate Watchman
+# (https://facebook.github.io/watchman/) with git to speed up detecting
+# new and modified files.
+#
+# The hook is passed a version (currently 2) and last update token
+# formatted as a string and outputs to stdout a new update token and
+# all files that have been modified since the update token. Paths must
+# be relative to the root of the working tree and separated by a single NUL.
+#
+# To enable this hook, rename this file to "query-watchman" and set
+# 'git config core.fsmonitor .git/hooks/query-watchman'
+#
+my ($version, $last_update_token) = @ARGV;
+
+# Uncomment for debugging
+# print STDERR "$0 $version $last_update_token\n";
+
+# Check the hook interface version
+if ($version ne 2) {
+	die "Unsupported query-fsmonitor hook version '$version'.\n" .
+	    "Falling back to scanning...\n";
+}
+
+my $git_work_tree = get_working_dir();
+
+my $retry = 1;
+
+my $json_pkg;
+eval {
+	require JSON::XS;
+	$json_pkg = "JSON::XS";
+	1;
+} or do {
+	require JSON::PP;
+	$json_pkg = "JSON::PP";
+};
+
+launch_watchman();
+
+sub launch_watchman {
+	my $o = watchman_query();
+	if (is_work_tree_watched($o)) {
+		output_result($o->{clock}, @{$o->{files}});
+	}
+}
+
+sub output_result {
+	my ($clockid, @files) = @_;
+
+	# Uncomment for debugging watchman output
+	# open (my $fh, ">", ".git/watchman-output.out");
+	# binmode $fh, ":utf8";
+	# print $fh "$clockid\n@files\n";
+	# close $fh;
+
+	binmode STDOUT, ":utf8";
+	print $clockid;
+	print "\0";
+	local $, = "\0";
+	print @files;
+}
+
+sub watchman_clock {
+	my $response = qx/watchman clock "$git_work_tree"/;
+	die "Failed to get clock id on '$git_work_tree'.\n" .
+		"Falling back to scanning...\n" if $? != 0;
+
+	return $json_pkg->new->utf8->decode($response);
+}
+
+sub watchman_query {
+	my $pid = open2(\*CHLD_OUT, \*CHLD_IN, 'watchman -j --no-pretty')
+	or die "open2() failed: $!\n" .
+	"Falling back to scanning...\n";
+
+	# In the query expression below we're asking for names of files that
+	# changed since $last_update_token but not from the .git folder.
+	#
+	# To accomplish this, we're using the "since" generator to use the
+	# recency index to select candidate nodes and "fields" to limit the
+	# output to file names only. Then we're using the "expression" term to
+	# further constrain the results.
+	my $last_update_line = "";
+	if (substr($last_update_token, 0, 1) eq "c") {
+		$last_update_token = "\"$last_update_token\"";
+		$last_update_line = qq[\n"since": $last_update_token,];
+	}
+	my $query = <<"	END";
+		["query", "$git_work_tree", {$last_update_line
+			"fields": ["name"],
+			"expression": ["not", ["dirname", ".git"]]
+		}]
+	END
+
+	# Uncomment for debugging the watchman query
+	# open (my $fh, ">", ".git/watchman-query.json");
+	# print $fh $query;
+	# close $fh;
+
+	print CHLD_IN $query;
+	close CHLD_IN;
+	my $response = do {local $/; <CHLD_OUT>};
+
+	# Uncomment for debugging the watch response
+	# open ($fh, ">", ".git/watchman-response.json");
+	# print $fh $response;
+	# close $fh;
+
+	die "Watchman: command returned no output.\n" .
+	"Falling back to scanning...\n" if $response eq "";
+	die "Watchman: command returned invalid output: $response\n" .
+	"Falling back to scanning...\n" unless $response =~ /^\{/;
+
+	return $json_pkg->new->utf8->decode($response);
+}
+
+sub is_work_tree_watched {
+	my ($output) = @_;
+	my $error = $output->{error};
+	if ($retry > 0 and $error and $error =~ m/unable to resolve root .* directory (.*) is not watched/) {
+		$retry--;
+		my $response = qx/watchman watch "$git_work_tree"/;
+		die "Failed to make watchman watch '$git_work_tree'.\n" .
+		    "Falling back to scanning...\n" if $? != 0;
+		$output = $json_pkg->new->utf8->decode($response);
+		$error = $output->{error};
+		die "Watchman: $error.\n" .
+		"Falling back to scanning...\n" if $error;
+
+		# Uncomment for debugging watchman output
+		# open (my $fh, ">", ".git/watchman-output.out");
+		# close $fh;
+
+		# Watchman will always return all files on the first query so
+		# return the fast "everything is dirty" flag to git and do the
+		# Watchman query just to get it over with now so we won't pay
+		# the cost in git to look up each individual file.
+		my $o = watchman_clock();
+		$error = $output->{error};
+
+		die "Watchman: $error.\n" .
+		"Falling back to scanning...\n" if $error;
+
+		output_result($o->{clock}, ("/"));
+		$last_update_token = $o->{clock};
+
+		eval { launch_watchman() };
+		return 0;
+	}
+
+	die "Watchman: $error.\n" .
+	"Falling back to scanning...\n" if $error;
+
+	return 1;
+}
+
+sub get_working_dir {
+	my $working_dir;
+	if ($^O =~ 'msys' || $^O =~ 'cygwin') {
+		$working_dir = Win32::GetCwd();
+		$working_dir =~ tr/\\/\//;
+	} else {
+		require Cwd;
+		$working_dir = Cwd::cwd();
+	}
+
+	return $working_dir;
+}
+</file>
+
+<file path="coding-agent-testing-error-code/examples/12_stack_queue/.git/hooks/post-update.sample">
+#!/bin/sh
+#
+# An example hook script to prepare a packed repository for use over
+# dumb transports.
+#
+# To enable this hook, rename this file to "post-update".
+
+exec git update-server-info
+</file>
+
+<file path="coding-agent-testing-error-code/examples/12_stack_queue/.git/hooks/pre-applypatch.sample">
+#!/bin/sh
+#
+# An example hook script to verify what is about to be committed
+# by applypatch from an e-mail message.
+#
+# The hook should exit with non-zero status after issuing an
+# appropriate message if it wants to stop the commit.
+#
+# To enable this hook, rename this file to "pre-applypatch".
+
+. git-sh-setup
+precommit="$(git rev-parse --git-path hooks/pre-commit)"
+test -x "$precommit" && exec "$precommit" ${1+"$@"}
+:
+</file>
+
+<file path="coding-agent-testing-error-code/examples/12_stack_queue/.git/hooks/pre-commit.sample">
+#!/bin/sh
+#
+# An example hook script to verify what is about to be committed.
+# Called by "git commit" with no arguments.  The hook should
+# exit with non-zero status after issuing an appropriate message if
+# it wants to stop the commit.
+#
+# To enable this hook, rename this file to "pre-commit".
+
+if git rev-parse --verify HEAD >/dev/null 2>&1
+then
+	against=HEAD
+else
+	# Initial commit: diff against an empty tree object
+	against=$(git hash-object -t tree /dev/null)
+fi
+
+# If you want to allow non-ASCII filenames set this variable to true.
+allownonascii=$(git config --type=bool hooks.allownonascii)
+
+# Redirect output to stderr.
+exec 1>&2
+
+# Cross platform projects tend to avoid non-ASCII filenames; prevent
+# them from being added to the repository. We exploit the fact that the
+# printable range starts at the space character and ends with tilde.
+if [ "$allownonascii" != "true" ] &&
+	# Note that the use of brackets around a tr range is ok here, (it's
+	# even required, for portability to Solaris 10's /usr/bin/tr), since
+	# the square bracket bytes happen to fall in the designated range.
+	test $(git diff-index --cached --name-only --diff-filter=A -z $against |
+	  LC_ALL=C tr -d '[ -~]\0' | wc -c) != 0
+then
+	cat <<\EOF
+Error: Attempt to add a non-ASCII file name.
+
+This can cause problems if you want to work with people on other platforms.
+
+To be portable it is advisable to rename the file.
+
+If you know what you are doing you can disable this check using:
+
+  git config hooks.allownonascii true
+EOF
+	exit 1
+fi
+
+# If there are whitespace errors, print the offending file names and fail.
+exec git diff-index --check --cached $against --
+</file>
+
+<file path="coding-agent-testing-error-code/examples/12_stack_queue/.git/hooks/pre-merge-commit.sample">
+#!/bin/sh
+#
+# An example hook script to verify what is about to be committed.
+# Called by "git merge" with no arguments.  The hook should
+# exit with non-zero status after issuing an appropriate message to
+# stderr if it wants to stop the merge commit.
+#
+# To enable this hook, rename this file to "pre-merge-commit".
+
+. git-sh-setup
+test -x "$GIT_DIR/hooks/pre-commit" &&
+        exec "$GIT_DIR/hooks/pre-commit"
+:
+</file>
+
+<file path="coding-agent-testing-error-code/examples/12_stack_queue/.git/hooks/pre-push.sample">
+#!/bin/sh
+
+# An example hook script to verify what is about to be pushed.  Called by "git
+# push" after it has checked the remote status, but before anything has been
+# pushed.  If this script exits with a non-zero status nothing will be pushed.
+#
+# This hook is called with the following parameters:
+#
+# $1 -- Name of the remote to which the push is being done
+# $2 -- URL to which the push is being done
+#
+# If pushing without using a named remote those arguments will be equal.
+#
+# Information about the commits which are being pushed is supplied as lines to
+# the standard input in the form:
+#
+#   <local ref> <local oid> <remote ref> <remote oid>
+#
+# This sample shows how to prevent push of commits where the log message starts
+# with "WIP" (work in progress).
+
+remote="$1"
+url="$2"
+
+zero=$(git hash-object --stdin </dev/null | tr '[0-9a-f]' '0')
+
+while read local_ref local_oid remote_ref remote_oid
+do
+	if test "$local_oid" = "$zero"
+	then
+		# Handle delete
+		:
+	else
+		if test "$remote_oid" = "$zero"
+		then
+			# New branch, examine all commits
+			range="$local_oid"
+		else
+			# Update to existing branch, examine new commits
+			range="$remote_oid..$local_oid"
+		fi
+
+		# Check for WIP commit
+		commit=$(git rev-list -n 1 --grep '^WIP' "$range")
+		if test -n "$commit"
+		then
+			echo >&2 "Found WIP commit in $local_ref, not pushing"
+			exit 1
+		fi
+	fi
+done
+
+exit 0
+</file>
+
+<file path="coding-agent-testing-error-code/examples/12_stack_queue/.git/hooks/pre-rebase.sample">
+#!/bin/sh
+#
+# Copyright (c) 2006, 2008 Junio C Hamano
+#
+# The "pre-rebase" hook is run just before "git rebase" starts doing
+# its job, and can prevent the command from running by exiting with
+# non-zero status.
+#
+# The hook is called with the following parameters:
+#
+# $1 -- the upstream the series was forked from.
+# $2 -- the branch being rebased (or empty when rebasing the current branch).
+#
+# This sample shows how to prevent topic branches that are already
+# merged to 'next' branch from getting rebased, because allowing it
+# would result in rebasing already published history.
+
+publish=next
+basebranch="$1"
+if test "$#" = 2
+then
+	topic="refs/heads/$2"
+else
+	topic=`git symbolic-ref HEAD` ||
+	exit 0 ;# we do not interrupt rebasing detached HEAD
+fi
+
+case "$topic" in
+refs/heads/??/*)
+	;;
+*)
+	exit 0 ;# we do not interrupt others.
+	;;
+esac
+
+# Now we are dealing with a topic branch being rebased
+# on top of master.  Is it OK to rebase it?
+
+# Does the topic really exist?
+git show-ref -q "$topic" || {
+	echo >&2 "No such branch $topic"
+	exit 1
+}
+
+# Is topic fully merged to master?
+not_in_master=`git rev-list --pretty=oneline ^master "$topic"`
+if test -z "$not_in_master"
+then
+	echo >&2 "$topic is fully merged to master; better remove it."
+	exit 1 ;# we could allow it, but there is no point.
+fi
+
+# Is topic ever merged to next?  If so you should not be rebasing it.
+only_next_1=`git rev-list ^master "^$topic" ${publish} | sort`
+only_next_2=`git rev-list ^master           ${publish} | sort`
+if test "$only_next_1" = "$only_next_2"
+then
+	not_in_topic=`git rev-list "^$topic" master`
+	if test -z "$not_in_topic"
+	then
+		echo >&2 "$topic is already up to date with master"
+		exit 1 ;# we could allow it, but there is no point.
+	else
+		exit 0
+	fi
+else
+	not_in_next=`git rev-list --pretty=oneline ^${publish} "$topic"`
+	/usr/bin/perl -e '
+		my $topic = $ARGV[0];
+		my $msg = "* $topic has commits already merged to public branch:\n";
+		my (%not_in_next) = map {
+			/^([0-9a-f]+) /;
+			($1 => 1);
+		} split(/\n/, $ARGV[1]);
+		for my $elem (map {
+				/^([0-9a-f]+) (.*)$/;
+				[$1 => $2];
+			} split(/\n/, $ARGV[2])) {
+			if (!exists $not_in_next{$elem->[0]}) {
+				if ($msg) {
+					print STDERR $msg;
+					undef $msg;
+				}
+				print STDERR " $elem->[1]\n";
+			}
+		}
+	' "$topic" "$not_in_next" "$not_in_master"
+	exit 1
+fi
+
+<<\DOC_END
+
+This sample hook safeguards topic branches that have been
+published from being rewound.
+
+The workflow assumed here is:
+
+ * Once a topic branch forks from "master", "master" is never
+   merged into it again (either directly or indirectly).
+
+ * Once a topic branch is fully cooked and merged into "master",
+   it is deleted.  If you need to build on top of it to correct
+   earlier mistakes, a new topic branch is created by forking at
+   the tip of the "master".  This is not strictly necessary, but
+   it makes it easier to keep your history simple.
+
+ * Whenever you need to test or publish your changes to topic
+   branches, merge them into "next" branch.
+
+The script, being an example, hardcodes the publish branch name
+to be "next", but it is trivial to make it configurable via
+$GIT_DIR/config mechanism.
+
+With this workflow, you would want to know:
+
+(1) ... if a topic branch has ever been merged to "next".  Young
+    topic branches can have stupid mistakes you would rather
+    clean up before publishing, and things that have not been
+    merged into other branches can be easily rebased without
+    affecting other people.  But once it is published, you would
+    not want to rewind it.
+
+(2) ... if a topic branch has been fully merged to "master".
+    Then you can delete it.  More importantly, you should not
+    build on top of it -- other people may already want to
+    change things related to the topic as patches against your
+    "master", so if you need further changes, it is better to
+    fork the topic (perhaps with the same name) afresh from the
+    tip of "master".
+
+Let's look at this example:
+
+		   o---o---o---o---o---o---o---o---o---o "next"
+		  /       /           /           /
+		 /   a---a---b A     /           /
+		/   /               /           /
+	       /   /   c---c---c---c B         /
+	      /   /   /             \         /
+	     /   /   /   b---b C     \       /
+	    /   /   /   /             \     /
+    ---o---o---o---o---o---o---o---o---o---o---o "master"
+
+
+A, B and C are topic branches.
+
+ * A has one fix since it was merged up to "next".
+
+ * B has finished.  It has been fully merged up to "master" and "next",
+   and is ready to be deleted.
+
+ * C has not merged to "next" at all.
+
+We would want to allow C to be rebased, refuse A, and encourage
+B to be deleted.
+
+To compute (1):
+
+	git rev-list ^master ^topic next
+	git rev-list ^master        next
+
+	if these match, topic has not merged in next at all.
+
+To compute (2):
+
+	git rev-list master..topic
+
+	if this is empty, it is fully merged to "master".
+
+DOC_END
+</file>
+
+<file path="coding-agent-testing-error-code/examples/12_stack_queue/.git/hooks/pre-receive.sample">
+#!/bin/sh
+#
+# An example hook script to make use of push options.
+# The example simply echoes all push options that start with 'echoback='
+# and rejects all pushes when the "reject" push option is used.
+#
+# To enable this hook, rename this file to "pre-receive".
+
+if test -n "$GIT_PUSH_OPTION_COUNT"
+then
+	i=0
+	while test "$i" -lt "$GIT_PUSH_OPTION_COUNT"
+	do
+		eval "value=\$GIT_PUSH_OPTION_$i"
+		case "$value" in
+		echoback=*)
+			echo "echo from the pre-receive-hook: ${value#*=}" >&2
+			;;
+		reject)
+			exit 1
+		esac
+		i=$((i + 1))
+	done
+fi
+</file>
+
+<file path="coding-agent-testing-error-code/examples/12_stack_queue/.git/hooks/prepare-commit-msg.sample">
+#!/bin/sh
+#
+# An example hook script to prepare the commit log message.
+# Called by "git commit" with the name of the file that has the
+# commit message, followed by the description of the commit
+# message's source.  The hook's purpose is to edit the commit
+# message file.  If the hook fails with a non-zero status,
+# the commit is aborted.
+#
+# To enable this hook, rename this file to "prepare-commit-msg".
+
+# This hook includes three examples. The first one removes the
+# "# Please enter the commit message..." help message.
+#
+# The second includes the output of "git diff --name-status -r"
+# into the message, just before the "git status" output.  It is
+# commented because it doesn't cope with --amend or with squashed
+# commits.
+#
+# The third example adds a Signed-off-by line to the message, that can
+# still be edited.  This is rarely a good idea.
+
+COMMIT_MSG_FILE=$1
+COMMIT_SOURCE=$2
+SHA1=$3
+
+/usr/bin/perl -i.bak -ne 'print unless(m/^. Please enter the commit message/..m/^#$/)' "$COMMIT_MSG_FILE"
+
+# case "$COMMIT_SOURCE,$SHA1" in
+#  ,|template,)
+#    /usr/bin/perl -i.bak -pe '
+#       print "\n" . `git diff --cached --name-status -r`
+# 	 if /^#/ && $first++ == 0' "$COMMIT_MSG_FILE" ;;
+#  *) ;;
+# esac
+
+# SOB=$(git var GIT_COMMITTER_IDENT | sed -n 's/^\(.*>\).*$/Signed-off-by: \1/p')
+# git interpret-trailers --in-place --trailer "$SOB" "$COMMIT_MSG_FILE"
+# if test -z "$COMMIT_SOURCE"
+# then
+#   /usr/bin/perl -i.bak -pe 'print "\n" if !$first_line++' "$COMMIT_MSG_FILE"
+# fi
+</file>
+
+<file path="coding-agent-testing-error-code/examples/12_stack_queue/.git/hooks/push-to-checkout.sample">
+#!/bin/sh
+
+# An example hook script to update a checked-out tree on a git push.
+#
+# This hook is invoked by git-receive-pack(1) when it reacts to git
+# push and updates reference(s) in its repository, and when the push
+# tries to update the branch that is currently checked out and the
+# receive.denyCurrentBranch configuration variable is set to
+# updateInstead.
+#
+# By default, such a push is refused if the working tree and the index
+# of the remote repository has any difference from the currently
+# checked out commit; when both the working tree and the index match
+# the current commit, they are updated to match the newly pushed tip
+# of the branch. This hook is to be used to override the default
+# behaviour; however the code below reimplements the default behaviour
+# as a starting point for convenient modification.
+#
+# The hook receives the commit with which the tip of the current
+# branch is going to be updated:
+commit=$1
+
+# It can exit with a non-zero status to refuse the push (when it does
+# so, it must not modify the index or the working tree).
+die () {
+	echo >&2 "$*"
+	exit 1
+}
+
+# Or it can make any necessary changes to the working tree and to the
+# index to bring them to the desired state when the tip of the current
+# branch is updated to the new commit, and exit with a zero status.
+#
+# For example, the hook can simply run git read-tree -u -m HEAD "$1"
+# in order to emulate git fetch that is run in the reverse direction
+# with git push, as the two-tree form of git read-tree -u -m is
+# essentially the same as git switch or git checkout that switches
+# branches while keeping the local changes in the working tree that do
+# not interfere with the difference between the branches.
+
+# The below is a more-or-less exact translation to shell of the C code
+# for the default behaviour for git's push-to-checkout hook defined in
+# the push_to_deploy() function in builtin/receive-pack.c.
+#
+# Note that the hook will be executed from the repository directory,
+# not from the working tree, so if you want to perform operations on
+# the working tree, you will have to adapt your code accordingly, e.g.
+# by adding "cd .." or using relative paths.
+
+if ! git update-index -q --ignore-submodules --refresh
+then
+	die "Up-to-date check failed"
+fi
+
+if ! git diff-files --quiet --ignore-submodules --
+then
+	die "Working directory has unstaged changes"
+fi
+
+# This is a rough translation of:
+#
+#   head_has_history() ? "HEAD" : EMPTY_TREE_SHA1_HEX
+if git cat-file -e HEAD 2>/dev/null
+then
+	head=HEAD
+else
+	head=$(git hash-object -t tree --stdin </dev/null)
+fi
+
+if ! git diff-index --quiet --cached --ignore-submodules $head --
+then
+	die "Working directory has staged changes"
+fi
+
+if ! git read-tree -u -m "$commit"
+then
+	die "Could not update working tree to new HEAD"
+fi
+</file>
+
+<file path="coding-agent-testing-error-code/examples/12_stack_queue/.git/hooks/sendemail-validate.sample">
+#!/bin/sh
+
+# An example hook script to validate a patch (and/or patch series) before
+# sending it via email.
+#
+# The hook should exit with non-zero status after issuing an appropriate
+# message if it wants to prevent the email(s) from being sent.
+#
+# To enable this hook, rename this file to "sendemail-validate".
+#
+# By default, it will only check that the patch(es) can be applied on top of
+# the default upstream branch without conflicts in a secondary worktree. After
+# validation (successful or not) of the last patch of a series, the worktree
+# will be deleted.
+#
+# The following config variables can be set to change the default remote and
+# remote ref that are used to apply the patches against:
+#
+#   sendemail.validateRemote (default: origin)
+#   sendemail.validateRemoteRef (default: HEAD)
+#
+# Replace the TODO placeholders with appropriate checks according to your
+# needs.
+
+validate_cover_letter () {
+	file="$1"
+	# TODO: Replace with appropriate checks (e.g. spell checking).
+	true
+}
+
+validate_patch () {
+	file="$1"
+	# Ensure that the patch applies without conflicts.
+	git am -3 "$file" || return
+	# TODO: Replace with appropriate checks for this patch
+	# (e.g. checkpatch.pl).
+	true
+}
+
+validate_series () {
+	# TODO: Replace with appropriate checks for the whole series
+	# (e.g. quick build, coding style checks, etc.).
+	true
+}
+
+# main -------------------------------------------------------------------------
+
+if test "$GIT_SENDEMAIL_FILE_COUNTER" = 1
+then
+	remote=$(git config --default origin --get sendemail.validateRemote) &&
+	ref=$(git config --default HEAD --get sendemail.validateRemoteRef) &&
+	worktree=$(mktemp --tmpdir -d sendemail-validate.XXXXXXX) &&
+	git worktree add -fd --checkout "$worktree" "refs/remotes/$remote/$ref" &&
+	git config --replace-all sendemail.validateWorktree "$worktree"
+else
+	worktree=$(git config --get sendemail.validateWorktree)
+fi || {
+	echo "sendemail-validate: error: failed to prepare worktree" >&2
+	exit 1
+}
+
+unset GIT_DIR GIT_WORK_TREE
+cd "$worktree" &&
+
+if grep -q "^diff --git " "$1"
+then
+	validate_patch "$1"
+else
+	validate_cover_letter "$1"
+fi &&
+
+if test "$GIT_SENDEMAIL_FILE_COUNTER" = "$GIT_SENDEMAIL_FILE_TOTAL"
+then
+	git config --unset-all sendemail.validateWorktree &&
+	trap 'git worktree remove -ff "$worktree"' EXIT &&
+	validate_series
+fi
+</file>
+
+<file path="coding-agent-testing-error-code/examples/12_stack_queue/.git/hooks/update.sample">
+#!/bin/sh
+#
+# An example hook script to block unannotated tags from entering.
+# Called by "git receive-pack" with arguments: refname sha1-old sha1-new
+#
+# To enable this hook, rename this file to "update".
+#
+# Config
+# ------
+# hooks.allowunannotated
+#   This boolean sets whether unannotated tags will be allowed into the
+#   repository.  By default they won't be.
+# hooks.allowdeletetag
+#   This boolean sets whether deleting tags will be allowed in the
+#   repository.  By default they won't be.
+# hooks.allowmodifytag
+#   This boolean sets whether a tag may be modified after creation. By default
+#   it won't be.
+# hooks.allowdeletebranch
+#   This boolean sets whether deleting branches will be allowed in the
+#   repository.  By default they won't be.
+# hooks.denycreatebranch
+#   This boolean sets whether remotely creating branches will be denied
+#   in the repository.  By default this is allowed.
+#
+
+# --- Command line
+refname="$1"
+oldrev="$2"
+newrev="$3"
+
+# --- Safety check
+if [ -z "$GIT_DIR" ]; then
+	echo "Don't run this script from the command line." >&2
+	echo " (if you want, you could supply GIT_DIR then run" >&2
+	echo "  $0 <ref> <oldrev> <newrev>)" >&2
+	exit 1
+fi
+
+if [ -z "$refname" -o -z "$oldrev" -o -z "$newrev" ]; then
+	echo "usage: $0 <ref> <oldrev> <newrev>" >&2
+	exit 1
+fi
+
+# --- Config
+allowunannotated=$(git config --type=bool hooks.allowunannotated)
+allowdeletebranch=$(git config --type=bool hooks.allowdeletebranch)
+denycreatebranch=$(git config --type=bool hooks.denycreatebranch)
+allowdeletetag=$(git config --type=bool hooks.allowdeletetag)
+allowmodifytag=$(git config --type=bool hooks.allowmodifytag)
+
+# check for no description
+projectdesc=$(sed -e '1q' "$GIT_DIR/description")
+case "$projectdesc" in
+"Unnamed repository"* | "")
+	echo "*** Project description file hasn't been set" >&2
+	exit 1
+	;;
+esac
+
+# --- Check types
+# if $newrev is 0000...0000, it's a commit to delete a ref.
+zero=$(git hash-object --stdin </dev/null | tr '[0-9a-f]' '0')
+if [ "$newrev" = "$zero" ]; then
+	newrev_type=delete
+else
+	newrev_type=$(git cat-file -t $newrev)
+fi
+
+case "$refname","$newrev_type" in
+	refs/tags/*,commit)
+		# un-annotated tag
+		short_refname=${refname##refs/tags/}
+		if [ "$allowunannotated" != "true" ]; then
+			echo "*** The un-annotated tag, $short_refname, is not allowed in this repository" >&2
+			echo "*** Use 'git tag [ -a | -s ]' for tags you want to propagate." >&2
+			exit 1
+		fi
+		;;
+	refs/tags/*,delete)
+		# delete tag
+		if [ "$allowdeletetag" != "true" ]; then
+			echo "*** Deleting a tag is not allowed in this repository" >&2
+			exit 1
+		fi
+		;;
+	refs/tags/*,tag)
+		# annotated tag
+		if [ "$allowmodifytag" != "true" ] && git rev-parse $refname > /dev/null 2>&1
+		then
+			echo "*** Tag '$refname' already exists." >&2
+			echo "*** Modifying a tag is not allowed in this repository." >&2
+			exit 1
+		fi
+		;;
+	refs/heads/*,commit)
+		# branch
+		if [ "$oldrev" = "$zero" -a "$denycreatebranch" = "true" ]; then
+			echo "*** Creating a branch is not allowed in this repository" >&2
+			exit 1
+		fi
+		;;
+	refs/heads/*,delete)
+		# delete branch
+		if [ "$allowdeletebranch" != "true" ]; then
+			echo "*** Deleting a branch is not allowed in this repository" >&2
+			exit 1
+		fi
+		;;
+	refs/remotes/*,commit)
+		# tracking branch
+		;;
+	refs/remotes/*,delete)
+		# delete tracking branch
+		if [ "$allowdeletebranch" != "true" ]; then
+			echo "*** Deleting a tracking branch is not allowed in this repository" >&2
+			exit 1
+		fi
+		;;
+	*)
+		# Anything else (is there anything else?)
+		echo "*** Update hook: unknown type of update to ref $refname of type $newrev_type" >&2
+		exit 1
+		;;
+esac
+
+# --- Finished
+exit 0
+</file>
+
+<file path="coding-agent-testing-error-code/examples/12_stack_queue/.git/info/exclude">
+# git ls-files --others --exclude-from=.git/info/exclude
+# Lines that start with '#' are comments.
+# For a project mostly in C, the following would be a good set of
+# exclude patterns (uncomment them if you want to use them):
+# *.[oa]
+# *~
+</file>
+
+<file path="coding-agent-testing-error-code/examples/12_stack_queue/.git/logs/refs/heads/auto-agent-work">
+0000000000000000000000000000000000000000 406f4dd140e5a0606af0a871446d4d174e1e7561 Test User <test@example.com> 1787205311 +0530	commit (initial): [CHECKPOINT] initial_state_fix all the bugs in the source
+406f4dd140e5a0606af0a871446d4d174e1e7561 25f2621b6777cc3c54d4a68decd6fb2acbd33f4e Test User <test@example.com> 1787205337 +0630	agent iteration 1: File changes made successfully. Turn completed.
+25f2621b6777cc3c54d4a68decd6fb2acbd33f4e 3ac136ad3c06011a8a3e48fad58e32874ff25a4e Test User <test@example.com> 1787205337 +0530	commit: [CHECKPOINT] pre_iter_2
+3ac136ad3c06011a8a3e48fad58e32874ff25a4e 70018793d07b9853f1be5a8f9d1eee8de44b2db3 Test User <test@example.com> 1787205352 +0630	agent iteration 2: File changes made successfully. Turn completed.
+70018793d07b9853f1be5a8f9d1eee8de44b2db3 0d24e6953dc15b6e51a5c0ffc5c912c8bee92aa4 Test User <test@example.com> 1787205451 +0530	commit: [CHECKPOINT] initial_state_cls
+0d24e6953dc15b6e51a5c0ffc5c912c8bee92aa4 c6c1c17761878f3dcb9f0c39af68176cb573917d Test User <test@example.com> 1787205489 +0530	commit: [CHECKPOINT] initial_state_Fix all bugs in source files s
+c6c1c17761878f3dcb9f0c39af68176cb573917d 7feef32ec28b94467d370d3af61d8da3cd262014 Test User <test@example.com> 1787205504 +0630	agent iteration 1: File changes made successfully. Turn completed.
+7feef32ec28b94467d370d3af61d8da3cd262014 918c784295260d1ea87c537699a6b4732116e4fd Test User <test@example.com> 1787205504 +0530	commit: [CHECKPOINT] pre_iter_2
+918c784295260d1ea87c537699a6b4732116e4fd ed81aa4d1cd94993343ce8beed92fd3b3d909513 Test User <test@example.com> 1787205518 +0630	agent iteration 2: Agent failed with error: Modifying or editing test files is strictly for
+ed81aa4d1cd94993343ce8beed92fd3b3d909513 130ab1459d8da598c95e8a031cf095698758d2e8 Test User <test@example.com> 1787206682 +0530	commit: [CHECKPOINT] initial_state_Fix Queue.dequeue() to pop fro
+130ab1459d8da598c95e8a031cf095698758d2e8 f4fb48375f917d19b97b443882384a45584b1afc Test User <test@example.com> 1787206710 +0630	agent iteration 1: File changes made successfully. Turn completed.
+f4fb48375f917d19b97b443882384a45584b1afc 76f44e8887cc93a8f213e10cb589c750c4b5d249 Test User <test@example.com> 1787206710 +0530	commit: [CHECKPOINT] pre_iter_2
+76f44e8887cc93a8f213e10cb589c750c4b5d249 859ed87b2a840e3f2d2dd54d3e054181890b89a6 Test User <test@example.com> 1787206720 +0630	agent iteration 2: ```json
+859ed87b2a840e3f2d2dd54d3e054181890b89a6 12e070eb0e867881891e6cf50844656af374e811 Test User <test@example.com> 1787206721 +0530	commit: [CHECKPOINT] pre_iter_3
+12e070eb0e867881891e6cf50844656af374e811 ef441baa3dd7f46d2284e26e81efd83f36ae13d5 Test User <test@example.com> 1787206734 +0630	agent iteration 3: ```json
+ef441baa3dd7f46d2284e26e81efd83f36ae13d5 12e070eb0e867881891e6cf50844656af374e811 Test User <test@example.com> 1787206734 +0530	reset: moving to 12e070eb0e867881891e6cf50844656af374e811
+12e070eb0e867881891e6cf50844656af374e811 4c938cd2b48e9b57ebff81b1ebdaa2751cea037b Test User <test@example.com> 1787206735 +0530	commit: [CHECKPOINT] pre_iter_4
+4c938cd2b48e9b57ebff81b1ebdaa2751cea037b 279d1a8747ea768040a68e39b129a899fa6c247f Test User <test@example.com> 1787206746 +0630	agent iteration 4: ```json
+279d1a8747ea768040a68e39b129a899fa6c247f 4c938cd2b48e9b57ebff81b1ebdaa2751cea037b Test User <test@example.com> 1787206746 +0530	reset: moving to 4c938cd2b48e9b57ebff81b1ebdaa2751cea037b
+4c938cd2b48e9b57ebff81b1ebdaa2751cea037b 2467c5f755e8149f7581b6f288c674548b0a14e9 Test User <test@example.com> 1787206746 +0530	commit: [CHECKPOINT] pre_iter_5
+2467c5f755e8149f7581b6f288c674548b0a14e9 5c84560f0eddfdabc4b07443d9244c33934bbb93 Test User <test@example.com> 1787206757 +0630	agent iteration 5: File changes made successfully. Turn completed.
+5c84560f0eddfdabc4b07443d9244c33934bbb93 2467c5f755e8149f7581b6f288c674548b0a14e9 Test User <test@example.com> 1787206758 +0530	reset: moving to 2467c5f755e8149f7581b6f288c674548b0a14e9
+2467c5f755e8149f7581b6f288c674548b0a14e9 b752a92ab63b0b486ad56217cef7770db5ad3772 Test User <test@example.com> 1787206758 +0530	commit: [CHECKPOINT] pre_iter_6
+b752a92ab63b0b486ad56217cef7770db5ad3772 7517e4d1063cea0174ad94ea135b51a758520580 Test User <test@example.com> 1787206767 +0630	agent iteration 6: ```json
+7517e4d1063cea0174ad94ea135b51a758520580 b752a92ab63b0b486ad56217cef7770db5ad3772 Test User <test@example.com> 1787206767 +0530	reset: moving to b752a92ab63b0b486ad56217cef7770db5ad3772
+b752a92ab63b0b486ad56217cef7770db5ad3772 f00f0ab3dc4d6fdf4e7bbd04c419021e4d700d06 Test User <test@example.com> 1787206767 +0530	commit: [CHECKPOINT] pre_iter_7
+f00f0ab3dc4d6fdf4e7bbd04c419021e4d700d06 2c8961fd55517019f1d01b267cb547bff5b7b8ae Test User <test@example.com> 1787206780 +0630	agent iteration 7: ```json
+2c8961fd55517019f1d01b267cb547bff5b7b8ae f00f0ab3dc4d6fdf4e7bbd04c419021e4d700d06 Test User <test@example.com> 1787206781 +0530	reset: moving to f00f0ab3dc4d6fdf4e7bbd04c419021e4d700d06
+f00f0ab3dc4d6fdf4e7bbd04c419021e4d700d06 7dbbf92c5667ed993939938788287f2ed5d72c5f Test User <test@example.com> 1787206781 +0530	commit: [CHECKPOINT] pre_iter_8
+7dbbf92c5667ed993939938788287f2ed5d72c5f 809c4fb8c70211cd2f69e5411959befa3caa38b1 Test User <test@example.com> 1787206792 +0630	agent iteration 8: File changes made successfully. Turn completed.
+809c4fb8c70211cd2f69e5411959befa3caa38b1 7dbbf92c5667ed993939938788287f2ed5d72c5f Test User <test@example.com> 1787206792 +0530	reset: moving to 7dbbf92c5667ed993939938788287f2ed5d72c5f
+7dbbf92c5667ed993939938788287f2ed5d72c5f 878e827fafd5db52c75bd2e2c4f057a0fbe5aab4 Test User <test@example.com> 1787206793 +0530	commit: [CHECKPOINT] pre_iter_9
+878e827fafd5db52c75bd2e2c4f057a0fbe5aab4 a3b2b93c6027db5709fe73c9e355796f2445d61e Test User <test@example.com> 1787206804 +0630	agent iteration 9: ```json
+a3b2b93c6027db5709fe73c9e355796f2445d61e 878e827fafd5db52c75bd2e2c4f057a0fbe5aab4 Test User <test@example.com> 1787206805 +0530	reset: moving to 878e827fafd5db52c75bd2e2c4f057a0fbe5aab4
+878e827fafd5db52c75bd2e2c4f057a0fbe5aab4 cf0b9b258a621c386697c8e48ab5849e4137e844 Test User <test@example.com> 1787206805 +0530	commit: [CHECKPOINT] pre_iter_10
+cf0b9b258a621c386697c8e48ab5849e4137e844 9fb3581e709fe2e370a0921f4047dc0309410293 Test User <test@example.com> 1787206876 +0630	agent iteration 10: File changes made successfully. Turn completed.
+9fb3581e709fe2e370a0921f4047dc0309410293 130ab1459d8da598c95e8a031cf095698758d2e8 Test User <test@example.com> 1787206876 +0530	reset: moving to 130ab1459d8da598c95e8a031cf095698758d2e8
+130ab1459d8da598c95e8a031cf095698758d2e8 0aeda63f2bcc0615f651494b77f9fc97baddf3eb Test User <test@example.com> 1787207688 +0530	commit: [CHECKPOINT] initial_state_Fix all bugs in source files s
+0aeda63f2bcc0615f651494b77f9fc97baddf3eb ad278f3e5ed695be0b9dde493f5b10cdea87ed97 Test User <test@example.com> 1787207714 +0630	agent iteration 1: ```json
+ad278f3e5ed695be0b9dde493f5b10cdea87ed97 037534c40936721ae1c2eec3291c2e0eb6148dfc Test User <test@example.com> 1787207715 +0530	commit: [CHECKPOINT] pre_iter_2
+037534c40936721ae1c2eec3291c2e0eb6148dfc bae33771a293e68ee029584c5bf2e57916a7818d Test User <test@example.com> 1787207734 +0630	agent iteration 2: ```json
+bae33771a293e68ee029584c5bf2e57916a7818d 3c9667ca302e62f70930ac1752e8aa8f5a523aa2 Test User <test@example.com> 1787207735 +0530	commit: [CHECKPOINT] pre_iter_3
+3c9667ca302e62f70930ac1752e8aa8f5a523aa2 0c04a62a21a6c990bd36ce8384aa05284dbf967c Test User <test@example.com> 1787207804 +0630	agent iteration 3: Agent hit recursion limit of 30 steps due to repeating operations.
+0c04a62a21a6c990bd36ce8384aa05284dbf967c 3c9667ca302e62f70930ac1752e8aa8f5a523aa2 Test User <test@example.com> 1787207804 +0530	reset: moving to 3c9667ca302e62f70930ac1752e8aa8f5a523aa2
+3c9667ca302e62f70930ac1752e8aa8f5a523aa2 b1cfa7bceb6b90e5203a2e27e361f11691734a47 Test User <test@example.com> 1787207805 +0530	commit: [CHECKPOINT] pre_iter_4
+b1cfa7bceb6b90e5203a2e27e361f11691734a47 bcd2737be3515214d9705ff4372ba33a2cf78405 Test User <test@example.com> 1787207824 +0630	agent iteration 4: ```json
+bcd2737be3515214d9705ff4372ba33a2cf78405 b1cfa7bceb6b90e5203a2e27e361f11691734a47 Test User <test@example.com> 1787207824 +0530	reset: moving to b1cfa7bceb6b90e5203a2e27e361f11691734a47
+b1cfa7bceb6b90e5203a2e27e361f11691734a47 45855ef7eeec9ee0f51d18d6a9a2ab3587c85660 Test User <test@example.com> 1787207824 +0530	commit: [CHECKPOINT] pre_iter_5
+45855ef7eeec9ee0f51d18d6a9a2ab3587c85660 52c54da5be2d779681721e8ea7cb66a175f688de Test User <test@example.com> 1787207881 +0630	agent iteration 5: Agent hit recursion limit of 30 steps due to repeating operations.
+52c54da5be2d779681721e8ea7cb66a175f688de 45855ef7eeec9ee0f51d18d6a9a2ab3587c85660 Test User <test@example.com> 1787207882 +0530	reset: moving to 45855ef7eeec9ee0f51d18d6a9a2ab3587c85660
+45855ef7eeec9ee0f51d18d6a9a2ab3587c85660 51bcce78370f665cd675b8097b25b050e311e0df Test User <test@example.com> 1787207882 +0530	commit: [CHECKPOINT] pre_iter_6
+51bcce78370f665cd675b8097b25b050e311e0df 82a7f7ddfd84265306780e88cdcd0b54d04b8104 Test User <test@example.com> 1787207938 +0630	agent iteration 6: Agent hit recursion limit of 30 steps due to repeating operations.
+82a7f7ddfd84265306780e88cdcd0b54d04b8104 51bcce78370f665cd675b8097b25b050e311e0df Test User <test@example.com> 1787207938 +0530	reset: moving to 51bcce78370f665cd675b8097b25b050e311e0df
+51bcce78370f665cd675b8097b25b050e311e0df 2ba0887208575cfdca8d12e79221acf85e123352 Test User <test@example.com> 1787207939 +0530	commit: [CHECKPOINT] pre_iter_7
+2ba0887208575cfdca8d12e79221acf85e123352 c841c82cdb41e73992621f172f83e7811ee4c85b Test User <test@example.com> 1787207952 +0630	agent iteration 7: ```json
+c841c82cdb41e73992621f172f83e7811ee4c85b 2ba0887208575cfdca8d12e79221acf85e123352 Test User <test@example.com> 1787207953 +0530	reset: moving to 2ba0887208575cfdca8d12e79221acf85e123352
+2ba0887208575cfdca8d12e79221acf85e123352 fe8ecaf40645fb85bd94db0ae509c62d8091b573 Test User <test@example.com> 1787207953 +0530	commit: [CHECKPOINT] pre_iter_8
+fe8ecaf40645fb85bd94db0ae509c62d8091b573 8f9ce43600a3eb635955dbbfdc9563013a3f9567 Test User <test@example.com> 1787208045 +0630	agent iteration 8: Agent hit recursion limit of 30 steps due to repeating operations.
+8f9ce43600a3eb635955dbbfdc9563013a3f9567 fe8ecaf40645fb85bd94db0ae509c62d8091b573 Test User <test@example.com> 1787208045 +0530	reset: moving to fe8ecaf40645fb85bd94db0ae509c62d8091b573
+fe8ecaf40645fb85bd94db0ae509c62d8091b573 4edfbc69fe0bb20290fd580e10b55a0e2cbb04c3 Test User <test@example.com> 1787208046 +0530	commit: [CHECKPOINT] pre_iter_9
+4edfbc69fe0bb20290fd580e10b55a0e2cbb04c3 60a2e665606a46d6722ac3f00afeb9ae0735feed Test User <test@example.com> 1787208063 +0630	agent iteration 9: ```json
+60a2e665606a46d6722ac3f00afeb9ae0735feed 4edfbc69fe0bb20290fd580e10b55a0e2cbb04c3 Test User <test@example.com> 1787208064 +0530	reset: moving to 4edfbc69fe0bb20290fd580e10b55a0e2cbb04c3
+4edfbc69fe0bb20290fd580e10b55a0e2cbb04c3 4c3458816ebb8e04cd7ad783a9dc9a5ef7227c35 Test User <test@example.com> 1787208064 +0530	commit: [CHECKPOINT] pre_iter_10
+4c3458816ebb8e04cd7ad783a9dc9a5ef7227c35 6e09d77bc78d8de8b6fe129e08de090661cb6139 Test User <test@example.com> 1787208113 +0630	agent iteration 10: Agent hit recursion limit of 30 steps due to repeating operations.
+6e09d77bc78d8de8b6fe129e08de090661cb6139 0aeda63f2bcc0615f651494b77f9fc97baddf3eb Test User <test@example.com> 1787208113 +0530	reset: moving to 0aeda63f2bcc0615f651494b77f9fc97baddf3eb
+</file>
+
+<file path="coding-agent-testing-error-code/examples/12_stack_queue/.git/logs/HEAD">
+0000000000000000000000000000000000000000 406f4dd140e5a0606af0a871446d4d174e1e7561 Test User <test@example.com> 1787205311 +0530	commit (initial): [CHECKPOINT] initial_state_fix all the bugs in the source
+406f4dd140e5a0606af0a871446d4d174e1e7561 25f2621b6777cc3c54d4a68decd6fb2acbd33f4e Test User <test@example.com> 1787205337 +0630	agent iteration 1: File changes made successfully. Turn completed.
+25f2621b6777cc3c54d4a68decd6fb2acbd33f4e 3ac136ad3c06011a8a3e48fad58e32874ff25a4e Test User <test@example.com> 1787205337 +0530	commit: [CHECKPOINT] pre_iter_2
+3ac136ad3c06011a8a3e48fad58e32874ff25a4e 70018793d07b9853f1be5a8f9d1eee8de44b2db3 Test User <test@example.com> 1787205352 +0630	agent iteration 2: File changes made successfully. Turn completed.
+70018793d07b9853f1be5a8f9d1eee8de44b2db3 0d24e6953dc15b6e51a5c0ffc5c912c8bee92aa4 Test User <test@example.com> 1787205451 +0530	commit: [CHECKPOINT] initial_state_cls
+0d24e6953dc15b6e51a5c0ffc5c912c8bee92aa4 c6c1c17761878f3dcb9f0c39af68176cb573917d Test User <test@example.com> 1787205489 +0530	commit: [CHECKPOINT] initial_state_Fix all bugs in source files s
+c6c1c17761878f3dcb9f0c39af68176cb573917d 7feef32ec28b94467d370d3af61d8da3cd262014 Test User <test@example.com> 1787205504 +0630	agent iteration 1: File changes made successfully. Turn completed.
+7feef32ec28b94467d370d3af61d8da3cd262014 918c784295260d1ea87c537699a6b4732116e4fd Test User <test@example.com> 1787205504 +0530	commit: [CHECKPOINT] pre_iter_2
+918c784295260d1ea87c537699a6b4732116e4fd ed81aa4d1cd94993343ce8beed92fd3b3d909513 Test User <test@example.com> 1787205518 +0630	agent iteration 2: Agent failed with error: Modifying or editing test files is strictly for
+ed81aa4d1cd94993343ce8beed92fd3b3d909513 130ab1459d8da598c95e8a031cf095698758d2e8 Test User <test@example.com> 1787206682 +0530	commit: [CHECKPOINT] initial_state_Fix Queue.dequeue() to pop fro
+130ab1459d8da598c95e8a031cf095698758d2e8 f4fb48375f917d19b97b443882384a45584b1afc Test User <test@example.com> 1787206710 +0630	agent iteration 1: File changes made successfully. Turn completed.
+f4fb48375f917d19b97b443882384a45584b1afc 76f44e8887cc93a8f213e10cb589c750c4b5d249 Test User <test@example.com> 1787206710 +0530	commit: [CHECKPOINT] pre_iter_2
+76f44e8887cc93a8f213e10cb589c750c4b5d249 859ed87b2a840e3f2d2dd54d3e054181890b89a6 Test User <test@example.com> 1787206721 +0630	agent iteration 2: ```json
+859ed87b2a840e3f2d2dd54d3e054181890b89a6 12e070eb0e867881891e6cf50844656af374e811 Test User <test@example.com> 1787206721 +0530	commit: [CHECKPOINT] pre_iter_3
+12e070eb0e867881891e6cf50844656af374e811 ef441baa3dd7f46d2284e26e81efd83f36ae13d5 Test User <test@example.com> 1787206734 +0630	agent iteration 3: ```json
+ef441baa3dd7f46d2284e26e81efd83f36ae13d5 ef441baa3dd7f46d2284e26e81efd83f36ae13d5 Test User <test@example.com> 1787206734 +0530	checkout: moving from auto-agent-work to auto-agent-work
+ef441baa3dd7f46d2284e26e81efd83f36ae13d5 12e070eb0e867881891e6cf50844656af374e811 Test User <test@example.com> 1787206734 +0530	reset: moving to 12e070eb0e867881891e6cf50844656af374e811
+12e070eb0e867881891e6cf50844656af374e811 4c938cd2b48e9b57ebff81b1ebdaa2751cea037b Test User <test@example.com> 1787206735 +0530	commit: [CHECKPOINT] pre_iter_4
+4c938cd2b48e9b57ebff81b1ebdaa2751cea037b 279d1a8747ea768040a68e39b129a899fa6c247f Test User <test@example.com> 1787206746 +0630	agent iteration 4: ```json
+279d1a8747ea768040a68e39b129a899fa6c247f 279d1a8747ea768040a68e39b129a899fa6c247f Test User <test@example.com> 1787206746 +0530	checkout: moving from auto-agent-work to auto-agent-work
+279d1a8747ea768040a68e39b129a899fa6c247f 4c938cd2b48e9b57ebff81b1ebdaa2751cea037b Test User <test@example.com> 1787206746 +0530	reset: moving to 4c938cd2b48e9b57ebff81b1ebdaa2751cea037b
+4c938cd2b48e9b57ebff81b1ebdaa2751cea037b 2467c5f755e8149f7581b6f288c674548b0a14e9 Test User <test@example.com> 1787206746 +0530	commit: [CHECKPOINT] pre_iter_5
+2467c5f755e8149f7581b6f288c674548b0a14e9 5c84560f0eddfdabc4b07443d9244c33934bbb93 Test User <test@example.com> 1787206757 +0630	agent iteration 5: File changes made successfully. Turn completed.
+5c84560f0eddfdabc4b07443d9244c33934bbb93 5c84560f0eddfdabc4b07443d9244c33934bbb93 Test User <test@example.com> 1787206758 +0530	checkout: moving from auto-agent-work to auto-agent-work
+5c84560f0eddfdabc4b07443d9244c33934bbb93 2467c5f755e8149f7581b6f288c674548b0a14e9 Test User <test@example.com> 1787206758 +0530	reset: moving to 2467c5f755e8149f7581b6f288c674548b0a14e9
+2467c5f755e8149f7581b6f288c674548b0a14e9 b752a92ab63b0b486ad56217cef7770db5ad3772 Test User <test@example.com> 1787206758 +0530	commit: [CHECKPOINT] pre_iter_6
+b752a92ab63b0b486ad56217cef7770db5ad3772 7517e4d1063cea0174ad94ea135b51a758520580 Test User <test@example.com> 1787206767 +0630	agent iteration 6: ```json
+7517e4d1063cea0174ad94ea135b51a758520580 7517e4d1063cea0174ad94ea135b51a758520580 Test User <test@example.com> 1787206767 +0530	checkout: moving from auto-agent-work to auto-agent-work
+7517e4d1063cea0174ad94ea135b51a758520580 b752a92ab63b0b486ad56217cef7770db5ad3772 Test User <test@example.com> 1787206767 +0530	reset: moving to b752a92ab63b0b486ad56217cef7770db5ad3772
+b752a92ab63b0b486ad56217cef7770db5ad3772 f00f0ab3dc4d6fdf4e7bbd04c419021e4d700d06 Test User <test@example.com> 1787206767 +0530	commit: [CHECKPOINT] pre_iter_7
+f00f0ab3dc4d6fdf4e7bbd04c419021e4d700d06 2c8961fd55517019f1d01b267cb547bff5b7b8ae Test User <test@example.com> 1787206780 +0630	agent iteration 7: ```json
+2c8961fd55517019f1d01b267cb547bff5b7b8ae 2c8961fd55517019f1d01b267cb547bff5b7b8ae Test User <test@example.com> 1787206780 +0530	checkout: moving from auto-agent-work to auto-agent-work
+2c8961fd55517019f1d01b267cb547bff5b7b8ae f00f0ab3dc4d6fdf4e7bbd04c419021e4d700d06 Test User <test@example.com> 1787206781 +0530	reset: moving to f00f0ab3dc4d6fdf4e7bbd04c419021e4d700d06
+f00f0ab3dc4d6fdf4e7bbd04c419021e4d700d06 7dbbf92c5667ed993939938788287f2ed5d72c5f Test User <test@example.com> 1787206781 +0530	commit: [CHECKPOINT] pre_iter_8
+7dbbf92c5667ed993939938788287f2ed5d72c5f 809c4fb8c70211cd2f69e5411959befa3caa38b1 Test User <test@example.com> 1787206792 +0630	agent iteration 8: File changes made successfully. Turn completed.
+809c4fb8c70211cd2f69e5411959befa3caa38b1 809c4fb8c70211cd2f69e5411959befa3caa38b1 Test User <test@example.com> 1787206792 +0530	checkout: moving from auto-agent-work to auto-agent-work
+809c4fb8c70211cd2f69e5411959befa3caa38b1 7dbbf92c5667ed993939938788287f2ed5d72c5f Test User <test@example.com> 1787206792 +0530	reset: moving to 7dbbf92c5667ed993939938788287f2ed5d72c5f
+7dbbf92c5667ed993939938788287f2ed5d72c5f 878e827fafd5db52c75bd2e2c4f057a0fbe5aab4 Test User <test@example.com> 1787206793 +0530	commit: [CHECKPOINT] pre_iter_9
+878e827fafd5db52c75bd2e2c4f057a0fbe5aab4 a3b2b93c6027db5709fe73c9e355796f2445d61e Test User <test@example.com> 1787206804 +0630	agent iteration 9: ```json
+a3b2b93c6027db5709fe73c9e355796f2445d61e a3b2b93c6027db5709fe73c9e355796f2445d61e Test User <test@example.com> 1787206805 +0530	checkout: moving from auto-agent-work to auto-agent-work
+a3b2b93c6027db5709fe73c9e355796f2445d61e 878e827fafd5db52c75bd2e2c4f057a0fbe5aab4 Test User <test@example.com> 1787206805 +0530	reset: moving to 878e827fafd5db52c75bd2e2c4f057a0fbe5aab4
+878e827fafd5db52c75bd2e2c4f057a0fbe5aab4 cf0b9b258a621c386697c8e48ab5849e4137e844 Test User <test@example.com> 1787206805 +0530	commit: [CHECKPOINT] pre_iter_10
+cf0b9b258a621c386697c8e48ab5849e4137e844 9fb3581e709fe2e370a0921f4047dc0309410293 Test User <test@example.com> 1787206876 +0630	agent iteration 10: File changes made successfully. Turn completed.
+9fb3581e709fe2e370a0921f4047dc0309410293 9fb3581e709fe2e370a0921f4047dc0309410293 Test User <test@example.com> 1787206876 +0530	checkout: moving from auto-agent-work to auto-agent-work
+9fb3581e709fe2e370a0921f4047dc0309410293 130ab1459d8da598c95e8a031cf095698758d2e8 Test User <test@example.com> 1787206876 +0530	reset: moving to 130ab1459d8da598c95e8a031cf095698758d2e8
+130ab1459d8da598c95e8a031cf095698758d2e8 0aeda63f2bcc0615f651494b77f9fc97baddf3eb Test User <test@example.com> 1787207688 +0530	commit: [CHECKPOINT] initial_state_Fix all bugs in source files s
+0aeda63f2bcc0615f651494b77f9fc97baddf3eb ad278f3e5ed695be0b9dde493f5b10cdea87ed97 Test User <test@example.com> 1787207714 +0630	agent iteration 1: ```json
+ad278f3e5ed695be0b9dde493f5b10cdea87ed97 037534c40936721ae1c2eec3291c2e0eb6148dfc Test User <test@example.com> 1787207715 +0530	commit: [CHECKPOINT] pre_iter_2
+037534c40936721ae1c2eec3291c2e0eb6148dfc bae33771a293e68ee029584c5bf2e57916a7818d Test User <test@example.com> 1787207734 +0630	agent iteration 2: ```json
+bae33771a293e68ee029584c5bf2e57916a7818d 3c9667ca302e62f70930ac1752e8aa8f5a523aa2 Test User <test@example.com> 1787207735 +0530	commit: [CHECKPOINT] pre_iter_3
+3c9667ca302e62f70930ac1752e8aa8f5a523aa2 0c04a62a21a6c990bd36ce8384aa05284dbf967c Test User <test@example.com> 1787207804 +0630	agent iteration 3: Agent hit recursion limit of 30 steps due to repeating operations.
+0c04a62a21a6c990bd36ce8384aa05284dbf967c 0c04a62a21a6c990bd36ce8384aa05284dbf967c Test User <test@example.com> 1787207804 +0530	checkout: moving from auto-agent-work to auto-agent-work
+0c04a62a21a6c990bd36ce8384aa05284dbf967c 3c9667ca302e62f70930ac1752e8aa8f5a523aa2 Test User <test@example.com> 1787207804 +0530	reset: moving to 3c9667ca302e62f70930ac1752e8aa8f5a523aa2
+3c9667ca302e62f70930ac1752e8aa8f5a523aa2 b1cfa7bceb6b90e5203a2e27e361f11691734a47 Test User <test@example.com> 1787207805 +0530	commit: [CHECKPOINT] pre_iter_4
+b1cfa7bceb6b90e5203a2e27e361f11691734a47 bcd2737be3515214d9705ff4372ba33a2cf78405 Test User <test@example.com> 1787207824 +0630	agent iteration 4: ```json
+bcd2737be3515214d9705ff4372ba33a2cf78405 bcd2737be3515214d9705ff4372ba33a2cf78405 Test User <test@example.com> 1787207824 +0530	checkout: moving from auto-agent-work to auto-agent-work
+bcd2737be3515214d9705ff4372ba33a2cf78405 b1cfa7bceb6b90e5203a2e27e361f11691734a47 Test User <test@example.com> 1787207824 +0530	reset: moving to b1cfa7bceb6b90e5203a2e27e361f11691734a47
+b1cfa7bceb6b90e5203a2e27e361f11691734a47 45855ef7eeec9ee0f51d18d6a9a2ab3587c85660 Test User <test@example.com> 1787207824 +0530	commit: [CHECKPOINT] pre_iter_5
+45855ef7eeec9ee0f51d18d6a9a2ab3587c85660 52c54da5be2d779681721e8ea7cb66a175f688de Test User <test@example.com> 1787207881 +0630	agent iteration 5: Agent hit recursion limit of 30 steps due to repeating operations.
+52c54da5be2d779681721e8ea7cb66a175f688de 52c54da5be2d779681721e8ea7cb66a175f688de Test User <test@example.com> 1787207882 +0530	checkout: moving from auto-agent-work to auto-agent-work
+52c54da5be2d779681721e8ea7cb66a175f688de 45855ef7eeec9ee0f51d18d6a9a2ab3587c85660 Test User <test@example.com> 1787207882 +0530	reset: moving to 45855ef7eeec9ee0f51d18d6a9a2ab3587c85660
+45855ef7eeec9ee0f51d18d6a9a2ab3587c85660 51bcce78370f665cd675b8097b25b050e311e0df Test User <test@example.com> 1787207882 +0530	commit: [CHECKPOINT] pre_iter_6
+51bcce78370f665cd675b8097b25b050e311e0df 82a7f7ddfd84265306780e88cdcd0b54d04b8104 Test User <test@example.com> 1787207938 +0630	agent iteration 6: Agent hit recursion limit of 30 steps due to repeating operations.
+82a7f7ddfd84265306780e88cdcd0b54d04b8104 82a7f7ddfd84265306780e88cdcd0b54d04b8104 Test User <test@example.com> 1787207938 +0530	checkout: moving from auto-agent-work to auto-agent-work
+82a7f7ddfd84265306780e88cdcd0b54d04b8104 51bcce78370f665cd675b8097b25b050e311e0df Test User <test@example.com> 1787207938 +0530	reset: moving to 51bcce78370f665cd675b8097b25b050e311e0df
+51bcce78370f665cd675b8097b25b050e311e0df 2ba0887208575cfdca8d12e79221acf85e123352 Test User <test@example.com> 1787207939 +0530	commit: [CHECKPOINT] pre_iter_7
+2ba0887208575cfdca8d12e79221acf85e123352 c841c82cdb41e73992621f172f83e7811ee4c85b Test User <test@example.com> 1787207952 +0630	agent iteration 7: ```json
+c841c82cdb41e73992621f172f83e7811ee4c85b c841c82cdb41e73992621f172f83e7811ee4c85b Test User <test@example.com> 1787207953 +0530	checkout: moving from auto-agent-work to auto-agent-work
+c841c82cdb41e73992621f172f83e7811ee4c85b 2ba0887208575cfdca8d12e79221acf85e123352 Test User <test@example.com> 1787207953 +0530	reset: moving to 2ba0887208575cfdca8d12e79221acf85e123352
+2ba0887208575cfdca8d12e79221acf85e123352 fe8ecaf40645fb85bd94db0ae509c62d8091b573 Test User <test@example.com> 1787207953 +0530	commit: [CHECKPOINT] pre_iter_8
+fe8ecaf40645fb85bd94db0ae509c62d8091b573 8f9ce43600a3eb635955dbbfdc9563013a3f9567 Test User <test@example.com> 1787208045 +0630	agent iteration 8: Agent hit recursion limit of 30 steps due to repeating operations.
+8f9ce43600a3eb635955dbbfdc9563013a3f9567 8f9ce43600a3eb635955dbbfdc9563013a3f9567 Test User <test@example.com> 1787208045 +0530	checkout: moving from auto-agent-work to auto-agent-work
+8f9ce43600a3eb635955dbbfdc9563013a3f9567 fe8ecaf40645fb85bd94db0ae509c62d8091b573 Test User <test@example.com> 1787208045 +0530	reset: moving to fe8ecaf40645fb85bd94db0ae509c62d8091b573
+fe8ecaf40645fb85bd94db0ae509c62d8091b573 4edfbc69fe0bb20290fd580e10b55a0e2cbb04c3 Test User <test@example.com> 1787208046 +0530	commit: [CHECKPOINT] pre_iter_9
+4edfbc69fe0bb20290fd580e10b55a0e2cbb04c3 60a2e665606a46d6722ac3f00afeb9ae0735feed Test User <test@example.com> 1787208063 +0630	agent iteration 9: ```json
+60a2e665606a46d6722ac3f00afeb9ae0735feed 60a2e665606a46d6722ac3f00afeb9ae0735feed Test User <test@example.com> 1787208063 +0530	checkout: moving from auto-agent-work to auto-agent-work
+60a2e665606a46d6722ac3f00afeb9ae0735feed 4edfbc69fe0bb20290fd580e10b55a0e2cbb04c3 Test User <test@example.com> 1787208064 +0530	reset: moving to 4edfbc69fe0bb20290fd580e10b55a0e2cbb04c3
+4edfbc69fe0bb20290fd580e10b55a0e2cbb04c3 4c3458816ebb8e04cd7ad783a9dc9a5ef7227c35 Test User <test@example.com> 1787208064 +0530	commit: [CHECKPOINT] pre_iter_10
+4c3458816ebb8e04cd7ad783a9dc9a5ef7227c35 6e09d77bc78d8de8b6fe129e08de090661cb6139 Test User <test@example.com> 1787208113 +0630	agent iteration 10: Agent hit recursion limit of 30 steps due to repeating operations.
+6e09d77bc78d8de8b6fe129e08de090661cb6139 6e09d77bc78d8de8b6fe129e08de090661cb6139 Test User <test@example.com> 1787208113 +0530	checkout: moving from auto-agent-work to auto-agent-work
+6e09d77bc78d8de8b6fe129e08de090661cb6139 0aeda63f2bcc0615f651494b77f9fc97baddf3eb Test User <test@example.com> 1787208113 +0530	reset: moving to 0aeda63f2bcc0615f651494b77f9fc97baddf3eb
+</file>
+
+<file path="coding-agent-testing-error-code/examples/12_stack_queue/.git/refs/heads/auto-agent-work">
+0aeda63f2bcc0615f651494b77f9fc97baddf3eb
+</file>
+
+<file path="coding-agent-testing-error-code/examples/12_stack_queue/.git/config">
+[core]
+	repositoryformatversion = 0
+	filemode = false
+	bare = false
+	logallrefupdates = true
+	symlinks = false
+	ignorecase = true
+</file>
+
+<file path="coding-agent-testing-error-code/examples/12_stack_queue/.git/description">
+Unnamed repository; edit this file 'description' to name the repository.
+</file>
+
+<file path="coding-agent-testing-error-code/examples/12_stack_queue/.git/HEAD">
+ref: refs/heads/auto-agent-work
+</file>
+
+<file path="coding-agent-testing-error-code/examples/12_stack_queue/.git/ORIG_HEAD">
+6e09d77bc78d8de8b6fe129e08de090661cb6139
+</file>
+
+<file path="coding-agent-testing-error-code/examples/12_stack_queue/pytest.ini">
+[pytest]
+rootdir = .
+</file>
+
+<file path="coding-agent-testing-error-code/examples/12_stack_queue/structures.py">
+"""Simple Stack and Queue implementations.
+
+Contains a LOGIC ERROR: Queue.dequeue() pops from the wrong end,
+turning it into stack (LIFO) behavior instead of FIFO.
+"""
+
+
+class Stack:
+    def __init__(self):
+        self._items = []
+
+    def push(self, item):
+        self._items.append(item)
+
+    def pop(self):
+        if not self._items:
+            raise IndexError("pop from empty stack")
+        return self._items.pop()
+
+    def peek(self):
+        if not self._items:
+            raise IndexError("peek from empty stack")
+        return self._items[-1]
+
+    def is_empty(self):
+        return len(self._items) == 0
+
+    def __len__(self):
+        return len(self._items)
+
+
+class Queue:
+    def __init__(self):
+        self._items = []
+
+    def enqueue(self, item):
+        self._items.append(item)
+
+    def dequeue(self):
+        if not self._items:
+            raise IndexError("dequeue from empty queue")
+        # BUG: should remove and return the FIRST item (self._items.pop(0))
+        return self._items.pop()
+
+    def is_empty(self):
+        return len(self._items) == 0
+
+    def __len__(self):
+        return len(self._items)
+</file>
+
+<file path="coding-agent-testing-error-code/examples/12_stack_queue/test_structures.py">
+import pytest
+
+from structures import Stack, Queue
+
+
+def test_stack_lifo_order():
+    s = Stack()
+    s.push(1)
+    s.push(2)
+    s.push(3)
+    assert s.pop() == 3
+    assert s.pop() == 2
+    assert s.pop() == 1
+
+
+def test_stack_pop_empty_raises():
+    s = Stack()
+    with pytest.raises(IndexError):
+        s.pop()
+
+
+def test_queue_fifo_order():
+    q = Queue()
+    q.enqueue("a")
+    q.enqueue("b")
+    q.enqueue("c")
+    assert q.dequeue() == "a"
+    assert q.dequeue() == "b"
+    assert q.dequeue() == "c"
+
+
+def test_queue_dequeue_empty_raises():
+    q = Queue()
+    with pytest.raises(IndexError):
+        q.dequeue()
+
+
+def test_queue_length_tracks_correctly():
+    q = Queue()
+    q.enqueue(1)
+    q.enqueue(2)
+    assert len(q) == 2
+    q.dequeue()
+    assert len(q) == 1
+</file>
+
+<file path="coding-agent-testing-error-code/examples/13_url_shortener/pytest.ini">
+[pytest]
+rootdir = .
+</file>
+
+<file path="coding-agent-testing-error-code/examples/13_url_shortener/shortener.py">
+"""In-memory URL shortener.
+
+Contains a LOGIC ERROR: shorten() always maps every code to the SAME
+key ("code") instead of a unique generated key, so previously
+shortened URLs get overwritten and lookups return the wrong URL.
+"""
+
+import hashlib
+
+
+class URLShortener:
+    def __init__(self):
+        self._store = {}
+
+    def _make_code(self, url: str) -> str:
+        return hashlib.md5(url.encode()).hexdigest()[:6]
+
+    def shorten(self, url: str) -> str:
+        code = self._make_code(url)
+        # BUG: should be self._store[code] = url
+        self._store["code"] = url
+        return code
+
+    def resolve(self, code: str) -> str:
+        if code not in self._store:
+            raise KeyError(f"Unknown code: {code}")
+        return self._store[code]
+
+    def __len__(self):
+        return len(self._store)
+</file>
+
+<file path="coding-agent-testing-error-code/examples/13_url_shortener/test_shortener.py">
+import pytest
+
+from shortener import URLShortener
+
+
+def test_shorten_and_resolve_single_url():
+    s = URLShortener()
+    code = s.shorten("https://example.com")
+    assert s.resolve(code) == "https://example.com"
+
+
+def test_shorten_multiple_urls_are_independent():
+    s = URLShortener()
+    code1 = s.shorten("https://example.com/one")
+    code2 = s.shorten("https://example.com/two")
+    assert code1 != code2
+    assert s.resolve(code1) == "https://example.com/one"
+    assert s.resolve(code2) == "https://example.com/two"
+
+
+def test_store_length_grows_with_unique_urls():
+    s = URLShortener()
+    s.shorten("https://a.com")
+    s.shorten("https://b.com")
+    s.shorten("https://c.com")
+    assert len(s) == 3
+
+
+def test_resolve_unknown_code_raises():
+    s = URLShortener()
+    with pytest.raises(KeyError):
+        s.resolve("nope123")
+</file>
+
+<file path="coding-agent-testing-error-code/examples/14_grade_calculator/grades.py">
+"""Student grade tracking utilities.
+
+Contains a classic MUTABLE DEFAULT ARGUMENT bug: add_score()'s
+`history=[]` default is created once and shared across every call
+that doesn't pass its own list, so scores leak between students.
+"""
+
+
+def add_score(score: float, history=[]) -> list:
+    # BUG: default mutable argument is shared across calls.
+    # Should be: def add_score(score, history=None): history = history if history is not None else []
+    history.append(score)
+    return history
+
+
+def average(scores: list) -> float:
+    if not scores:
+        raise ValueError("scores must not be empty")
+    return sum(scores) / len(scores)
+
+
+def letter_grade(avg: float) -> str:
+    if avg >= 90:
+        return "A"
+    elif avg >= 80:
+        return "B"
+    elif avg >= 70:
+        return "C"
+    elif avg >= 60:
+        return "D"
+    return "F"
+</file>
+
+<file path="coding-agent-testing-error-code/examples/14_grade_calculator/pytest.ini">
+[pytest]
+rootdir = .
+</file>
+
+<file path="coding-agent-testing-error-code/examples/14_grade_calculator/test_grades.py">
+import pytest
+
+from grades import add_score, average, letter_grade
+
+
+def test_add_score_returns_list_with_new_score():
+    history = add_score(85)
+    assert history == [85]
+
+
+def test_add_score_does_not_leak_between_independent_students():
+    student_a = add_score(90)
+    student_b = add_score(70)
+    assert student_a == [90]
+    assert student_b == [70]
+
+
+def test_add_score_accumulates_for_same_history():
+    history = []
+    add_score(60, history)
+    add_score(70, history)
+    assert history == [60, 70]
+
+
+def test_average_basic():
+    assert average([80, 90, 100]) == 90
+
+
+def test_average_empty_raises():
+    with pytest.raises(ValueError):
+        average([])
+
+
+def test_letter_grade_boundaries():
+    assert letter_grade(95) == "A"
+    assert letter_grade(85) == "B"
+    assert letter_grade(75) == "C"
+    assert letter_grade(65) == "D"
+    assert letter_grade(50) == "F"
+</file>
+
+<file path="coding-agent-testing-error-code/examples/15_config_parser/config.py">
+"""Simple key=value config file parser.
+
+Contains a LOGIC ERROR: parse() silently swallows malformed lines
+AND invalid integers via a bare except, returning incomplete/wrong
+data instead of raising, which hides real errors from callers.
+"""
+
+
+def parse(text: str) -> dict:
+    result = {}
+    for line in text.splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        try:
+            key, value = line.split("=", 1)
+            key = key.strip()
+            value = value.strip()
+            if value.isdigit():
+                value = int(value)
+            result[key] = value
+        except Exception:
+            # BUG: silently drops malformed lines instead of raising
+            # ValueError(f"Malformed config line: {line!r}")
+            continue
+    return result
+
+
+def get_int(config: dict, key: str, default: int = 0) -> int:
+    value = config.get(key, default)
+    if isinstance(value, int):
+        return value
+    raise TypeError(f"Config value for {key!r} is not an int: {value!r}")
+</file>
+
+<file path="coding-agent-testing-error-code/examples/15_config_parser/pytest.ini">
+[pytest]
+rootdir = .
+</file>
+
+<file path="coding-agent-testing-error-code/examples/15_config_parser/test_config.py">
+import pytest
+
+from config import parse, get_int
+
+
+def test_parse_basic_key_values():
+    text = "name=myapp\nport=8080\n"
+    result = parse(text)
+    assert result == {"name": "myapp", "port": 8080}
+
+
+def test_parse_ignores_comments_and_blank_lines():
+    text = "# comment\n\nname=myapp\n"
+    result = parse(text)
+    assert result == {"name": "myapp"}
+
+
+def test_parse_malformed_line_raises_value_error():
+    text = "name=myapp\nthis line has no equals sign\n"
+    with pytest.raises(ValueError):
+        parse(text)
+
+
+def test_get_int_returns_int_value():
+    config = {"port": 8080}
+    assert get_int(config, "port") == 8080
+
+
+def test_get_int_returns_default_when_missing():
+    config = {}
+    assert get_int(config, "port", 9000) == 9000
+
+
+def test_get_int_raises_for_non_int_value():
+    config = {"name": "myapp"}
+    with pytest.raises(TypeError):
+        get_int(config, "name")
+</file>
+
+<file path="coding-agent-testing-error-code/examples/16_prime_checker/primes.py">
+"""Prime number utilities.
+
+Contains an OFF-BY-ONE ERROR: is_prime()'s loop range excludes the
+square root boundary itself, so some composite numbers whose only
+factor is exactly sqrt(n) (e.g. 25 -> 5) are incorrectly reported
+as prime.
+"""
+
+import math
+
+
+def is_prime(n: int) -> bool:
+    if n < 2:
+        return False
+    if n in (2, 3):
+        return True
+    if n % 2 == 0:
+        return False
+    limit = int(math.sqrt(n))
+    # BUG: should be range(3, limit + 1, 2) to include the boundary
+    for i in range(3, limit, 2):
+        if n % i == 0:
+            return False
+    return True
+
+
+def primes_up_to(n: int) -> list:
+    return [x for x in range(2, n + 1) if is_prime(x)]
+
+
+def nth_prime(n: int) -> int:
+    if n < 1:
+        raise ValueError("n must be >= 1")
+    count = 0
+    candidate = 1
+    while count < n:
+        candidate += 1
+        if is_prime(candidate):
+            count += 1
+    return candidate
+</file>
+
+<file path="coding-agent-testing-error-code/examples/16_prime_checker/pytest.ini">
+[pytest]
+rootdir = .
+</file>
+
+<file path="coding-agent-testing-error-code/examples/16_prime_checker/test_primes.py">
+from primes import is_prime, primes_up_to, nth_prime
+
+
+def test_small_primes():
+    assert is_prime(2)
+    assert is_prime(3)
+    assert is_prime(5)
+    assert is_prime(7)
+
+
+def test_small_non_primes():
+    assert not is_prime(0)
+    assert not is_prime(1)
+    assert not is_prime(4)
+    assert not is_prime(6)
+
+
+def test_perfect_square_of_prime_is_not_prime():
+    # 25 = 5 * 5, must not be reported as prime
+    assert not is_prime(25)
+    assert not is_prime(49)
+    assert not is_prime(121)
+
+
+def test_primes_up_to_10():
+    assert primes_up_to(10) == [2, 3, 5, 7]
+
+
+def test_nth_prime():
+    assert nth_prime(1) == 2
+    assert nth_prime(5) == 11
+    assert nth_prime(10) == 29
+</file>
+
+<file path="coding-agent-testing-error-code/README.md">
+# Buggy Test Suite (New Benchmark Examples)
+
+This is a **standalone** folder of small Python repos, each with one
+seeded bug and a pytest test suite that fails because of it. It is
+meant to be uploaded as its own GitHub repo (or dropped into
+`my-buggy-test-repo/examples/` if you'd rather point the agent at
+this folder directly) so you can run your autonomous coding agent
+against fresh, unseen examples.
+
+No files from your original project were modified — this is entirely
+separate.
+
+## Layout
+
+```
+examples/
+  11_temperature_converter/   wrong formula (numeric logic bug)
+  12_stack_queue/              Queue.dequeue() pops wrong end (FIFO -> LIFO)
+  13_url_shortener/            every URL overwrites the same dict key
+  14_grade_calculator/         classic mutable default argument bug
+  15_config_parser/            bare except silently swallows bad input
+  16_prime_checker/            off-by-one in sqrt(n) loop boundary
+```
+
+Each example folder is self-contained:
+- one (or two) source file(s) with a single seeded bug
+- a `test_*.py` file exercising that bug
+- a `pytest.ini`
+
+Every example was verified locally: each fails 1+ tests due to the
+bug, with the rest passing, confirming the tests target the bug and
+nothing else.
+
+## How to use with your agent
+
+Point `--repo` (or `--benchmark-dir`) at one of these example
+folders, e.g.:
+
+```bash
+python main.py --repo /path/to/buggy-test-suite/examples/11_temperature_converter --goal "fix all failing unit tests"
+```
+
+Or run the whole set through the benchmark harness if you copy this
+`examples/` folder alongside (or in place of) the existing
+`my-buggy-test-repo/examples/` directory:
+
+```bash
+python main.py --benchmark --benchmark-dir ./buggy-test-suite/examples
+```
+
+## Bug summary
+
+| Folder | Bug type | What's wrong |
+|---|---|---|
+| 11_temperature_converter | Logic error | `celsius_to_fahrenheit` uses the wrong formula |
+| 12_stack_queue | Logic error | `Queue.dequeue()` pops from the end instead of the front |
+| 13_url_shortener | Logic error | `shorten()` writes to a hardcoded dict key, overwriting prior entries |
+| 14_grade_calculator | Classic Python pitfall | Mutable default argument (`history=[]`) shared across calls |
+| 15_config_parser | Silent failure | Bare `except` swallows malformed lines instead of raising |
+| 16_prime_checker | Off-by-one | Loop range excludes `sqrt(n)`, so perfect squares of primes (25, 49...) are misreported as prime |
 </file>
 
 <file path="dummy_repo/.git/hooks/applypatch-msg.sample">
@@ -17178,213 +20162,6 @@ class TestLoopMCPBridge:
                 pytest.fail(f"run() should degrade gracefully but raised: {exc}")
 </file>
 
-<file path="tools/base.py">
-"""Base tool abstraction and shared logging for the tools package.
-
-All tools in this package follow the same logging convention:
-    [TOOL] <name>
-    [TOOL] result=OK / result=FAILED / result=ERROR ...
-"""
-
-import functools
-from typing import Any
-
-
-# Tool log prefix used across all tool modules — keep consistent with the
-# existing [worker], [agent], [tests], [git] prefix style in loop.py
-_TOOL_PREFIX = "[TOOL]"
-
-
-def log_tool_call(name: str) -> None:
-    """Print a tool-invocation line to stdout."""
-    print(f"{_TOOL_PREFIX} {name}")
-
-
-def log_tool_result(result_summary: str) -> None:
-    """Print a one-line tool-result summary to stdout."""
-    print(f"{_TOOL_PREFIX} result={result_summary}")
-
-
-def safe_tool(func):
-    """Decorator that catches any unhandled exception from a tool function
-    and converts it to a structured error-string result instead of letting
-    it propagate into the agent loop.
-
-    Usage::
-
-        @safe_tool
-        def my_tool(arg: str) -> str:
-            ...
-    """
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs) -> Any:
-        try:
-            return func(*args, **kwargs)
-        except Exception as exc:
-            error_msg = f"ERROR: {type(exc).__name__}: {exc}"
-            log_tool_result(f"ERROR tool={func.__name__} exc={type(exc).__name__}")
-            return error_msg
-    return wrapper
-</file>
-
-<file path="tools/git_tools.py">
-"""Git tools: git_status, git_diff, git_log, git_commit.
-
-All tools are thin wrappers around the existing ``utils/git_utils.py``
-functions — no new git logic is introduced here.
-
-Safety:
-- ``git_commit`` is gated: it may only be used when ``require_approval`` is
-  False in the active run.  The tool accepts an explicit ``allow_commit``
-  flag that the registry sets at build time so the agent cannot bypass the
-  user's approval gate.
-- All tools catch git exceptions and return an error string rather than
-  propagating into the agent loop.
-"""
-
-from langchain_core.tools import tool
-
-from tools.base import log_tool_call, log_tool_result, safe_tool
-from utils.git_utils import get_repo, get_diff, commit_iteration
-
-
-# ---------------------------------------------------------------------------
-# git_status
-# ---------------------------------------------------------------------------
-
-def make_git_status_tool(repo_path: str):
-    """Factory that returns a git_status tool bound to a specific repo_path."""
-
-    @tool
-    def git_status() -> str:
-        """Return the current git status of the repository, showing which
-        files are modified, staged, or untracked."""
-        log_tool_call("git_status")
-        try:
-            repo = get_repo(repo_path)
-            status_lines = []
-            if repo.is_dirty(untracked_files=True):
-                for item in repo.index.diff(None):
-                    status_lines.append(f"  modified: {item.a_path}")
-                for item in repo.untracked_files:
-                    status_lines.append(f"  untracked: {item}")
-                for item in repo.index.diff("HEAD"):
-                    status_lines.append(f"  staged:   {item.a_path}")
-            result = "\n".join(status_lines) if status_lines else "nothing to commit, working tree clean"
-            log_tool_result("OK")
-            return result
-        except Exception as exc:
-            error = f"ERROR: {type(exc).__name__}: {exc}"
-            log_tool_result(f"ERROR {type(exc).__name__}")
-            return error
-
-    return git_status
-
-
-# ---------------------------------------------------------------------------
-# git_diff
-# ---------------------------------------------------------------------------
-
-def make_git_diff_tool(repo_path: str):
-    """Factory that returns a git_diff tool bound to a specific repo_path."""
-
-    @tool
-    def git_diff() -> str:
-        """Return the full unified diff of all unstaged changes in the
-        repository (equivalent to ``git diff``)."""
-        log_tool_call("git_diff")
-        try:
-            diff = get_diff(repo_path)
-            result = diff if diff.strip() else "(no diff — working tree is clean)"
-            log_tool_result("OK")
-            return result
-        except Exception as exc:
-            error = f"ERROR: {type(exc).__name__}: {exc}"
-            log_tool_result(f"ERROR {type(exc).__name__}")
-            return error
-
-    return git_diff
-
-
-# ---------------------------------------------------------------------------
-# git_log
-# ---------------------------------------------------------------------------
-
-def make_git_log_tool(repo_path: str):
-    """Factory that returns a git_log tool bound to a specific repo_path."""
-
-    @tool
-    def git_log(max_entries: int = 10) -> str:
-        """Return the last N commit log entries (default 10) from the current
-        branch.
-
-        Args:
-            max_entries: Maximum number of log entries to return (1-50).
-        """
-        log_tool_call("git_log")
-        try:
-            max_entries = max(1, min(int(max_entries), 50))
-            repo = get_repo(repo_path)
-            entries = []
-            for commit in repo.iter_commits(max_count=max_entries):
-                entries.append(
-                    f"{commit.hexsha[:8]}  {commit.committed_datetime.strftime('%Y-%m-%d %H:%M')}  {commit.summary}"
-                )
-            result = "\n".join(entries) if entries else "(no commits found)"
-            log_tool_result("OK")
-            return result
-        except Exception as exc:
-            error = f"ERROR: {type(exc).__name__}: {exc}"
-            log_tool_result(f"ERROR {type(exc).__name__}")
-            return error
-
-    return git_log
-
-
-# ---------------------------------------------------------------------------
-# git_commit  (optional — only safe when require_approval=False)
-# ---------------------------------------------------------------------------
-
-def make_git_commit_tool(repo_path: str, require_approval: bool):
-    """Factory that returns a git_commit tool.
-
-    When ``require_approval`` is True the returned tool always returns an
-    error message explaining it is disabled — the agent cannot bypass the
-    user's approval gate.
-    """
-
-    @tool
-    def git_commit(message: str) -> str:
-        """Stage all changes and create a git commit with the given message.
-
-        This tool is disabled when --require-approval is active; in that case
-        commits are handled by the controller after user confirmation.
-
-        Args:
-            message: The commit message to use (required).
-        """
-        log_tool_call("git_commit")
-        if require_approval:
-            msg = "ERROR: git_commit is disabled when --require-approval is active. The controller handles commits after user confirmation."
-            log_tool_result("DISABLED require_approval=True")
-            return msg
-        try:
-            hexsha = commit_iteration(repo_path, message)
-            if hexsha:
-                result = f"Committed {hexsha[:8]}: {message}"
-                log_tool_result(f"OK hash={hexsha[:8]}")
-            else:
-                result = "Nothing to commit — working tree was clean."
-                log_tool_result("OK nothing_to_commit")
-            return result
-        except Exception as exc:
-            error = f"ERROR: {type(exc).__name__}: {exc}"
-            log_tool_result(f"ERROR {type(exc).__name__}")
-            return error
-
-    return git_commit
-</file>
-
 <file path="unused/debug.txt">
 import subprocess
 
@@ -21899,387 +24676,6 @@ if __name__ == "__main__":
     pytest.main([__file__, "-v"])
 </file>
 
-<file path="test_phase/test_tools.py">
-"""test_tools.py — Phase 1: General Tool System unit tests.
-
-Covers:
-- execute_command: successful stdout capture, non-zero exit / stderr capture,
-  timeout behaviour, and the risk_tier field passthrough.
-- Filesystem helpers: create_directory, move_file, delete_file, list_directory,
-  including default risk_tier values and error paths.
-
-All tests are self-contained; no real network or external repo is required.
-Temp directories are provided by pytest's ``tmp_path`` fixture.
-"""
-
-import os
-import sys
-import time
-import pytest
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
-from tools.terminal import (
-    create_directory,
-    delete_file,
-    execute_command,
-    list_directory,
-    move_file,
-)
-
-def _echo_cmd(text: str) -> str:
-    """Return a cross-platform echo command."""
-    if sys.platform == "win32":
-        return f'cmd /c echo {text}'
-    return f'echo {text}'
-
-
-def _fail_cmd() -> str:
-    """Return a cross-platform command that exits with code 1."""
-    if sys.platform == "win32":
-        return 'cmd /c exit 1'
-    return 'exit 1'
-
-
-def _stderr_cmd(text: str) -> str:
-    """Return a cross-platform command that writes to stderr."""
-    if sys.platform == "win32":
-        return f'cmd /c echo {text} 1>&2 & exit 1'
-    return f'bash -c "echo {text} >&2; exit 1"'
-
-
-# ---------------------------------------------------------------------------
-# execute_command tests
-# ---------------------------------------------------------------------------
-
-class TestExecuteCommand:
-
-    def test_result_dict_has_all_required_keys(self):
-        """Returned dict must contain every key defined in the spec."""
-        result = execute_command(_echo_cmd("hello"))
-        required_keys = {
-            "stdout", "stderr", "exit_code", "execution_time",
-            "status", "command", "working_directory", "risk_tier",
-        }
-        assert required_keys == set(result.keys()), (
-            f"Missing keys: {required_keys - set(result.keys())}"
-        )
-
-    def test_successful_command_captures_stdout(self):
-        """A simple echo should return status='success', exit_code=0, non-empty stdout."""
-        result = execute_command(_echo_cmd("hello_world"))
-        assert result["status"] == "success"
-        assert result["exit_code"] == 0
-        assert "hello_world" in result["stdout"]
-        assert result["stderr"] == "" or result["stderr"] is not None  # stderr may be empty
-
-    def test_successful_command_execution_time_is_positive(self):
-        result = execute_command(_echo_cmd("ping"))
-        assert result["execution_time"] >= 0.0
-
-    def test_failed_command_non_zero_exit_code(self):
-        """A command that exits with code 1 should return status='error'."""
-        if sys.platform == "win32":
-            cmd = 'cmd /c exit 1'
-        else:
-            cmd = 'bash -c "exit 1"'
-        result = execute_command(cmd)
-        assert result["status"] == "error"
-        assert result["exit_code"] != 0
-
-    def test_failed_command_captures_stderr(self):
-        """A command writing to stderr should surface it in the result."""
-        if sys.platform == "win32":
-            cmd = 'cmd /c "echo error_text 1>&2 & exit 1"'
-        else:
-            cmd = 'bash -c "echo error_text >&2; exit 1"'
-        result = execute_command(cmd)
-        assert result["exit_code"] != 0
-        # On windows echo adds a trailing space/newline; just check containment
-        assert "error_text" in result["stderr"] or result["exit_code"] != 0
-
-    def test_unknown_command_does_not_crash(self):
-        """An unrecognised command should return status 'error' or 'exception',
-        not raise an exception into the caller."""
-        result = execute_command("this_command_does_not_exist_xyz_abc_123")
-        assert result["status"] in ("error", "exception", "timeout")
-        assert isinstance(result["exit_code"], int)
-
-    def test_timeout_returns_timeout_status(self):
-        """A command that runs longer than timeout should return status='timeout'."""
-        if sys.platform == "win32":
-            cmd = "ping -n 10 127.0.0.1"   # ~9 seconds on Windows
-        else:
-            cmd = "sleep 10"
-        result = execute_command(cmd, timeout=1)
-        assert result["status"] == "timeout"
-        assert result["exit_code"] == -1
-
-    def test_timeout_does_not_raise(self):
-        """Timeout must be caught internally — no exception propagates."""
-        if sys.platform == "win32":
-            cmd = "ping -n 10 127.0.0.1"
-        else:
-            cmd = "sleep 10"
-        try:
-            execute_command(cmd, timeout=1)
-        except Exception as exc:
-            pytest.fail(f"execute_command raised an unexpected exception: {exc}")
-
-    def test_risk_tier_auto_is_default(self):
-        result = execute_command(_echo_cmd("x"))
-        assert result["risk_tier"] == "auto"
-
-    def test_risk_tier_is_passed_through_confirm(self):
-        result = execute_command(_echo_cmd("x"), risk_tier="confirm")
-        assert result["risk_tier"] == "confirm"
-
-    def test_risk_tier_is_passed_through_destructive(self):
-        result = execute_command(_echo_cmd("x"), risk_tier="destructive")
-        assert result["risk_tier"] == "destructive"
-
-    def test_cwd_is_respected(self, tmp_path):
-        """Working directory should be set to the provided path.
-
-        Uses ``python -c`` to print os.getcwd() so the command is fully
-        cross-platform and does not rely on shell built-ins that may exit
-        with non-zero codes when run inside a nested shell on Windows.
-        """
-        cmd = f'"{sys.executable}" -c "import os; print(os.getcwd())"'
-        result = execute_command(cmd, cwd=str(tmp_path))
-        assert result["status"] == "success", (
-            f"Command failed: stderr={result['stderr']!r}"
-        )
-        # Normalise path separators for comparison
-        out = result["stdout"].strip().replace("\\", "/").lower()
-        expected = str(tmp_path).replace("\\", "/").lower()
-        assert expected in out, f"Expected {expected!r} in stdout {out!r}"
-
-    def test_working_directory_in_result(self, tmp_path):
-        result = execute_command(_echo_cmd("x"), cwd=str(tmp_path))
-        assert result["working_directory"] == str(tmp_path)
-
-    def test_command_field_matches_input(self):
-        cmd = _echo_cmd("check_command_field")
-        result = execute_command(cmd)
-        assert result["command"] == cmd
-
-
-# ---------------------------------------------------------------------------
-# create_directory tests
-# ---------------------------------------------------------------------------
-
-class TestCreateDirectory:
-
-    def test_creates_new_directory(self, tmp_path):
-        new_dir = str(tmp_path / "brand_new_dir")
-        result = create_directory(new_dir)
-        assert result["status"] == "success"
-        assert os.path.isdir(new_dir)
-
-    def test_creates_nested_directories(self, tmp_path):
-        nested = str(tmp_path / "a" / "b" / "c")
-        result = create_directory(nested)
-        assert result["status"] == "success"
-        assert os.path.isdir(nested)
-
-    def test_existing_directory_is_no_op(self, tmp_path):
-        existing = str(tmp_path)
-        result = create_directory(existing)
-        assert result["status"] == "success"
-
-    def test_default_risk_tier_is_auto(self, tmp_path):
-        result = create_directory(str(tmp_path / "x"))
-        assert result["risk_tier"] == "auto"
-
-    def test_custom_risk_tier_is_stored(self, tmp_path):
-        result = create_directory(str(tmp_path / "y"), risk_tier="confirm")
-        assert result["risk_tier"] == "confirm"
-
-    def test_result_contains_path(self, tmp_path):
-        p = str(tmp_path / "pathcheck")
-        result = create_directory(p)
-        assert result["path"] == p
-
-    def test_error_on_invalid_path(self):
-        # Trying to create a directory where a component is an existing file
-        # is platform-dependent but generally errors.  We just verify no crash.
-        result = create_directory("/\x00invalid")   # null byte is always invalid
-        assert result["status"] in ("success", "error")   # must not raise
-
-
-# ---------------------------------------------------------------------------
-# move_file tests
-# ---------------------------------------------------------------------------
-
-class TestMoveFile:
-
-    def test_moves_a_file(self, tmp_path):
-        src = tmp_path / "src.txt"
-        src.write_text("content")
-        dst = str(tmp_path / "dst.txt")
-        result = move_file(str(src), dst)
-        assert result["status"] == "success"
-        assert os.path.exists(dst)
-        assert not os.path.exists(str(src))
-
-    def test_moves_a_directory(self, tmp_path):
-        src_dir = tmp_path / "src_dir"
-        src_dir.mkdir()
-        (src_dir / "file.txt").write_text("hi")
-        dst_dir = str(tmp_path / "dst_dir")
-        result = move_file(str(src_dir), dst_dir)
-        assert result["status"] == "success"
-        assert os.path.isdir(dst_dir)
-
-    def test_default_risk_tier_is_confirm(self, tmp_path):
-        src = tmp_path / "a.txt"
-        src.write_text("x")
-        dst = str(tmp_path / "b.txt")
-        result = move_file(str(src), dst)
-        assert result["risk_tier"] == "confirm"
-
-    def test_custom_risk_tier_stored(self, tmp_path):
-        src = tmp_path / "c.txt"
-        src.write_text("x")
-        dst = str(tmp_path / "d.txt")
-        result = move_file(str(src), dst, risk_tier="destructive")
-        assert result["risk_tier"] == "destructive"
-
-    def test_missing_source_returns_error(self, tmp_path):
-        result = move_file(str(tmp_path / "does_not_exist.txt"), str(tmp_path / "dst.txt"))
-        assert result["status"] == "error"
-        assert "message" in result
-
-    def test_result_contains_source_and_destination(self, tmp_path):
-        src = tmp_path / "s.txt"
-        src.write_text("x")
-        dst = str(tmp_path / "t.txt")
-        result = move_file(str(src), dst)
-        assert result["source"] == str(src)
-        assert result["destination"] == dst
-
-
-# ---------------------------------------------------------------------------
-# delete_file tests
-# ---------------------------------------------------------------------------
-
-class TestDeleteFile:
-
-    def test_deletes_a_file(self, tmp_path):
-        f = tmp_path / "to_delete.txt"
-        f.write_text("bye")
-        result = delete_file(str(f))
-        assert result["status"] == "success"
-        assert not os.path.exists(str(f))
-
-    def test_deletes_a_directory_tree(self, tmp_path):
-        d = tmp_path / "tree"
-        d.mkdir()
-        (d / "child.txt").write_text("x")
-        result = delete_file(str(d))
-        assert result["status"] == "success"
-        assert not os.path.exists(str(d))
-
-    def test_nonexistent_path_is_success(self, tmp_path):
-        result = delete_file(str(tmp_path / "ghost.txt"))
-        assert result["status"] == "success"
-
-    def test_default_risk_tier_is_destructive(self, tmp_path):
-        f = tmp_path / "x.txt"
-        f.write_text("x")
-        result = delete_file(str(f))
-        assert result["risk_tier"] == "destructive"
-
-    def test_custom_risk_tier_stored(self, tmp_path):
-        f = tmp_path / "y.txt"
-        f.write_text("y")
-        result = delete_file(str(f), risk_tier="confirm")
-        assert result["risk_tier"] == "confirm"
-
-    def test_result_contains_path(self, tmp_path):
-        f = tmp_path / "z.txt"
-        f.write_text("z")
-        p = str(f)
-        result = delete_file(p)
-        assert result["path"] == p
-
-
-# ---------------------------------------------------------------------------
-# list_directory tests
-# ---------------------------------------------------------------------------
-
-class TestListDirectory:
-
-    def test_lists_files_and_dirs(self, tmp_path):
-        (tmp_path / "alpha.txt").write_text("a")
-        (tmp_path / "beta.txt").write_text("b")
-        (tmp_path / "subdir").mkdir()
-        result = list_directory(str(tmp_path))
-        assert result["status"] == "success"
-        names = [e["name"] for e in result["entries"]]
-        assert "alpha.txt" in names
-        assert "beta.txt" in names
-        assert "subdir" in names
-
-    def test_entry_types_are_correct(self, tmp_path):
-        (tmp_path / "file.txt").write_text("f")
-        (tmp_path / "folder").mkdir()
-        result = list_directory(str(tmp_path))
-        entries = {e["name"]: e for e in result["entries"]}
-        assert entries["file.txt"]["type"] == "file"
-        assert entries["folder"]["type"] == "directory"
-
-    def test_file_entries_have_size(self, tmp_path):
-        (tmp_path / "sized.txt").write_text("hello")
-        result = list_directory(str(tmp_path))
-        entry = next(e for e in result["entries"] if e["name"] == "sized.txt")
-        assert isinstance(entry["size"], int)
-        assert entry["size"] > 0
-
-    def test_directory_entries_have_none_size(self, tmp_path):
-        (tmp_path / "adir").mkdir()
-        result = list_directory(str(tmp_path))
-        entry = next(e for e in result["entries"] if e["name"] == "adir")
-        assert entry["size"] is None
-
-    def test_empty_directory(self, tmp_path):
-        empty = tmp_path / "empty"
-        empty.mkdir()
-        result = list_directory(str(empty))
-        assert result["status"] == "success"
-        assert result["entries"] == []
-
-    def test_nonexistent_path_returns_error(self, tmp_path):
-        result = list_directory(str(tmp_path / "no_such_dir"))
-        assert result["status"] == "error"
-
-    def test_file_path_returns_error(self, tmp_path):
-        f = tmp_path / "not_a_dir.txt"
-        f.write_text("x")
-        result = list_directory(str(f))
-        assert result["status"] == "error"
-
-    def test_default_risk_tier_is_auto(self, tmp_path):
-        result = list_directory(str(tmp_path))
-        assert result["risk_tier"] == "auto"
-
-    def test_custom_risk_tier_stored(self, tmp_path):
-        result = list_directory(str(tmp_path), risk_tier="confirm")
-        assert result["risk_tier"] == "confirm"
-
-    def test_result_contains_path(self, tmp_path):
-        result = list_directory(str(tmp_path))
-        assert result["path"] == str(tmp_path)
-
-    def test_entries_are_sorted(self, tmp_path):
-        for name in ["zebra.txt", "apple.txt", "mango.txt"]:
-            (tmp_path / name).write_text("x")
-        result = list_directory(str(tmp_path))
-        names = [e["name"] for e in result["entries"]]
-        assert names == sorted(names)
-</file>
-
 <file path="tools/__init__.py">
 """Tool registry for the coding agent.
 
@@ -22503,6 +24899,213 @@ __all__ = [
     "delete_file",
     "list_directory",
 ]
+</file>
+
+<file path="tools/base.py">
+"""Base tool abstraction and shared logging for the tools package.
+
+All tools in this package follow the same logging convention:
+    [TOOL] <name>
+    [TOOL] result=OK / result=FAILED / result=ERROR ...
+"""
+
+import functools
+from typing import Any
+
+
+# Tool log prefix used across all tool modules — keep consistent with the
+# existing [worker], [agent], [tests], [git] prefix style in loop.py
+_TOOL_PREFIX = "[TOOL]"
+
+
+def log_tool_call(name: str) -> None:
+    """Print a tool-invocation line to stdout."""
+    print(f"{_TOOL_PREFIX} {name}")
+
+
+def log_tool_result(result_summary: str) -> None:
+    """Print a one-line tool-result summary to stdout."""
+    print(f"{_TOOL_PREFIX} result={result_summary}")
+
+
+def safe_tool(func):
+    """Decorator that catches any unhandled exception from a tool function
+    and converts it to a structured error-string result instead of letting
+    it propagate into the agent loop.
+
+    Usage::
+
+        @safe_tool
+        def my_tool(arg: str) -> str:
+            ...
+    """
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs) -> Any:
+        try:
+            return func(*args, **kwargs)
+        except Exception as exc:
+            error_msg = f"Tool Error: ERROR {type(exc).__name__}: {exc}. Please check your arguments and try again."
+            log_tool_result(f"ERROR tool={func.__name__} exc={type(exc).__name__}")
+            return error_msg
+    return wrapper
+</file>
+
+<file path="tools/git_tools.py">
+"""Git tools: git_status, git_diff, git_log, git_commit.
+
+All tools are thin wrappers around the existing ``utils/git_utils.py``
+functions — no new git logic is introduced here.
+
+Safety:
+- ``git_commit`` is gated: it may only be used when ``require_approval`` is
+  False in the active run.  The tool accepts an explicit ``allow_commit``
+  flag that the registry sets at build time so the agent cannot bypass the
+  user's approval gate.
+- All tools catch git exceptions and return an error string rather than
+  propagating into the agent loop.
+"""
+
+from langchain_core.tools import tool
+
+from tools.base import log_tool_call, log_tool_result, safe_tool
+from utils.git_utils import get_repo, get_diff, commit_iteration
+
+
+# ---------------------------------------------------------------------------
+# git_status
+# ---------------------------------------------------------------------------
+
+def make_git_status_tool(repo_path: str):
+    """Factory that returns a git_status tool bound to a specific repo_path."""
+
+    @tool
+    def git_status() -> str:
+        """Return the current git status of the repository, showing which
+        files are modified, staged, or untracked."""
+        log_tool_call("git_status")
+        try:
+            repo = get_repo(repo_path)
+            status_lines = []
+            if repo.is_dirty(untracked_files=True):
+                for item in repo.index.diff(None):
+                    status_lines.append(f"  modified: {item.a_path}")
+                for item in repo.untracked_files:
+                    status_lines.append(f"  untracked: {item}")
+                for item in repo.index.diff("HEAD"):
+                    status_lines.append(f"  staged:   {item.a_path}")
+            result = "\n".join(status_lines) if status_lines else "nothing to commit, working tree clean"
+            log_tool_result("OK")
+            return result
+        except Exception as exc:
+            error = f"Tool Error: ERROR {type(exc).__name__}: {exc}. Please check your arguments and try again."
+            log_tool_result(f"ERROR {type(exc).__name__}")
+            return error
+
+    return git_status
+
+
+# ---------------------------------------------------------------------------
+# git_diff
+# ---------------------------------------------------------------------------
+
+def make_git_diff_tool(repo_path: str):
+    """Factory that returns a git_diff tool bound to a specific repo_path."""
+
+    @tool
+    def git_diff() -> str:
+        """Return the full unified diff of all unstaged changes in the
+        repository (equivalent to ``git diff``)."""
+        log_tool_call("git_diff")
+        try:
+            diff = get_diff(repo_path)
+            result = diff if diff.strip() else "(no diff — working tree is clean)"
+            log_tool_result("OK")
+            return result
+        except Exception as exc:
+            error = f"Tool Error: ERROR {type(exc).__name__}: {exc}. Please check your arguments and try again."
+            log_tool_result(f"ERROR {type(exc).__name__}")
+            return error
+
+    return git_diff
+
+
+# ---------------------------------------------------------------------------
+# git_log
+# ---------------------------------------------------------------------------
+
+def make_git_log_tool(repo_path: str):
+    """Factory that returns a git_log tool bound to a specific repo_path."""
+
+    @tool
+    def git_log(max_entries: int = 10) -> str:
+        """Return the last N commit log entries (default 10) from the current
+        branch.
+
+        Args:
+            max_entries: Maximum number of log entries to return (1-50).
+        """
+        log_tool_call("git_log")
+        try:
+            max_entries = max(1, min(int(max_entries), 50))
+            repo = get_repo(repo_path)
+            entries = []
+            for commit in repo.iter_commits(max_count=max_entries):
+                entries.append(
+                    f"{commit.hexsha[:8]}  {commit.committed_datetime.strftime('%Y-%m-%d %H:%M')}  {commit.summary}"
+                )
+            result = "\n".join(entries) if entries else "(no commits found)"
+            log_tool_result("OK")
+            return result
+        except Exception as exc:
+            error = f"Tool Error: ERROR {type(exc).__name__}: {exc}. Please check your arguments and try again."
+            log_tool_result(f"ERROR {type(exc).__name__}")
+            return error
+
+    return git_log
+
+
+# ---------------------------------------------------------------------------
+# git_commit  (optional — only safe when require_approval=False)
+# ---------------------------------------------------------------------------
+
+def make_git_commit_tool(repo_path: str, require_approval: bool):
+    """Factory that returns a git_commit tool.
+
+    When ``require_approval`` is True the returned tool always returns an
+    error message explaining it is disabled — the agent cannot bypass the
+    user's approval gate.
+    """
+
+    @tool
+    def git_commit(message: str) -> str:
+        """Stage all changes and create a git commit with the given message.
+
+        This tool is disabled when --require-approval is active; in that case
+        commits are handled by the controller after user confirmation.
+
+        Args:
+            message: The commit message to use (required).
+        """
+        log_tool_call("git_commit")
+        if require_approval:
+            msg = "ERROR: git_commit is disabled when --require-approval is active. The controller handles commits after user confirmation."
+            log_tool_result("DISABLED require_approval=True")
+            return msg
+        try:
+            hexsha = commit_iteration(repo_path, message)
+            if hexsha:
+                result = f"Committed {hexsha[:8]}: {message}"
+                log_tool_result(f"OK hash={hexsha[:8]}")
+            else:
+                result = "Nothing to commit — working tree was clean."
+                log_tool_result("OK nothing_to_commit")
+            return result
+        except Exception as exc:
+            error = f"Tool Error: ERROR {type(exc).__name__}: {exc}. Please check your arguments and try again."
+            log_tool_result(f"ERROR {type(exc).__name__}")
+            return error
+
+    return git_commit
 </file>
 
 <file path="utils/git_remote.py">
@@ -24851,72 +27454,405 @@ class TestRegressionConsolidation:
         assert len(tools) == 10
 </file>
 
-<file path="tools/exec_tools.py">
-"""Exec tools: run_tests_tool — a thin, agent-invokable wrapper around the
-existing ``controller.executor.run_tests()`` function.
+<file path="test_phase/test_tools.py">
+"""test_tools.py — Phase 1: General Tool System unit tests.
 
-Important: The controller still calls ``run_tests()`` directly in its own
-verification step (``controller/loop.py``). This tool is an *additional*
-agent-facing interface that lets the agent request test output mid-turn —
-it does NOT replace the controller's authoritative pass/fail gate.
+Covers:
+- execute_command: successful stdout capture, non-zero exit / stderr capture,
+  timeout behaviour, and the risk_tier field passthrough.
+- Filesystem helpers: create_directory, move_file, delete_file, list_directory,
+  including default risk_tier values and error paths.
 
-``run_command`` and ``search_code`` are deliberately NOT implemented here
-because ``FilesystemBackend`` already provides both capabilities through its
-built-in ``execute`` and ``grep`` tools (verified from deepagents 0.7.5
-source inspection).
+All tests are self-contained; no real network or external repo is required.
+Temp directories are provided by pytest's ``tmp_path`` fixture.
 """
 
-from langchain_core.tools import tool   
+import os
+import sys
+import time
+import pytest
 
-from controller.executor import run_tests as _run_tests
-from tools.base import log_tool_call, log_tool_result
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
+from tools.terminal import (
+    create_directory,
+    delete_file,
+    execute_command,
+    list_directory,
+    move_file,
+)
+
+def _echo_cmd(text: str) -> str:
+    """Return a cross-platform echo command."""
+    if sys.platform == "win32":
+        return f'cmd /c echo {text}'
+    return f'echo {text}'
 
 
-def make_run_tests_tool(repo_path: str, test_cmd: str):
-    """Factory that returns a run_tests tool bound to a repo_path and
-    the configured test_cmd."""
+def _fail_cmd() -> str:
+    """Return a cross-platform command that exits with code 1."""
+    if sys.platform == "win32":
+        return 'cmd /c exit 1'
+    return 'exit 1'
 
-    @tool
-    def run_tests_tool(extra_args: str = "") -> str:
-        """Run the project's test suite and return a structured pass/fail
-        result with the tail of the output.
 
-        Note: The controller also runs tests independently after each worker
-        turn as the authoritative pass/fail gate. This tool lets the agent
-        check test results during its reasoning without waiting for the next
-        controller iteration.
+def _stderr_cmd(text: str) -> str:
+    """Return a cross-platform command that writes to stderr."""
+    if sys.platform == "win32":
+        return f'cmd /c echo {text} 1>&2 & exit 1'
+    return f'bash -c "echo {text} >&2; exit 1"'
 
-        Args:
-            extra_args: Optional extra arguments appended to the test command
-                (e.g. ``'-k test_foo'`` to run a single test). Leave blank
-                to run the full suite.
-        """
-        log_tool_call("run_tests_tool")
-        cmd = f"{test_cmd} {extra_args}".strip()
+
+# ---------------------------------------------------------------------------
+# execute_command tests
+# ---------------------------------------------------------------------------
+
+class TestExecuteCommand:
+
+    def test_result_dict_has_all_required_keys(self):
+        """Returned dict must contain every key defined in the spec."""
+        result = execute_command(_echo_cmd("hello"))
+        required_keys = {
+            "stdout", "stderr", "exit_code", "execution_time",
+            "status", "command", "working_directory", "risk_tier",
+        }
+        assert required_keys == set(result.keys()), (
+            f"Missing keys: {required_keys - set(result.keys())}"
+        )
+
+    def test_successful_command_captures_stdout(self):
+        """A simple echo should return status='success', exit_code=0, non-empty stdout."""
+        result = execute_command(_echo_cmd("hello_world"))
+        assert result["status"] == "success"
+        assert result["exit_code"] == 0
+        assert "hello_world" in result["stdout"]
+        assert result["stderr"] == "" or result["stderr"] is not None  # stderr may be empty
+
+    def test_successful_command_execution_time_is_positive(self):
+        result = execute_command(_echo_cmd("ping"))
+        assert result["execution_time"] >= 0.0
+
+    def test_failed_command_non_zero_exit_code(self):
+        """A command that exits with code 1 should return status='error'."""
+        if sys.platform == "win32":
+            cmd = 'cmd /c exit 1'
+        else:
+            cmd = 'bash -c "exit 1"'
+        result = execute_command(cmd)
+        assert result["status"] == "error"
+        assert result["exit_code"] != 0
+
+    def test_failed_command_captures_stderr(self):
+        """A command writing to stderr should surface it in the result."""
+        if sys.platform == "win32":
+            cmd = 'cmd /c "echo error_text 1>&2 & exit 1"'
+        else:
+            cmd = 'bash -c "echo error_text >&2; exit 1"'
+        result = execute_command(cmd)
+        assert result["exit_code"] != 0
+        # On windows echo adds a trailing space/newline; just check containment
+        assert "error_text" in result["stderr"] or result["exit_code"] != 0
+
+    def test_unknown_command_does_not_crash(self):
+        """An unrecognised command should return status 'error' or 'exception',
+        not raise an exception into the caller."""
+        result = execute_command("this_command_does_not_exist_xyz_abc_123")
+        assert result["status"] in ("error", "exception", "timeout")
+        assert isinstance(result["exit_code"], int)
+
+    def test_timeout_returns_timeout_status(self):
+        """A command that runs longer than timeout should return status='timeout'."""
+        if sys.platform == "win32":
+            cmd = "ping -n 10 127.0.0.1"   # ~9 seconds on Windows
+        else:
+            cmd = "sleep 10"
+        result = execute_command(cmd, timeout=1)
+        assert result["status"] == "timeout"
+        assert result["exit_code"] == -1
+
+    def test_timeout_does_not_raise(self):
+        """Timeout must be caught internally — no exception propagates."""
+        if sys.platform == "win32":
+            cmd = "ping -n 10 127.0.0.1"
+        else:
+            cmd = "sleep 10"
         try:
-            result = _run_tests(repo_path, cmd)
-            status = "PASSED" if result.passed else "FAILED"
-            log_tool_result(f"{status} exit_code={result.returncode}")
-            
-            output = (
-                f"Tests {status} (exit code {result.returncode})\n\n"
-                f"Output (last 60 lines):\n{result.output_tail}"
-            )
-            
-            if not result.passed:
-                output = (
-                    "Tests failed due to code assertions/errors (see output below). "
-                    "Do NOT reinstall pytest or run pip install. Inspect the files, "
-                    "diagnose the logic error, and edit the source code to fix the failures.\n\n"
-                    f"FAILED (exit code {result.returncode}):\n{output}"
-                )
-            return output
+            execute_command(cmd, timeout=1)
         except Exception as exc:
-            error = f"ERROR: {type(exc).__name__}: {exc}"
-            log_tool_result(f"ERROR {type(exc).__name__}")
-            return error
+            pytest.fail(f"execute_command raised an unexpected exception: {exc}")
 
-    return run_tests_tool
+    def test_risk_tier_auto_is_default(self):
+        result = execute_command(_echo_cmd("x"))
+        assert result["risk_tier"] == "auto"
+
+    def test_risk_tier_is_passed_through_confirm(self):
+        result = execute_command(_echo_cmd("x"), risk_tier="confirm")
+        assert result["risk_tier"] == "confirm"
+
+    def test_risk_tier_is_passed_through_destructive(self):
+        result = execute_command(_echo_cmd("x"), risk_tier="destructive")
+        assert result["risk_tier"] == "destructive"
+
+    def test_cwd_is_respected(self, tmp_path):
+        """Working directory should be set to the provided path.
+
+        Uses ``python -c`` to print os.getcwd() so the command is fully
+        cross-platform and does not rely on shell built-ins that may exit
+        with non-zero codes when run inside a nested shell on Windows.
+        """
+        cmd = f'"{sys.executable}" -c "import os; print(os.getcwd())"'
+        result = execute_command(cmd, cwd=str(tmp_path))
+        assert result["status"] == "success", (
+            f"Command failed: stderr={result['stderr']!r}"
+        )
+        # Normalise path separators for comparison
+        out = result["stdout"].strip().replace("\\", "/").lower()
+        expected = str(tmp_path).replace("\\", "/").lower()
+        assert expected in out, f"Expected {expected!r} in stdout {out!r}"
+
+    def test_working_directory_in_result(self, tmp_path):
+        result = execute_command(_echo_cmd("x"), cwd=str(tmp_path))
+        assert result["working_directory"] == str(tmp_path)
+
+    def test_command_field_matches_input(self):
+        cmd = _echo_cmd("check_command_field")
+        result = execute_command(cmd)
+        assert result["command"] == cmd
+
+
+# ---------------------------------------------------------------------------
+# create_directory tests
+# ---------------------------------------------------------------------------
+
+class TestCreateDirectory:
+
+    def test_creates_new_directory(self, tmp_path):
+        new_dir = str(tmp_path / "brand_new_dir")
+        result = create_directory(new_dir)
+        assert result["status"] == "success"
+        assert os.path.isdir(new_dir)
+
+    def test_creates_nested_directories(self, tmp_path):
+        nested = str(tmp_path / "a" / "b" / "c")
+        result = create_directory(nested)
+        assert result["status"] == "success"
+        assert os.path.isdir(nested)
+
+    def test_existing_directory_is_no_op(self, tmp_path):
+        existing = str(tmp_path)
+        result = create_directory(existing)
+        assert result["status"] == "success"
+
+    def test_default_risk_tier_is_auto(self, tmp_path):
+        result = create_directory(str(tmp_path / "x"))
+        assert result["risk_tier"] == "auto"
+
+    def test_custom_risk_tier_is_stored(self, tmp_path):
+        result = create_directory(str(tmp_path / "y"), risk_tier="confirm")
+        assert result["risk_tier"] == "confirm"
+
+    def test_result_contains_path(self, tmp_path):
+        p = str(tmp_path / "pathcheck")
+        result = create_directory(p)
+        assert result["path"] == p
+
+    def test_error_on_invalid_path(self):
+        # Trying to create a directory where a component is an existing file
+        # is platform-dependent but generally errors.  We just verify no crash.
+        result = create_directory("/\x00invalid")   # null byte is always invalid
+        assert result["status"] in ("success", "error")   # must not raise
+
+
+# ---------------------------------------------------------------------------
+# move_file tests
+# ---------------------------------------------------------------------------
+
+class TestMoveFile:
+
+    def test_moves_a_file(self, tmp_path):
+        src = tmp_path / "src.txt"
+        src.write_text("content")
+        dst = str(tmp_path / "dst.txt")
+        result = move_file(str(src), dst)
+        assert result["status"] == "success"
+        assert os.path.exists(dst)
+        assert not os.path.exists(str(src))
+
+    def test_moves_a_directory(self, tmp_path):
+        src_dir = tmp_path / "src_dir"
+        src_dir.mkdir()
+        (src_dir / "file.txt").write_text("hi")
+        dst_dir = str(tmp_path / "dst_dir")
+        result = move_file(str(src_dir), dst_dir)
+        assert result["status"] == "success"
+        assert os.path.isdir(dst_dir)
+
+    def test_default_risk_tier_is_confirm(self, tmp_path):
+        src = tmp_path / "a.txt"
+        src.write_text("x")
+        dst = str(tmp_path / "b.txt")
+        result = move_file(str(src), dst)
+        assert result["risk_tier"] == "confirm"
+
+    def test_custom_risk_tier_stored(self, tmp_path):
+        src = tmp_path / "c.txt"
+        src.write_text("x")
+        dst = str(tmp_path / "d.txt")
+        result = move_file(str(src), dst, risk_tier="destructive")
+        assert result["risk_tier"] == "destructive"
+
+    def test_missing_source_returns_error(self, tmp_path):
+        result = move_file(str(tmp_path / "does_not_exist.txt"), str(tmp_path / "dst.txt"))
+        assert result["status"] == "error"
+        assert "message" in result
+
+    def test_result_contains_source_and_destination(self, tmp_path):
+        src = tmp_path / "s.txt"
+        src.write_text("x")
+        dst = str(tmp_path / "t.txt")
+        result = move_file(str(src), dst)
+        assert result["source"] == str(src)
+        assert result["destination"] == dst
+
+
+# ---------------------------------------------------------------------------
+# delete_file tests
+# ---------------------------------------------------------------------------
+
+class TestDeleteFile:
+
+    def test_deletes_a_file(self, tmp_path):
+        f = tmp_path / "to_delete.txt"
+        f.write_text("bye")
+        result = delete_file(str(f))
+        assert result["status"] == "success"
+        assert not os.path.exists(str(f))
+
+    def test_deletes_a_directory_tree(self, tmp_path):
+        d = tmp_path / "tree"
+        d.mkdir()
+        (d / "child.txt").write_text("x")
+        result = delete_file(str(d))
+        assert result["status"] == "success"
+        assert not os.path.exists(str(d))
+
+    def test_nonexistent_path_is_success(self, tmp_path):
+        result = delete_file(str(tmp_path / "ghost.txt"))
+        assert result["status"] == "success"
+
+    def test_default_risk_tier_is_destructive(self, tmp_path):
+        f = tmp_path / "x.txt"
+        f.write_text("x")
+        result = delete_file(str(f))
+        assert result["risk_tier"] == "destructive"
+
+    def test_custom_risk_tier_stored(self, tmp_path):
+        f = tmp_path / "y.txt"
+        f.write_text("y")
+        result = delete_file(str(f), risk_tier="confirm")
+        assert result["risk_tier"] == "confirm"
+
+    def test_result_contains_path(self, tmp_path):
+        f = tmp_path / "z.txt"
+        f.write_text("z")
+        p = str(f)
+        result = delete_file(p)
+        assert result["path"] == p
+
+
+# ---------------------------------------------------------------------------
+# list_directory tests
+# ---------------------------------------------------------------------------
+
+class TestListDirectory:
+
+    def test_lists_files_and_dirs(self, tmp_path):
+        (tmp_path / "alpha.txt").write_text("a")
+        (tmp_path / "beta.txt").write_text("b")
+        (tmp_path / "subdir").mkdir()
+        result = list_directory(str(tmp_path))
+        assert result["status"] == "success"
+        names = [e["name"] for e in result["entries"]]
+        assert "alpha.txt" in names
+        assert "beta.txt" in names
+        assert "subdir" in names
+
+    def test_entry_types_are_correct(self, tmp_path):
+        (tmp_path / "file.txt").write_text("f")
+        (tmp_path / "folder").mkdir()
+        result = list_directory(str(tmp_path))
+        entries = {e["name"]: e for e in result["entries"]}
+        assert entries["file.txt"]["type"] == "file"
+        assert entries["folder"]["type"] == "directory"
+
+    def test_file_entries_have_size(self, tmp_path):
+        (tmp_path / "sized.txt").write_text("hello")
+        result = list_directory(str(tmp_path))
+        entry = next(e for e in result["entries"] if e["name"] == "sized.txt")
+        assert isinstance(entry["size"], int)
+        assert entry["size"] > 0
+
+    def test_directory_entries_have_none_size(self, tmp_path):
+        (tmp_path / "adir").mkdir()
+        result = list_directory(str(tmp_path))
+        entry = next(e for e in result["entries"] if e["name"] == "adir")
+        assert entry["size"] is None
+
+    def test_empty_directory(self, tmp_path):
+        empty = tmp_path / "empty"
+        empty.mkdir()
+        result = list_directory(str(empty))
+        assert result["status"] == "success"
+        assert result["entries"] == []
+
+    def test_nonexistent_path_returns_error(self, tmp_path):
+        result = list_directory(str(tmp_path / "no_such_dir"))
+        assert result["status"] == "error"
+
+    def test_file_path_returns_error(self, tmp_path):
+        f = tmp_path / "not_a_dir.txt"
+        f.write_text("x")
+        result = list_directory(str(f))
+        assert result["status"] == "error"
+
+    def test_default_risk_tier_is_auto(self, tmp_path):
+        result = list_directory(str(tmp_path))
+        assert result["risk_tier"] == "auto"
+
+    def test_custom_risk_tier_stored(self, tmp_path):
+        result = list_directory(str(tmp_path), risk_tier="confirm")
+        assert result["risk_tier"] == "confirm"
+
+    def test_result_contains_path(self, tmp_path):
+        result = list_directory(str(tmp_path))
+        assert result["path"] == str(tmp_path)
+
+    def test_entries_are_sorted(self, tmp_path):
+        for name in ["zebra.txt", "apple.txt", "mango.txt"]:
+            (tmp_path / name).write_text("x")
+        result = list_directory(str(tmp_path))
+        names = [e["name"] for e in result["entries"]]
+        assert names == sorted(names)
+
+
+class TestPatchedFilesystemBackend:
+    def test_edit_ambiguity_returns_error(self, tmp_path):
+        from agents.worker import PatchedFilesystemBackend
+        f = tmp_path / "foo.py"
+        f.write_text("x = 1\nx = 1\n", encoding="utf-8")
+        backend = PatchedFilesystemBackend(root_dir=str(tmp_path))
+        res = backend.edit(file_path="foo.py", old_string="x = 1", new_string="x = 2")
+        assert res.error is not None
+        assert "matched multiple locations" in res.error
+
+    def test_edit_not_found_returns_error(self, tmp_path):
+        from agents.worker import PatchedFilesystemBackend
+        f = tmp_path / "foo.py"
+        f.write_text("x = 1\n", encoding="utf-8")
+        backend = PatchedFilesystemBackend(root_dir=str(tmp_path))
+        res = backend.edit(file_path="foo.py", old_string="x = 5", new_string="x = 2")
+        assert res.error is not None
+        assert "was not found" in res.error
 </file>
 
 <file path="tools/terminal.py">
@@ -25851,6 +28787,74 @@ def save_state(path: str, state: RunState) -> None:
         json.dump(asdict(state), f, indent=2)
 </file>
 
+<file path="tools/exec_tools.py">
+"""Exec tools: run_tests_tool — a thin, agent-invokable wrapper around the
+existing ``controller.executor.run_tests()`` function.
+
+Important: The controller still calls ``run_tests()`` directly in its own
+verification step (``controller/loop.py``). This tool is an *additional*
+agent-facing interface that lets the agent request test output mid-turn —
+it does NOT replace the controller's authoritative pass/fail gate.
+
+``run_command`` and ``search_code`` are deliberately NOT implemented here
+because ``FilesystemBackend`` already provides both capabilities through its
+built-in ``execute`` and ``grep`` tools (verified from deepagents 0.7.5
+source inspection).
+"""
+
+from langchain_core.tools import tool   
+
+from controller.executor import run_tests as _run_tests
+from tools.base import log_tool_call, log_tool_result
+
+
+def make_run_tests_tool(repo_path: str, test_cmd: str):
+    """Factory that returns a run_tests tool bound to a repo_path and
+    the configured test_cmd."""
+
+    @tool
+    def run_tests_tool(extra_args: str = "") -> str:
+        """Run the project's test suite and return a structured pass/fail
+        result with the tail of the output.
+
+        Note: The controller also runs tests independently after each worker
+        turn as the authoritative pass/fail gate. This tool lets the agent
+        check test results during its reasoning without waiting for the next
+        controller iteration.
+
+        Args:
+            extra_args: Optional extra arguments appended to the test command
+                (e.g. ``'-k test_foo'`` to run a single test). Leave blank
+                to run the full suite.
+        """
+        log_tool_call("run_tests_tool")
+        cmd = f"{test_cmd} {extra_args}".strip()
+        try:
+            result = _run_tests(repo_path, cmd)
+            status = "PASSED" if result.passed else "FAILED"
+            log_tool_result(f"{status} exit_code={result.returncode}")
+            
+            output = (
+                f"Tests {status} (exit code {result.returncode})\n\n"
+                f"Output (last 60 lines):\n{result.output_tail}"
+            )
+            
+            if not result.passed:
+                output = (
+                    "Tests failed due to code assertions/errors (see output below). "
+                    "Do NOT reinstall pytest or run pip install. Inspect the files, "
+                    "diagnose the logic error, and edit the source code to fix the failures.\n\n"
+                    f"FAILED (exit code {result.returncode}):\n{output}"
+                )
+            return output
+        except Exception as exc:
+            error = f"Tool Error: ERROR {type(exc).__name__}: {exc}. Please check your arguments and try again."
+            log_tool_result(f"ERROR {type(exc).__name__}")
+            return error
+
+    return run_tests_tool
+</file>
+
 <file path=".env.example">
 LLM_PROVIDER=ollama
 OLLAMA_API_KEY=your_ollama_api_key_here
@@ -26613,13 +29617,20 @@ def run(config) -> bool:
                 if nvidia_api_key:
                     nvidia_model = os.environ.get("NVIDIA_MODEL", "nvidia/nemotron-3-ultra-550b-a55b")
                     print(f"[AGENT] Escalating to NVIDIA NIM ({nvidia_model}) after 2 consecutive failed iterations.")
-                    agent = build_worker_agent(
-                        config.local_repo_path,
-                        nvidia_model,
-                        "nvidia",
-                        extra_tools=extra_tools,
-                    )
-                    setattr(agent, "escalated_to_nvidia", True)
+                    try:
+                        agent = build_worker_agent(
+                            config.local_repo_path,
+                            nvidia_model,
+                            "nvidia",
+                            extra_tools=extra_tools,
+                        )
+                        setattr(agent, "escalated_to_nvidia", True)
+                    except (ImportError, ModuleNotFoundError) as e:
+                        print(f"[WARNING] langchain_openai is not installed; skipping escalation, continuing with local model. Details: {e}")
+                        setattr(agent, "escalated_to_nvidia", True)
+                    except Exception as e:
+                        print(f"[WARNING] Escalation failed: {e}; continuing with local model.")
+                        setattr(agent, "escalated_to_nvidia", True)
                 else:
                     print("[AGENT] NVIDIA_API_KEY not found in environment — skipping escalation, continuing with local model.")
                     setattr(agent, "escalated_to_nvidia", True)
@@ -26745,17 +29756,24 @@ class PatchedFilesystemBackend(FilesystemBackend):
         return super()._resolve_path(cleaned_path)
 
     def write(self, file_path: str, content: str, *args, **kwargs):
+        from deepagents.backends.protocol import WriteResult
         base = os.path.basename(file_path).lower()
         if base.startswith("test_") or base.endswith("_test.py") or "tests/" in file_path.replace("\\", "/"):
-            raise ValueError("Modifying, creating, or rewriting test files is strictly forbidden. You must only fix bugs in the actual source/implementation files in this repository (not test files).")
-        res = super().write(file_path=file_path, content=content, *args, **kwargs)
-        from langgraph.errors import GraphRecursionError
-        raise GraphRecursionError("[SHORT_CIRCUIT] File write completed successfully. Ending turn.")
+            return WriteResult(error="Error: Modifying or editing test files is strictly forbidden. You must only fix bugs in the actual source/implementation files in this repository.")
+        try:
+            res = super().write(file_path=file_path, content=content, *args, **kwargs)
+            from langgraph.errors import GraphRecursionError
+            raise GraphRecursionError("[SHORT_CIRCUIT] File write completed successfully. Ending turn.")
+        except Exception as e:
+            if "[SHORT_CIRCUIT]" in str(e):
+                raise
+            return WriteResult(error=f"Tool Error: {e}. Please check your arguments and try again.")
 
     def edit(self, file_path: str, old_string: str, new_string: str, replace_all: bool = False, *args, **kwargs):
+        from deepagents.backends.protocol import EditResult
         base = os.path.basename(file_path).lower()
         if base.startswith("test_") or base.endswith("_test.py") or "tests/" in file_path.replace("\\", "/"):
-            raise ValueError("Modifying or editing test files is strictly forbidden. You must only fix bugs in the actual source/implementation files in this repository (not test files).")
+            return EditResult(error="Error: Modifying or editing test files is strictly forbidden. You must only fix bugs in the actual source/implementation files in this repository.")
         
         def strip_line_prefix(s: str) -> str:
             lines = s.splitlines()
@@ -26769,14 +29787,60 @@ class PatchedFilesystemBackend(FilesystemBackend):
         cleaned_new = strip_line_prefix(new_string)
 
         if cleaned_old == cleaned_new:
-            raise ValueError(
-                f"No-op edit detected: old_string matches new_string. "
-                f"You passed: '{old_string}'. Please make sure you are changing the code instead of replacing a line with itself."
-            )
+            return EditResult(error="Tool Error: No-op edit detected: old_string matches new_string. Please check your arguments and try again.")
 
-        res = super().edit(file_path=file_path, old_string=cleaned_old, new_string=cleaned_new, replace_all=replace_all, *args, **kwargs)
-        from langgraph.errors import GraphRecursionError
-        raise GraphRecursionError("[SHORT_CIRCUIT] File edit completed successfully. Ending turn.")
+        try:
+            resolved_path = self._resolve_path(file_path)
+            if not os.path.exists(resolved_path):
+                return EditResult(error=f"Tool Error: File not found: {file_path}. Please check your arguments and try again.")
+            
+            with open(resolved_path, "r", encoding="utf-8", errors="ignore") as f:
+                file_content = f.read()
+                
+            if cleaned_old not in file_content:
+                return EditResult(error=f"Error: 'old_string' was not found in {file_path}. Please read the file first to ensure exact string and whitespace matching.")
+
+            if file_content.count(cleaned_old) > 1:
+                return EditResult(error=f"Error: 'old_string' matched multiple locations in {file_path}. Please include surrounding lines (like function definitions or neighboring comments) in 'old_string' to make it unique.")
+
+            res = super().edit(file_path=file_path, old_string=cleaned_old, new_string=cleaned_new, replace_all=replace_all, *args, **kwargs)
+            from langgraph.errors import GraphRecursionError
+            raise GraphRecursionError("[SHORT_CIRCUIT] File edit completed successfully. Ending turn.")
+        except Exception as e:
+            if "[SHORT_CIRCUIT]" in str(e):
+                raise
+            return EditResult(error=f"Tool Error: {e}. Please check your arguments and try again.")
+
+    def delete(self, file_path: str, *args, **kwargs):
+        from deepagents.backends.protocol import DeleteResult
+        base = os.path.basename(file_path).lower()
+        if base.startswith("test_") or base.endswith("_test.py") or "tests/" in file_path.replace("\\", "/"):
+            return DeleteResult(error="Error: Modifying or editing test files is strictly forbidden. You must only fix bugs in the actual source/implementation files in this repository.")
+        try:
+            return super().delete(file_path, *args, **kwargs)
+        except Exception as e:
+            return DeleteResult(error=f"Tool Error: {e}. Please check your arguments and try again.")
+
+    def read(self, file_path: str, *args, **kwargs):
+        from deepagents.backends.protocol import ReadResult
+        try:
+            return super().read(file_path, *args, **kwargs)
+        except Exception as e:
+            return ReadResult(error=f"Tool Error: {e}. Please check your arguments and try again.")
+
+    def ls(self, *args, **kwargs):
+        from deepagents.backends.protocol import LsResult
+        try:
+            return super().ls(*args, **kwargs)
+        except Exception as e:
+            return LsResult(error=f"Tool Error: {e}. Please check your arguments and try again.")
+
+    def grep(self, *args, **kwargs):
+        from deepagents.backends.protocol import GrepResult
+        try:
+            return super().grep(*args, **kwargs)
+        except Exception as e:
+            return GrepResult(error=f"Tool Error: {e}. Please check your arguments and try again.")
 
     def execute(self, command: str, *args, **kwargs) -> Any:
         from deepagents.backends.protocol import ExecuteResponse
@@ -27060,6 +30124,7 @@ Rules:
 {"name": "edit_file", "arguments": {"file_path": "calculator.py", "old_string": "'^': power", "new_string": "'**': power"}}
 ```
 - CRITICAL: NEVER modify test files (e.g. test_*.py). Only edit implementation files in the repository.
+- CRITICAL: When editing files, always provide sufficient unique surrounding context (2-4 lines) in `old_string` to prevent ambiguous matching when identical lines exist elsewhere in the file.
 - CRITICAL: When using 'read_file', the tool prefixes lines with line numbers for reference (e.g. ' 1  import pytest'). These numbers are NOT part of the actual file text. When using 'edit_file', do NOT include line numbers in old_string or new_string.
 - CRITICAL: NEVER run 'pip install pytest' or try to install packages when a test fails. Pytest is already installed and functional. Exit code 1 means your code has a bug that you must fix.
 - CRITICAL: When using edit_file, ensure 'new_string' is strictly different from 'old_string'.
