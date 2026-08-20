@@ -50,6 +50,8 @@ class RunState:
     # Phase 8 additions
     tool_calls_count: Optional[dict] = None
     audit_log: Optional[list] = None
+    # Token usage tracking — accumulated across all worker turns in this run
+    token_usage: Optional[dict] = None
 
     # ------------------------------------------------------------------
     # Existing methods — unchanged
@@ -100,6 +102,18 @@ class RunState:
     def set_audit_log(self, audit_log: Optional[list]) -> None:
         """Record the audit log of guarded tool calls executed."""
         self.audit_log = audit_log
+
+    def accumulate_token_usage(self, usage: dict) -> None:
+        """Add per-turn token counts to the running run-level totals.
+
+        Safe to call with an all-zero dict (no-op when total_tokens == 0).
+        """
+        if not usage or not any(usage.values()):
+            return
+        if self.token_usage is None:
+            self.token_usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+        for key in ("prompt_tokens", "completion_tokens", "total_tokens"):
+            self.token_usage[key] = self.token_usage.get(key, 0) + usage.get(key, 0)
 
 
 # ------------------------------------------------------------------
@@ -165,6 +179,8 @@ def load_state(path: str, goal: str) -> RunState:
         # Phase 8 new fields — safe .get() so old JSON files load cleanly
         state.tool_calls_count = data.get("tool_calls_count", None)
         state.audit_log = data.get("audit_log", None)
+        # Token usage tracking — safe .get() so old JSON files load cleanly
+        state.token_usage = data.get("token_usage", None)
         return state
     return RunState(goal=goal)
 

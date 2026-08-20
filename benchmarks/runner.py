@@ -11,7 +11,18 @@ import shutil
 import tempfile
 import threading
 import time
+import multiprocessing
 from dataclasses import dataclass, field
+
+def _target_worker(config, state_dict):
+    try:
+        import controller.loop
+        state_dict["success"] = controller.loop.run(config)
+    except Exception as exc:
+        state_dict["exception"] = str(exc)
+    finally:
+        state_dict["completed"] = True
+
 from typing import Dict, List, Optional
 
 from config import Config
@@ -95,6 +106,7 @@ class BenchmarkRunner:
         skills_dir: Optional[str] = None,
         mcp_config_path: Optional[str] = None,
         require_approval: bool = False,
+        _process_factory=None,
     ) -> BenchmarkResult:
         """Run a single benchmark in an isolated sandbox with wall-clock timeout enforcement.
 
@@ -110,6 +122,10 @@ class BenchmarkRunner:
             skills_dir: Path to skills directory.
             mcp_config_path: Path to MCP configuration JSON.
             require_approval: Confirmation gate flag (forced False for non-interactive benchmark).
+            _process_factory: Optional callable that accepts (target, args) and returns an
+                object with .start() and .join(timeout) and .is_alive() and .terminate().
+                Defaults to multiprocessing.Process.  Tests pass a thread-based factory so
+                that unittest.mock patches propagate into the same process.
 
         Returns:
             BenchmarkResult containing execution outcome and metrics.
@@ -141,36 +157,63 @@ class BenchmarkRunner:
                 mcp_config_path=mcp_config_path,
             )
 
-            run_state_container = {
+            manager = multiprocessing.Manager()
+            run_state_container = manager.dict({
                 "success": False,
                 "exception": None,
                 "completed": False,
-            }
+            })
 
-            def _target_worker():
-                try:
-                    # Real entrypoint is controller.loop.run(config)
-                    run_state_container["success"] = controller.loop.run(config)
-                except Exception as exc:
-                    run_state_container["exception"] = exc
-                finally:
-                    run_state_container["completed"] = True
+            # Allow tests to substitute a thread-based factory so that
+            # unittest.mock patches propagate correctly (Windows uses spawn,
+            # so patches don't cross the real multiprocessing boundary).
+            ProcessClass = _process_factory if _process_factory is not None else multiprocessing.Process
 
             start_time = time.time()
-            worker_thread = threading.Thread(target=_target_worker, daemon=True)
-            worker_thread.start()
-            worker_thread.join(timeout=timeout)
+            worker_process = ProcessClass(
+                target=_target_worker,
+                args=(config, run_state_container)
+            )
+            worker_process.start()
+            worker_process.join(timeout=timeout)
+            
+            if worker_process.is_alive():
+                worker_process.terminate()
+                worker_process.join()  # wait for it to actually terminate
+                run_state_container["completed"] = False
+                
             duration = time.time() - start_time
 
             # Determine wall-clock timeout vs normal completion vs exception
-            if not run_state_container["completed"]:
+            if not run_state_container.get("completed", False):
                 passed = False
-                error_message = f"Benchmark timed out after {timeout} seconds"
-            elif run_state_container["exception"] is not None:
+                # Try to read partial state.json for diagnostic info even on timeout
+                partial_info = ""
+                _state_path = os.path.join(temp_repo_copy, config.state_file)
+                if os.path.exists(_state_path):
+                    try:
+                        with open(_state_path, "r", encoding="utf-8") as _f:
+                            _partial = json.load(_f)
+                        _iters = _partial.get("iterations", [])
+                        _iter_count = len(_iters)
+                        _tc = _partial.get("tool_calls_count") or {}
+                        _last_summ = ""
+                        if _iters:
+                            _last_rec = _iters[-1]
+                            _last_summ = _last_rec.get("worker_summary", "")[:80]
+                        _tc_str = ", ".join(f"{k}\u00d7{v}" for k, v in _tc.items()) if _tc else "none"
+                        partial_info = f" (partial: {_iter_count} iteration(s), tools: {_tc_str}"
+                        if _last_summ:
+                            partial_info += f", last: {_last_summ!r}"
+                        partial_info += ")"
+                    except Exception:
+                        pass
+                error_message = f"Benchmark timed out after {timeout} seconds{partial_info}"
+            elif run_state_container.get("exception") is not None:
                 passed = False
-                error_message = str(run_state_container["exception"])
+                error_message = str(run_state_container.get("exception"))
             else:
-                passed = bool(run_state_container["success"])
+                passed = bool(run_state_container.get("success", False))
                 error_message = None
 
             # Read back state.json from the isolated sandbox directory

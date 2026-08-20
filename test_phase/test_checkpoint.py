@@ -22,17 +22,17 @@ def temp_git_repo():
     repo_dir = tempfile.mkdtemp()
     
     # Configure git dummy user info locally for Windows tests
-    subprocess.run(["git", "init"], cwd=repo_dir, check=True)
-    subprocess.run(["git", "config", "user.name", "Test User"], cwd=repo_dir, check=True)
-    subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=repo_dir, check=True)
-    subprocess.run(["git", "config", "commit.gpgsign", "false"], cwd=repo_dir, check=True)
+    subprocess.run(["git", "init"], cwd=repo_dir, check=True, capture_output=True, stdin=subprocess.DEVNULL)
+    subprocess.run(["git", "config", "user.name", "Test User"], cwd=repo_dir, check=True, capture_output=True, stdin=subprocess.DEVNULL)
+    subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=repo_dir, check=True, capture_output=True, stdin=subprocess.DEVNULL)
+    subprocess.run(["git", "config", "commit.gpgsign", "false"], cwd=repo_dir, check=True, capture_output=True, stdin=subprocess.DEVNULL)
 
     # Initial commit to have a HEAD reference
     readme = os.path.join(repo_dir, "README.md")
     with open(readme, "w") as f:
         f.write("# Initial project setup\n")
-    subprocess.run(["git", "add", "-A"], cwd=repo_dir, check=True)
-    subprocess.run(["git", "commit", "-m", "Initial commit"], cwd=repo_dir, check=True)
+    subprocess.run(["git", "add", "-A"], cwd=repo_dir, check=True, capture_output=True, stdin=subprocess.DEVNULL)
+    subprocess.run(["git", "commit", "-m", "Initial commit"], cwd=repo_dir, check=True, capture_output=True, stdin=subprocess.DEVNULL)
 
     yield repo_dir
     shutil.rmtree(repo_dir, ignore_errors=True)

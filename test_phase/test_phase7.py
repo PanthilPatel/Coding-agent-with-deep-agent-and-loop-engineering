@@ -641,14 +641,14 @@ class TestRequireApprovalWithLint:
 
 def _init_git_repo(path: str) -> None:
     """Initialize a bare git repo suitable for the agent to work in."""
-    subprocess.run(["git", "init", path], check=True, capture_output=True)
+    subprocess.run(["git", "init", path], check=True, capture_output=True, stdin=subprocess.DEVNULL)
     subprocess.run(
         ["git", "config", "user.email", "test@test.com"],
-        cwd=path, check=True, capture_output=True
+        cwd=path, check=True, capture_output=True, stdin=subprocess.DEVNULL
     )
     subprocess.run(
         ["git", "config", "user.name", "Test Agent"],
-        cwd=path, check=True, capture_output=True
+        cwd=path, check=True, capture_output=True, stdin=subprocess.DEVNULL
     )
 
 
@@ -659,10 +659,10 @@ def _make_initial_commit(repo_path: str, files: dict) -> None:
         os.makedirs(os.path.dirname(fpath), exist_ok=True)
         with open(fpath, "w") as f:
             f.write(content)
-    subprocess.run(["git", "add", "-A"], cwd=repo_path, check=True, capture_output=True)
+    subprocess.run(["git", "add", "-A"], cwd=repo_path, check=True, capture_output=True, stdin=subprocess.DEVNULL)
     subprocess.run(
         ["git", "commit", "-m", "Initial commit"],
-        cwd=repo_path, check=True, capture_output=True
+        cwd=repo_path, check=True, capture_output=True, stdin=subprocess.DEVNULL
     )
 
 

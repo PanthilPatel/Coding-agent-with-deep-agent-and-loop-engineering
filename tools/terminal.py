@@ -98,6 +98,7 @@ def execute_command(
             capture_output=True,
             text=True,
             timeout=timeout,
+            stdin=subprocess.DEVNULL,
         )
         elapsed = time.monotonic() - start
         result["stdout"] = proc.stdout

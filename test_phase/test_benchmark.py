@@ -13,6 +13,7 @@ import json
 import os
 import sys
 import tempfile
+import threading
 import time
 from unittest.mock import MagicMock, patch
 import pytest
@@ -20,6 +21,37 @@ import pytest
 from benchmarks.runner import BenchmarkResult, BenchmarkRunner
 from benchmarks.reporter import BenchmarkReporter
 from main import parse_args, main
+
+
+# ---------------------------------------------------------------------------
+# In-process thread factory: replaces multiprocessing.Process in tests so
+# that unittest.mock patches on controller.loop.run propagate correctly.
+# (On Windows, multiprocessing uses spawn — patches don't cross the boundary.)
+# ---------------------------------------------------------------------------
+
+class _InProcessFactory:
+    """Mimics the multiprocessing.Process interface but runs the target
+    synchronously in a daemon thread within the same process."""
+
+    def __init__(self, target, args=()):
+        self._thread = threading.Thread(target=target, args=args, daemon=True)
+        self._alive = True
+
+    def start(self):
+        self._thread.start()
+
+    def join(self, timeout=None):
+        self._thread.join(timeout=timeout)
+        if not self._thread.is_alive():
+            self._alive = False
+
+    def is_alive(self):
+        return self._thread.is_alive()
+
+    def terminate(self):
+        # Threads cannot be forcibly killed; mark as no longer alive.
+        # The daemon flag ensures the thread dies with the process.
+        self._alive = False
 
 
 # ---------------------------------------------------------------------------
@@ -116,7 +148,7 @@ class TestBenchmarkRunnerSandboxAndDiscovery:
             return True
 
         with patch("controller.loop.run", side_effect=mock_loop_run):
-            result = runner.run_benchmark(str(source_repo))
+            result = runner.run_benchmark(str(source_repo), _process_factory=_InProcessFactory)
 
         assert result.passed is True
         # Verify source repo was NOT modified
@@ -158,7 +190,7 @@ class TestBenchmarkRunnerExecution:
             return True
 
         with patch("controller.loop.run", side_effect=mock_loop_run):
-            result = runner.run_benchmark(dummy_repo)
+            result = runner.run_benchmark(dummy_repo, _process_factory=_InProcessFactory)
 
         assert result.repo_name == "calc_repo"
         assert result.passed is True
@@ -189,7 +221,7 @@ class TestBenchmarkRunnerExecution:
             return False
 
         with patch("controller.loop.run", side_effect=mock_loop_run):
-            result = runner.run_benchmark(dummy_repo)
+            result = runner.run_benchmark(dummy_repo, _process_factory=_InProcessFactory)
 
         assert result.passed is False
         assert result.iterations == 2
@@ -200,7 +232,7 @@ class TestBenchmarkRunnerExecution:
         runner = BenchmarkRunner()
 
         with patch("controller.loop.run", side_effect=RuntimeError("LLM API connection failed")):
-            result = runner.run_benchmark(dummy_repo)
+            result = runner.run_benchmark(dummy_repo, _process_factory=_InProcessFactory)
 
         assert result.passed is False
         assert "LLM API connection failed" in result.error_message
@@ -213,7 +245,7 @@ class TestBenchmarkRunnerExecution:
 
         runner = BenchmarkRunner()
         with patch("controller.loop.run", return_value=True):
-            results = runner.run_suite(str(base))
+            results = runner.run_suite(str(base), _process_factory=_InProcessFactory)
 
         assert len(results) == 2
         assert {r.repo_name for r in results} == {"repo_a", "repo_b"}
@@ -261,7 +293,7 @@ class TestBenchmarkSafetyAndTimeout:
 
         with patch("controller.loop.run", side_effect=mock_loop_run):
             start_t = time.time()
-            result = runner.run_benchmark(dummy_repo)
+            result = runner.run_benchmark(dummy_repo, _process_factory=_InProcessFactory)
             elapsed = time.time() - start_t
 
         assert elapsed < 5.0  # Runs instantaneously, never hangs
@@ -269,6 +301,17 @@ class TestBenchmarkSafetyAndTimeout:
         assert result.passed is False
 
     def test_hard_timeout_wall_clock_enforcement(self, dummy_repo):
+        """Real OS-level process isolation and real hard-kill via terminate().
+
+        IMPORTANT: This test intentionally does NOT pass _process_factory=_InProcessFactory.
+        It uses the real multiprocessing.Process so that actual subprocess creation,
+        wall-clock timeout enforcement, and terminate() are exercised.
+
+        NOTE: _InProcessFactory-based tests above validate state-reading and
+        control-flow logic only — they do NOT cover real process isolation or the
+        subprocess hang-recovery mechanism that Fix 1 guarantees. Do not swap
+        this test to the thread-based factory without replacing this coverage elsewhere.
+        """
         runner = BenchmarkRunner()
 
         def hanging_loop_run(config):
@@ -372,13 +415,13 @@ class TestCLIBenchmarkArgs:
             "--benchmark",
             "--benchmark-dir", "custom/bench/dir",
             "--filter", "01,06",
-            "--benchmark-timeout", "120",
+            "--benchmark-timeout", "300",
             "--output-dir", "custom_reports",
         ])
         assert args.benchmark is True
         assert args.benchmark_dir == "custom/bench/dir"
         assert args.filter == "01,06"
-        assert args.benchmark_timeout == 120
+        assert args.benchmark_timeout == 300
         assert args.output_dir == "custom_reports"
 
     def test_main_benchmark_execution_flow(self, tmp_path):

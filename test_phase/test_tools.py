@@ -143,7 +143,7 @@ class TestExecuteCommand:
         cross-platform and does not rely on shell built-ins that may exit
         with non-zero codes when run inside a nested shell on Windows.
         """
-        cmd = 'python -c "import os; print(os.getcwd())"'
+        cmd = f'"{sys.executable}" -c "import os; print(os.getcwd())"'
         result = execute_command(cmd, cwd=str(tmp_path))
         assert result["status"] == "success", (
             f"Command failed: stderr={result['stderr']!r}"

@@ -99,7 +99,11 @@ class TestRouterTransitions:
         assert decision.should_continue is True
 
     def test_replan_transition_on_repeated_worker_summary(self):
+        """Same diff (not just same worker_summary) triggers REPLAN via the
+        diff-based stagnation path. Worker summary strings are no longer the
+        signal — the git diff is."""
         eval_res = {"is_correct": False}
+        repeated_diff = "--- a/calc.py\n+++ b/calc.py\n@@ -1 +1 @@\n-return a + b\n+return a - b\n"
         decision = decide_next_step(
             eval_res,
             current_iteration=2,
@@ -108,10 +112,52 @@ class TestRouterTransitions:
             max_seconds=100,
             worker_summary="Created status.txt with SYSTEM_OK content.",
             previous_worker_summary="Created status.txt with SYSTEM_OK content.",
+            current_diff=repeated_diff,
+            previous_diff=repeated_diff,
         )
         assert decision.state == RouterState.REPLAN
         assert decision.should_continue is True
-        assert "Near-identical worker output" in decision.reason
+        assert "Near-identical code diff detected" in decision.reason
+
+    def test_same_worker_summary_but_different_diffs_does_not_replan(self):
+        """Regression: run_worker_turn's SHORT_CIRCUIT path always returns the
+        same hardcoded string ('File changes made successfully. Turn completed.').
+        Two consecutive iterations with that same string but DIFFERENT diffs
+        represent real progress and must NOT trigger the similarity REPLAN."""
+        hardcoded_summary = "File changes made successfully. Turn completed."
+        eval_res = {"is_correct": False}
+        decision = decide_next_step(
+            eval_res,
+            current_iteration=2,
+            max_iterations=5,
+            elapsed_seconds=10,
+            max_seconds=100,
+            worker_summary=hardcoded_summary,
+            previous_worker_summary=hardcoded_summary,
+            current_diff="--- a/calc.py\n+++ b/calc.py\n@@ -1 +1 @@\n-return a - b\n+return a + b\n",
+            previous_diff="--- a/utils.py\n+++ b/utils.py\n@@ -3 +3 @@\n-x = None\n+x = 0\n",
+        )
+        # Different diffs -> real progress -> no REPLAN via similarity path
+        assert decision.state != RouterState.REPLAN
+
+    def test_same_failure_count_replan_fires_independently_of_diff(self):
+        """The same_failure_count >= 2 REPLAN path is a separate mechanism from
+        the diff-based stagnation check and must still fire when the same
+        test failure repeats, even if the diffs differ."""
+        eval_res = {"is_correct": False}
+        decision = decide_next_step(
+            eval_res,
+            current_iteration=2,
+            max_iterations=5,
+            elapsed_seconds=10,
+            max_seconds=100,
+            same_failure_count=2,
+            # different diffs — the count-based path must fire regardless
+            current_diff="--- a/calc.py\n+++ b/calc.py\n@@ -1 +1 @@\n-return a - b\n+return a + b\n",
+            previous_diff="--- a/utils.py\n+++ b/utils.py\n@@ -3 +3 @@\n-x = None\n+x = 0\n",
+        )
+        assert decision.state == RouterState.REPLAN
+        assert "Repeated identical failure" in decision.reason
 
     def test_dict_backwards_compatibility(self):
         eval_res = {"is_correct": True}
@@ -168,7 +214,7 @@ class TestToolRegistryPermissions:
         tools = {t.name: t for t in build_tool_registry(repo_path=str(tmp_path), test_cmd="pytest", harness=harness)}
         
         # 'auto' tier is allowed in non-interactive
-        res = tools["execute_command"].run({"command": "python -c \"print('ran')\"", "risk_tier": "auto"})
+        res = tools["execute_command"].run({"command": f'"{sys.executable}" -c "print(\'ran\')"', "risk_tier": "auto"})
         assert res.get("status") == "success"
         assert "ran" in res.get("stdout", "")
 
@@ -177,7 +223,7 @@ class TestToolRegistryPermissions:
         tools = {t.name: t for t in build_tool_registry(repo_path=str(tmp_path), test_cmd="pytest", harness=harness)}
         
         # 'confirm' tier is denied in non-interactive
-        res = tools["execute_command"].run({"command": "python -c \"print('ran')\"", "risk_tier": "confirm"})
+        res = tools["execute_command"].run({"command": f'"{sys.executable}" -c "print(\'ran\')"', "risk_tier": "confirm"})
         assert res.get("status") == "permission_denied"
 
     def test_execute_command_destructive_safety_net_override(self, tmp_path):
@@ -240,18 +286,26 @@ class TestStandardizedLoggingTags:
                 assert tag in captured, f"Expected tag {tag} in stdout"
 
     def test_loop_replan_on_repeated_worker_summary(self, tmp_path, capsys):
+        """REPLAN fires when consecutive iterations produce the same code diff.
+
+        The test patches get_diff to return the same non-empty diff both times,
+        which simulates an agent that writes the same patch twice (real stagnation).
+        The REPLAN trigger is now diff-based, not worker-summary-based.
+        """
         from controller.loop import run
         from config import Config
         from controller.state import RunState
-        
+
         cfg = Config(repo_path=str(tmp_path), goal="fix bug", max_iterations=3)
-        
+
         summaries = [
             "Attempted fix on calculate() by changing return value.",
             "Attempted fix on calculate() by changing return value.",
             "Completely different approach using refactored method.",
         ]
-        
+        # Same patch applied twice → genuine stagnation → diff-based REPLAN fires
+        repeated_diff = "--- a/calc.py\n+++ b/calc.py\n@@ -1 +1 @@\n-return a - b\n+return a + b\n"
+
         with patch("controller.loop.load_state", return_value=RunState(goal="fix bug")), \
              patch("controller.loop.save_state"), \
              patch("controller.loop.ensure_work_branch"), \
@@ -262,12 +316,14 @@ class TestStandardizedLoggingTags:
                  MagicMock(passed=False, returncode=1, output_tail="Fail 2"),
                  MagicMock(passed=True, returncode=0, output_tail="All passed"),
              ]), \
-             patch("controller.loop.commit_iteration", return_value="abc12345"):
-            
+             patch("controller.loop.commit_iteration", return_value="abc12345"), \
+             patch("controller.loop.get_diff", return_value=repeated_diff):
+
             success = run(cfg)
             assert success is True
             captured = capsys.readouterr().out
-            assert "[RECOVERY] Router triggered REPLAN: Near-identical worker output detected" in captured
+            assert "[RECOVERY] Router triggered REPLAN" in captured
+            assert "Near-identical code diff detected" in captured
             # Check that iteration 3 received updated instruction with force_new_strategy
             assert mock_worker.call_count == 3
             iter3_instruction = mock_worker.call_args_list[2][0][1]

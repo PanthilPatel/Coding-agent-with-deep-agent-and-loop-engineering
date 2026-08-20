@@ -78,8 +78,10 @@ def decide_next_step(
     max_seconds: float,
     same_failure_count: int = 0,
     max_same_failures: Optional[int] = None,
-    worker_summary: Optional[str] = None,
-    previous_worker_summary: Optional[str] = None,
+    worker_summary: Optional[str] = None,           # kept for backward compat; no longer used for REPLAN
+    previous_worker_summary: Optional[str] = None,  # kept for backward compat; no longer used for REPLAN
+    current_diff: Optional[str] = None,
+    previous_diff: Optional[str] = None,
 ) -> RoutingDecision:
     """Decide whether to continue the loop, recover/replan, or stop.
 
@@ -88,8 +90,9 @@ def decide_next_step(
       2. Time-out (``elapsed_seconds > max_seconds``) -> FAILED (TIMEOUT)
       3. Repeated-failure threshold -> REPLAN or FAILED (VERIFICATION_FAILED)
       4. Iteration limit (``current_iteration >= max_iterations``) -> FAILED (MAX_ITERATIONS)
-      5. Error recovery (repeated failure count == 1 or explicit issues) -> RECOVER
-      6. Continue (none of the above triggered) -> CONTINUE
+      5. No-change / stagnation detected via diff comparison -> REPLAN
+      6. Error recovery (repeated failure count == 1 or explicit issues) -> RECOVER
+      7. Continue (none of the above triggered) -> CONTINUE
 
     Args:
         evaluator_result:  The dict returned by ``evaluate_iteration()`` or a
@@ -102,6 +105,11 @@ def decide_next_step(
                             same failure signature.
         max_same_failures: When set, stop with ``VERIFICATION_FAILED`` if
                            ``same_failure_count`` reaches this value.
+        worker_summary:    Retained for backward compatibility; not used in routing logic.
+        previous_worker_summary: Retained for backward compatibility; not used in routing logic.
+        current_diff:      ``git diff`` output captured after committing this iteration's changes.
+                           Empty string means no files were actually modified.
+        previous_diff:     ``git diff`` output from the immediately preceding iteration.
 
     Returns:
         A ``RoutingDecision`` instance containing the state, continuation flag,
@@ -150,17 +158,38 @@ def decide_next_step(
             termination_reason=TerminationReason.MAX_ITERATIONS_SAFETY_LIMIT,
         )
 
-    # If repeating near-identical worker summary / approach, trigger REPLAN immediately
-    if worker_summary and previous_worker_summary:
-        ratio = difflib.SequenceMatcher(None, worker_summary.strip(), previous_worker_summary.strip()).ratio()
-        if ratio > 0.9:
+    # Diff-based stagnation check: compare the actual code changes between iterations.
+    # This is the ground truth for whether progress was made — worker_summary strings
+    # are unreliable (e.g. the SHORT_CIRCUIT path always returns the same hardcoded
+    # string regardless of what was actually changed).
+    #
+    # Two cases that both indicate stagnation:
+    #   a) Both current_diff and previous_diff are empty: the agent made zero file
+    #      changes in two consecutive iterations.
+    #   b) current_diff is near-identical to previous_diff: the agent applied the
+    #      same patch as last time.
+    if current_diff is not None and previous_diff is not None:
+        cur = current_diff.strip()
+        prev = previous_diff.strip()
+        if cur == "" and prev == "":
+            # Two consecutive iterations with no file changes at all
             return RoutingDecision(
                 state=RouterState.REPLAN,
                 should_continue=True,
-                reason=f"Near-identical worker output detected (similarity {ratio:.2f} > 0.9). No progress made.",
+                reason="No file changes detected in two consecutive iterations. No progress made.",
                 suggested_action="Force strategy change and discard previous failing approach.",
                 termination_reason=None,
             )
+        if cur and prev:
+            ratio = difflib.SequenceMatcher(None, cur, prev).ratio()
+            if ratio > 0.9:
+                return RoutingDecision(
+                    state=RouterState.REPLAN,
+                    should_continue=True,
+                    reason=f"Near-identical code diff detected (similarity {ratio:.2f} > 0.9). No progress made.",
+                    suggested_action="Force strategy change and discard previous failing approach.",
+                    termination_reason=None,
+                )
 
     # If repeating the exact same failure (>=2 times), trigger REPLAN
     if same_failure_count >= 2:

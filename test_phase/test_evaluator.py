@@ -1,4 +1,4 @@
-﻿"""test_evaluator.py — Phase 3: Generalized Evaluator & Verification Engine.
+"""test_evaluator.py — Phase 3: Generalized Evaluator & Verification Engine.
 
 Covers:
 - VerificationResult dataclass shape.
@@ -182,29 +182,29 @@ class TestVerifyDirectoryExists:
 
 class TestVerifyCommandExecution:
     def test_exit_code_0_passes(self):
-        result = verify_command_execution('python -c "exit(0)"')
+        result = verify_command_execution(f'"{sys.executable}" -c "exit(0)"')
         assert result.passed is True
         assert result.strategy == "command_execution"
 
     def test_non_zero_exit_fails(self):
-        result = verify_command_execution('python -c "exit(1)"')
+        result = verify_command_execution(f'"{sys.executable}" -c "exit(1)"')
         assert result.passed is False
         assert "unexpected_exit_code" in result.issues
 
     def test_expected_non_zero_passes(self):
-        result = verify_command_execution('python -c "exit(2)"', expected_exit_code=2)
+        result = verify_command_execution(f'"{sys.executable}" -c "exit(2)"', expected_exit_code=2)
         assert result.passed is True
 
     def test_stdout_match_passes(self):
         result = verify_command_execution(
-            'python -c "print(\'hello_world\')"',
+            f'"{sys.executable}" -c "print(\'hello_world\')"',
             stdout_match="hello_world",
         )
         assert result.passed is True
 
     def test_stdout_match_not_found_fails(self):
         result = verify_command_execution(
-            'python -c "print(\'goodbye\')"',
+            f'"{sys.executable}" -c "print(\'goodbye\')"',
             stdout_match="hello_world",
         )
         assert result.passed is False
@@ -230,16 +230,16 @@ class TestVerifyCommandExecution:
             pytest.fail(f"Unexpected exception: {exc}")
 
     def test_details_contain_exit_code(self):
-        result = verify_command_execution('python -c "exit(0)"')
+        result = verify_command_execution(f'"{sys.executable}" -c "exit(0)"')
         assert "exit_code" in result.details
 
     def test_details_contain_stdout(self):
-        result = verify_command_execution('python -c "print(42)"')
+        result = verify_command_execution(f'"{sys.executable}" -c "print(42)"')
         assert "stdout" in result.details
 
     def test_cwd_is_used(self, tmp_path):
         result = verify_command_execution(
-            'python -c "import os; print(os.getcwd())"',
+            f'"{sys.executable}" -c "import os; print(os.getcwd())"',
             cwd=str(tmp_path),
             stdout_match=str(tmp_path).replace("\\", "/").split("/")[-1],
         )
@@ -356,7 +356,7 @@ class TestGeneralEvaluator:
 
     def test_routes_command_execution(self):
         result = self.ev.evaluate("command_execution",
-                                  command='python -c "exit(0)"')
+                                  command=f'"{sys.executable}" -c "exit(0)"')
         assert result.strategy == "command_execution"
         assert result.passed is True
 

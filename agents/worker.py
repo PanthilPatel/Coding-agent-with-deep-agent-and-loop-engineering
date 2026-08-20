@@ -225,6 +225,11 @@ class PatchedChatOllama(ChatOllama):
                 
         return response
 
+# Module-level side-channel: loop.py reads this after each run_worker_turn() call.
+# Using a dict (not a return-value change) so existing test mocks stay valid.
+_last_turn_token_usage: dict = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+
+
 class TerminalLogCallbackHandler(BaseCallbackHandler):
     def __init__(self, log_dir: str = "agent_logs"):
         super().__init__()
@@ -234,6 +239,12 @@ class TerminalLogCallbackHandler(BaseCallbackHandler):
             pass
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         self.log_file = os.path.join(log_dir, f"agent_{timestamp}.log")
+        # Running token totals accumulated across all LLM calls in this turn
+        self._turn_token_totals: dict = {
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+        }
 
     def _log_to_file(self, text: str):
         try:
@@ -241,6 +252,10 @@ class TerminalLogCallbackHandler(BaseCallbackHandler):
                 f.write(text + "\n")
         except Exception:
             pass
+
+    def get_turn_token_totals(self) -> dict:
+        """Return a copy of the accumulated token totals for this turn."""
+        return dict(self._turn_token_totals)
 
     def on_llm_start(self, serialized, prompts, **kwargs):
         prompt_chars = sum(len(p) for p in prompts) if prompts else 0
@@ -254,7 +269,54 @@ class TerminalLogCallbackHandler(BaseCallbackHandler):
             print(token, end="", flush=True)
 
     def on_llm_end(self, response, **kwargs):
-        print()
+        """Extract real token counts from the LLM response and accumulate them.
+
+        Handles both provider formats:
+          - ChatOllama / ChatOpenAI (NVIDIA NIM): response_metadata["token_usage"]
+            with keys prompt_tokens, completion_tokens, total_tokens
+          - Some Ollama builds: usage_metadata with keys input_tokens, output_tokens
+        """
+        print()  # newline after streaming output
+
+        # Walk generations to find the AIMessage with metadata
+        msg = None
+        if hasattr(response, "generations") and response.generations:
+            for gen_list in response.generations:
+                for gen in gen_list:
+                    if hasattr(gen, "message"):
+                        msg = gen.message
+                        break
+                if msg is not None:
+                    break
+
+        # Try response_metadata["token_usage"] first (ChatOllama, ChatOpenAI/NVIDIA)
+        obj = msg if msg is not None else response
+        rm = getattr(obj, "response_metadata", None) or {}
+        usage = rm.get("token_usage") if isinstance(rm, dict) else None
+
+        # Fallback: usage_metadata (some Ollama builds use input_tokens/output_tokens)
+        if not usage:
+            um = getattr(obj, "usage_metadata", None) or {}
+            if um:
+                usage = um
+
+        if usage:
+            prompt_tokens = int(usage.get("prompt_tokens") or usage.get("input_tokens") or 0)
+            completion_tokens = int(usage.get("completion_tokens") or usage.get("output_tokens") or 0)
+            total_tokens = int(usage.get("total_tokens") or (prompt_tokens + completion_tokens))
+
+            # Per-call stdout + file log
+            token_msg = (
+                f"[TOKEN USAGE] Prompt: {prompt_tokens} | "
+                f"Completion: {completion_tokens} | Total: {total_tokens}"
+            )
+            print(token_msg)
+            self._log_to_file(token_msg)
+
+            # Accumulate into turn totals
+            self._turn_token_totals["prompt_tokens"] += prompt_tokens
+            self._turn_token_totals["completion_tokens"] += completion_tokens
+            self._turn_token_totals["total_tokens"] += total_tokens
 
     def on_tool_start(self, serialized, input_str, **kwargs):
         name = serialized.get("name", "tool")
@@ -314,7 +376,7 @@ def _build_model(model_name: str, llm_provider: str = "ollama_cloud") -> Any:
 
     Supports both ``ollama_cloud`` (remote) and ``ollama`` (local).
     """
-    timeout = float(os.environ.get("OLLAMA_TIMEOUT", "120.0"))
+    timeout = float(os.environ.get("OLLAMA_TIMEOUT", "60.0"))  # Keep well below benchmark wall-clock timeout
     num_ctx = int(os.environ.get("OLLAMA_NUM_CTX", "8192"))
     if llm_provider == "ollama_cloud":
         return PatchedChatOllama(
@@ -380,18 +442,30 @@ def build_worker_agent(
     return agent
 
 def run_worker_turn(agent, instruction: str) -> str:
-    """Invoke the worker agent with a single instruction and return the 
+    """Invoke the worker agent with a single instruction and return the
     text of its final response.
+
+    Token usage is accumulated inside the TerminalLogCallbackHandler and
+    written to the module-level ``_last_turn_token_usage`` dict after every
+    exit path so that ``controller.loop`` can read it without a signature
+    change (preserving all existing test-mock compatibility).
     """
+    global _last_turn_token_usage
+    # Reset side-channel before each turn
+    _last_turn_token_usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+
     from langgraph.errors import GraphRecursionError
+    handler = TerminalLogCallbackHandler()
     try:
         result = agent.invoke(
             {"messages": [{"role": "user", "content": instruction}]},
             config={
-                "callbacks": [TerminalLogCallbackHandler()],
+                "callbacks": [handler],
                 "recursion_limit": 30
             }
         )
+        # Publish token totals to side-channel before returning
+        _last_turn_token_usage = handler.get_turn_token_totals()
         messages = result.get("messages", [])
         if not messages:
             return ""
@@ -400,19 +474,23 @@ def run_worker_turn(agent, instruction: str) -> str:
             return last.get("content", "") or ""
         return getattr(last, "content", "") or ""
     except GraphRecursionError as gre:
+        _last_turn_token_usage = handler.get_turn_token_totals()
         if "[SHORT_CIRCUIT]" in str(gre):
             print("\n[worker] Short-circuit triggered: Code edit/write completed. Ending turn immediately.")
             return "File changes made successfully. Turn completed."
         print("\n[worker] Warning: Agent hit recursion limit of 30 steps (potential loop). Aborting turn.")
         return "Agent hit recursion limit of 30 steps due to repeating operations."
     except Exception as e:
+        _last_turn_token_usage = handler.get_turn_token_totals()
         err_msg = str(e)
         if "[SHORT_CIRCUIT]" in err_msg:
             print("\n[worker] Short-circuit triggered: Code edit/write completed. Ending turn immediately.")
             return "File changes made successfully. Turn completed."
-        if "timed out" in err_msg.lower() or "timeout" in err_msg.lower():
-            print(f"\n[worker] Timeout Error: Request to Ollama timed out: {e}")
-            return f"Agent failed with timeout: Ollama LLM call exceeded timeout threshold ({e})."
+        timeout_keywords = ("timed out", "timeout", "read timeout", "connect timeout")
+        if any(kw in err_msg.lower() for kw in timeout_keywords):
+            timeout_val = os.environ.get("OLLAMA_TIMEOUT", "60")
+            print(f"\n[worker] Timeout Error: LLM call exceeded {timeout_val}s timeout: {e}")
+            return f"LLM call exceeded {timeout_val}-second timeout ({e})."
         if "localhost" in err_msg or "127.0.0.1" in err_msg or "connection" in err_msg.lower() or "connect" in err_msg.lower():
             print(f"\n[worker] Connection Error: Could not connect to Ollama. Please ensure your local Ollama server is running (usually at http://localhost:11434). Detail: {e}")
             return f"Agent failed with connection error: Could not connect to local Ollama. Please make sure the Ollama service is running locally on http://localhost:11434 and the model is pulled."

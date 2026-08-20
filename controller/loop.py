@@ -45,6 +45,7 @@ def build_instruction(
     skill_content: str = "",
     error_feedback: str = "",
     prior_attempts: list = None,
+    last_returncode: int = None,
 ) -> str:
     """Compose the instruction string sent to the worker agent each iteration.
 
@@ -71,7 +72,17 @@ def build_instruction(
     if error_feedback:
         parts.append(f"Error recovery note:\n{error_feedback}")
     if last_output_tail:
-        parts.append(f"Latest verification output:\n{last_output_tail}")
+        if last_returncode is not None and last_returncode != 0:
+            parts.append(
+                f"[PREVIOUS RUN FAILED - RETURN CODE {last_returncode}]\n"
+                f"Pytest failure traceback:\n{last_output_tail}\n\n"
+                "Instructions:\n"
+                "1. Carefully inspect the failing assertions and traceback above.\n"
+                "2. Edit ONLY the source code files to resolve the failure.\n"
+                "3. NEVER edit test files."
+            )
+        else:
+            parts.append(f"Latest verification output:\n{last_output_tail}")
     if force_new_strategy:
         parts.append(
             "The previous fix did not resolve this failure. Do not repeat "
@@ -100,6 +111,15 @@ def print_execution_summary(state, success: bool, iterations_run: int) -> None:
     print(f"Iterations Run:      {iterations_run}")
     if state.termination_reason:
         print(f"Termination Reason:  {state.termination_reason}")
+    # Token usage totals (only shown when real data was captured)
+    token_usage = getattr(state, "token_usage", None)
+    if token_usage:
+        print(
+            f"Token Usage (total): "
+            f"Prompt: {token_usage.get('prompt_tokens', 0)} | "
+            f"Completion: {token_usage.get('completion_tokens', 0)} | "
+            f"Total: {token_usage.get('total_tokens', 0)}"
+        )
     print("\nChanges Performed by Iteration:")
     for record in state.iterations:
         # handle both dict and object formats
@@ -280,7 +300,9 @@ def run(config) -> bool:
 
     start_time = time.time()
     last_output_tail = ""
+    last_returncode = None
     previous_worker_summary = None
+    previous_diff: str | None = None  # tracks the committed diff from the prior iteration
     force_new_strategy = False
     error_feedback = ""
     iterations_run = 0
@@ -330,6 +352,13 @@ def run(config) -> bool:
                             one_line_summ += "..."
                         prior_attempts.append(f"Iteration {it_num}: {one_line_summ} -> {status_str}")
 
+            # ------------------------------------------------------------------
+            # PER-ITERATION CHECKPOINT — taken at the very start so that REPLAN
+            # can roll back only the current iteration's changes, not all prior
+            # progress from earlier (successful) iterations.
+            # ------------------------------------------------------------------
+            iteration_checkpoint = checkpoint_mgr.create_checkpoint(f"pre_iter_{i}")
+
             instruction = build_instruction(
                 config.goal,
                 last_output_tail,
@@ -337,6 +366,7 @@ def run(config) -> bool:
                 skill_content,
                 error_feedback=error_feedback,
                 prior_attempts=prior_attempts,
+                last_returncode=last_returncode,
             )
 
             # Record the plan (instruction sent to the worker) in state
@@ -345,6 +375,11 @@ def run(config) -> bool:
             print(f"[PLAN] Instruction composed for iteration {i}")
 
             worker_summary = run_worker_turn(agent, instruction)
+
+            # Read token usage from the side-channel written by run_worker_turn
+            from agents.worker import _last_turn_token_usage
+            state.accumulate_token_usage(_last_turn_token_usage)
+
             print(f"[AGENT] {worker_summary[:300]}")
 
             # Check if explicit verification strategy is set on config
@@ -358,6 +393,7 @@ def run(config) -> bool:
                 v_result = gen_evaluator.evaluate(verification_strategy, **eval_kwargs)
                 passed = v_result.passed
                 output_tail = v_result.evidence
+                last_returncode = 0 if v_result.passed else 1
                 print(f"[VERIFY] Strategy '{verification_strategy}' result: passed={passed} ({v_result.evidence})")
 
                 evaluator_dict = {
@@ -378,6 +414,7 @@ def run(config) -> bool:
                 )
                 passed = result.passed
                 output_tail = result.output_tail
+                last_returncode = result.returncode
                 print(f"[VERIFY] Tests passed={result.passed} returncode={result.returncode}")
 
                 # Optional lint step — only runs when lint_cmd is configured
@@ -410,6 +447,11 @@ def run(config) -> bool:
                             pass
                     return False
 
+            # Capture diff BEFORE commit so it reflects what the agent changed this iteration.
+            # get_diff() returns the staged+unstaged diff against HEAD; after commit it returns
+            # empty, so we must call it first.
+            current_diff = get_diff(config.local_repo_path)
+
             commit_hash = commit_iteration(
                 config.local_repo_path, f"agent iteration {i}: {worker_summary[:72]}"
             )
@@ -439,8 +481,11 @@ def run(config) -> bool:
                 same_failure_count=state.same_failure_count,
                 worker_summary=worker_summary,
                 previous_worker_summary=previous_worker_summary,
+                current_diff=current_diff,
+                previous_diff=previous_diff,
             )
             previous_worker_summary = worker_summary
+            previous_diff = current_diff
 
             if evaluator_dict.get("is_correct"):
                 consecutive_failures = 0
@@ -453,10 +498,20 @@ def run(config) -> bool:
                 error_feedback = f"Repeated failure occurred. Suggested action: {router_decision.suggested_action}"
                 force_new_strategy = True
                 consecutive_failures = max(consecutive_failures, 2)
-                
-                # Discard dirty changes by rolling back to checkpoint
-                if initial_checkpoint:
-                    checkpoint_mgr.rollback_to_checkpoint(initial_checkpoint)
+
+                # Severity-split rollback:
+                # - returncode==2 means collection/syntax error → repo may be broken,
+                #   fall back to full reset to initial_checkpoint.
+                # - returncode==1 (ordinary assertion failure) → only discard the
+                #   current iteration's changes so prior partial progress is preserved.
+                if last_returncode == 2:
+                    target_cp = initial_checkpoint
+                    print("[RECOVERY] Syntax/collection error (rc=2): rolling back to initial checkpoint")
+                else:
+                    target_cp = iteration_checkpoint
+                    print(f"[RECOVERY] Rolling back to start of iteration {i} checkpoint (preserving prior progress)")
+                if target_cp:
+                    checkpoint_mgr.rollback_to_checkpoint(target_cp)
             elif router_decision.state == RouterState.RECOVER:
                 print(f"[RECOVERY] Router triggered RECOVER: {router_decision.reason}")
                 error_feedback = f"Previous iteration failed. Suggested action: {router_decision.suggested_action}"

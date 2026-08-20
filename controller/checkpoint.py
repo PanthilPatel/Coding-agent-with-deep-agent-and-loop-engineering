@@ -1,4 +1,4 @@
-﻿"""controller/checkpoint.py — Phase 7: Git Checkpoint Rollback & State Snapshots.
+"""controller/checkpoint.py — Phase 7: Git Checkpoint Rollback & State Snapshots.
 
 Provides the CheckpointManager class to handle git checkpointing, rollback, and state management.
 """
@@ -25,7 +25,8 @@ class CheckpointManager:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
-                check=False
+                check=False,
+                stdin=subprocess.DEVNULL
             )
             return res.returncode == 0 and "true" in res.stdout.lower()
         except Exception:
@@ -41,7 +42,7 @@ class CheckpointManager:
             # We want to create a clean commit representing the current state.
             # If there are uncommitted changes, stage and commit them as a checkpoint.
             if self.has_uncommitted_changes():
-                subprocess.run(["git", "add", "-A"], cwd=self.repo_path, check=True)
+                subprocess.run(["git", "add", "-A"], cwd=self.repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True, stdin=subprocess.DEVNULL)
                 commit_msg = f"[CHECKPOINT] {label}"
                 res = subprocess.run(
                     ["git", "commit", "-m", commit_msg],
@@ -49,15 +50,18 @@ class CheckpointManager:
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
                     text=True,
-                    check=True
+                    check=True,
+                    stdin=subprocess.DEVNULL
                 )
                 # Get HEAD SHA
                 sha_res = subprocess.run(
                     ["git", "rev-parse", "HEAD"],
                     cwd=self.repo_path,
                     stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
                     text=True,
-                    check=True
+                    check=True,
+                    stdin=subprocess.DEVNULL
                 )
                 sha = sha_res.stdout.strip()
                 print(f"[CHECKPOINT] Created checkpoint commit {sha} for label '{label}'")
@@ -68,8 +72,10 @@ class CheckpointManager:
                     ["git", "rev-parse", "HEAD"],
                     cwd=self.repo_path,
                     stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
                     text=True,
-                    check=True
+                    check=True,
+                    stdin=subprocess.DEVNULL
                 )
                 sha = sha_res.stdout.strip()
                 print(f"[CHECKPOINT] Created checkpoint {sha} (clean HEAD) for label '{label}'")
@@ -89,11 +95,14 @@ class CheckpointManager:
             return False
 
         try:
+            # Attempt to reattach HEAD to the working branch if detached
+            subprocess.run(["git", "checkout", "auto-agent-work"], cwd=self.repo_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False, stdin=subprocess.DEVNULL)
+
             # Hard reset to checkpoint_id
             print(f"[ROLLBACK] Restoring repository state to {checkpoint_id}")
-            subprocess.run(["git", "reset", "--hard", checkpoint_id], cwd=self.repo_path, check=True)
-            # Clean untracked files
-            subprocess.run(["git", "clean", "-fdx"], cwd=self.repo_path, check=True)
+            subprocess.run(["git", "reset", "--hard", checkpoint_id], cwd=self.repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True, stdin=subprocess.DEVNULL)
+            # Clean untracked files, preserving the run metadata state.json
+            subprocess.run(["git", "clean", "-fdx", "-e", "state.json"], cwd=self.repo_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True, stdin=subprocess.DEVNULL)
             return True
         except Exception as e:
             print(f"[ROLLBACK] Error rolling back to checkpoint: {e}")
@@ -114,7 +123,8 @@ class CheckpointManager:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
-                check=True
+                check=True,
+                stdin=subprocess.DEVNULL
             )
             return bool(res.stdout.strip())
         except Exception:
