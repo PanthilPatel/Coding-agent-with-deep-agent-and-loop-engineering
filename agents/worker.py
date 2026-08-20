@@ -21,6 +21,9 @@ class PatchedFilesystemBackend(FilesystemBackend):
     def __init__(self, root_dir, *args, **kwargs):
         super().__init__(root_dir=root_dir, *args, **kwargs)
         self.my_root_dir = root_dir
+        # Tracks (file_path, cleaned_old) pairs that were rejected as ambiguous
+        # so that re-submissions are caught instantly with a clearer directive.
+        self._rejected_ambiguous_strings: set = set()
 
     def _resolve_path(self, path: str) -> str:
         cleaned_path = path.lstrip("/\\")
@@ -77,6 +80,17 @@ class PatchedFilesystemBackend(FilesystemBackend):
         if cleaned_old == cleaned_new:
             return EditResult(error="Tool Error: No-op edit detected: old_string matches new_string. Please check your arguments and try again.")
 
+        # Fast-reject: this exact (file_path, old_string) pair was already rejected
+        # as ambiguous earlier in this run — avoid re-running the count() check and
+        # repeating the same generic message that clearly isn't stopping the retry.
+        rejection_key = (file_path, cleaned_old)
+        if rejection_key in self._rejected_ambiguous_strings:
+            return EditResult(
+                error=f"Error: This exact old_string for {file_path} was already rejected as ambiguous "
+                      f"earlier in this run. Do not resubmit it. Use a wider, unique old_string instead "
+                      f"(e.g. include the full function signature or 2-4 neighboring lines)."
+            )
+
         try:
             resolved_path = self._resolve_path(file_path)
             if not os.path.exists(resolved_path):
@@ -89,7 +103,16 @@ class PatchedFilesystemBackend(FilesystemBackend):
                 return EditResult(error=f"Error: 'old_string' was not found in {file_path}. Please read the file first to ensure exact string and whitespace matching.")
 
             if file_content.count(cleaned_old) > 1:
-                return EditResult(error=f"Error: 'old_string' matched multiple locations in {file_path}. Please include surrounding lines (like function definitions or neighboring comments) in 'old_string' to make it unique.")
+                # Record this key so the next identical attempt is fast-rejected with
+                # a clearer, more directive message rather than the generic one.
+                self._rejected_ambiguous_strings.add(rejection_key)
+                return EditResult(
+                    error=f"Error: 'old_string' matched multiple locations in {file_path} and was REJECTED. "
+                          f"Do not retry this exact old_string — it will always be rejected. "
+                          f"Read the file again and include enough unique surrounding context "
+                          f"(e.g. the full function signature or 2-4 neighboring lines) "
+                          f"to make it unique, then submit a DIFFERENT old_string."
+                )
 
             res = super().edit(file_path=file_path, old_string=cleaned_old, new_string=cleaned_new, replace_all=replace_all, *args, **kwargs)
             from langgraph.errors import GraphRecursionError
