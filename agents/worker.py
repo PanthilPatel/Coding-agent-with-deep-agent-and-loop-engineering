@@ -100,6 +100,36 @@ class PatchedFilesystemBackend(FilesystemBackend):
                 file_content = f.read()
                 
             if cleaned_old not in file_content:
+                # Secondary check: search for whitespace-insensitive match to provide
+                # actionable indentation feedback rather than a blind failure.
+                target_lines = [line.strip() for line in cleaned_old.splitlines() if line.strip()]
+                if target_lines:
+                    file_lines = file_content.splitlines()
+                    target_len = len(target_lines)
+                    matching_snippets = []
+                    for i in range(len(file_lines) - target_len + 1):
+                        window = file_lines[i : i + target_len]
+                        if [line.strip() for line in window if line.strip()] == target_lines:
+                            matching_snippets.append("\n".join(window))
+                    
+                    if len(matching_snippets) == 1:
+                        hint = matching_snippets[0]
+                        return EditResult(
+                            error=(
+                                f"Error: 'old_string' was not found in {file_path} due to whitespace/indentation mismatch. "
+                                f"Here is the exact matching snippet with correct indentation from the file:\n"
+                                f"```python\n{hint}\n```\n"
+                                f"Please use this exact string in 'old_string'."
+                            )
+                        )
+                    elif len(matching_snippets) > 1:
+                        return EditResult(
+                            error=(
+                                f"Error: 'old_string' matched multiple locations in {file_path} (whitespace-insensitively). "
+                                f"Please include more surrounding context (such as function definition or enclosing block) to make it unique."
+                            )
+                        )
+
                 return EditResult(error=f"Error: 'old_string' was not found in {file_path}. Please read the file first to ensure exact string and whitespace matching.")
 
             if file_content.count(cleaned_old) > 1:
