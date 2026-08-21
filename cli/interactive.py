@@ -200,6 +200,43 @@ def run_interactive(config_template: Config) -> None:
                 success = run_controller_loop(config)
                 status = "SUCCESS" if success else "FAILURE"
                 print(f"\n[interactive] Autonomous loop completed: {status}\n")
+
+                # Bridge /run outcome into conversational chat-turn agent's memory
+                try:
+                    from utils.git_utils import get_repo
+                    repo = get_repo(repo_path)
+                    commit_summary = ""
+                    if repo.heads and len(repo.heads) > 0:
+                        try:
+                            last_commit = repo.head.commit
+                            commit_summary = f"Commit {last_commit.hexsha[:8]}: {last_commit.summary}"
+                            diff_summary = repo.git.diff("HEAD~1", "HEAD")[:2000]
+                        except Exception:
+                            commit_summary = ""
+                            diff_summary = ""
+                    else:
+                        diff_summary = ""
+
+                    bridge_msg = (
+                        f"[SYSTEM NOTIFICATION: Autonomous task '/run {goal}' completed with status: {status}. "
+                    )
+                    if commit_summary:
+                        bridge_msg += f"{commit_summary}. Changes made:\n{diff_summary}]"
+                    else:
+                        bridge_msg += "No commits were created.]"
+
+                    # Update checkpointer thread with the /run outcome
+                    from langchain_core.messages import HumanMessage, AIMessage
+                    agent.update_state(
+                        {"configurable": {"thread_id": session_thread_id}},
+                        {"messages": [
+                            HumanMessage(content=f"Executed autonomous loop: /run {goal}"),
+                            AIMessage(content=bridge_msg),
+                        ]},
+                    )
+                except Exception as ex:
+                    print(f"[interactive] Warning: could not sync /run outcome to chat memory: {ex}")
+
                 continue
 
             # Regular conversational turn with persistent agent & interruption support

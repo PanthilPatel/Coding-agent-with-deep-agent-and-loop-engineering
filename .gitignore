@@ -18,3 +18,7 @@ agent_logs/
 workspace_clones/
 state.json
 test_output.txt
+*.egg-info/
+build/
+dist/
+

@@ -33,13 +33,17 @@ def make_git_status_tool(repo_path: str):
         try:
             repo = get_repo(repo_path)
             status_lines = []
+            from utils.git_utils import EXCLUDED_INTERNAL_FILES
             if repo.is_dirty(untracked_files=True):
                 for item in repo.index.diff(None):
-                    status_lines.append(f"  modified: {item.a_path}")
+                    if item.a_path not in EXCLUDED_INTERNAL_FILES:
+                        status_lines.append(f"  modified: {item.a_path}")
                 for item in repo.untracked_files:
-                    status_lines.append(f"  untracked: {item}")
+                    if item not in EXCLUDED_INTERNAL_FILES:
+                        status_lines.append(f"  untracked: {item}")
                 for item in repo.index.diff("HEAD"):
-                    status_lines.append(f"  staged:   {item.a_path}")
+                    if item.a_path not in EXCLUDED_INTERNAL_FILES:
+                        status_lines.append(f"  staged:   {item.a_path}")
             result = "\n".join(status_lines) if status_lines else "nothing to commit, working tree clean"
             log_tool_result("OK")
             return result

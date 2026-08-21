@@ -21,6 +21,12 @@ def ensure_work_branch(repo_path: str, branch_name: str) -> None:
     repo = get_repo(repo_path)
     try:
         if not repo.head.is_detached and repo.active_branch.name == branch_name:
+            # Untrack internal bookkeeping files if they were previously tracked
+            for exc in EXCLUDED_INTERNAL_FILES:
+                try:
+                    repo.git.rm("--cached", exc, "-f")
+                except Exception:
+                    pass
             return
     except (TypeError, ValueError):
         pass
@@ -34,6 +40,14 @@ def ensure_work_branch(repo_path: str, branch_name: str) -> None:
             repo.git.checkout(branch_name, "--force")
     else:
         repo.git.checkout("-b", branch_name)
+
+    # Ensure internal bookkeeping files are untracked on the work branch
+    for exc in EXCLUDED_INTERNAL_FILES:
+        try:
+            repo.git.rm("--cached", exc, "-f")
+        except Exception:
+            pass
+
 
 EXCLUDED_INTERNAL_FILES = {"state.json", ".agent_state.json"}
 

@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "coding-agent"
+version = "0.1.0"
+description = "Autonomous fix-until-green coding agent with deep agents and loop engineering"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    { name = "Deep Agents Team" }
+]
+dependencies = [
+    "deepagents>=0.1.0",
+    "langchain",
+    "langgraph",
+    "python-dotenv",
+    "gitpython",
+    "fastapi",
+    "uvicorn",
+    "langchain-ollama>=0.3.0",
+]
+
+[project.scripts]
+codeagent = "cli.entrypoint:main"
+
+[tool.setuptools]
+packages = [
+    "agents",
+    "benchmarks",
+    "cli",
+    "controller",
+    "mcp_agent",
+    "orchestrator",
+    "skills",
+    "tools",
+    "utils",
+]
+py-modules = [
+    "config",
+    "main",
+]

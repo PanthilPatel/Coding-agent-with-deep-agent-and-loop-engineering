@@ -67,15 +67,26 @@ def test_review_diff_mocked():
         mock_model = MagicMock()
         mock_build.return_value = mock_model
 
-        mock_model.invoke.return_value = MagicMock(content="APPROVE Clean implementation of size() method.")
-        ok, reason = review_diff("diff --git a/structures.py", "add size method")
+        mock_model.invoke.return_value = MagicMock(content="APPROVE Clean implementation of size() method in Stack class.")
+        ok, reason = review_diff("diff --git a/structures.py\n@@ -10,6 +10,9 @@ class Stack:\n+    def size(self):", "add size method to Stack")
         assert ok is True
         assert "APPROVE" in reason
 
-        mock_model.invoke.return_value = MagicMock(content="REJECT The size method raises an AttributeError.")
-        ok, reason = review_diff("diff --git a/structures.py", "add size method")
+        mock_model.invoke.return_value = MagicMock(content="REJECT The size method was added to Queue instead of Stack.")
+        ok, reason = review_diff("diff --git a/structures.py\n@@ -36,6 +36,9 @@ class Queue:\n+    def size(self):", "add size method to Stack")
         assert ok is False
         assert "REJECT" in reason
+
+
+def test_extract_diff_targets():
+    from agents.worker import _extract_diff_targets
+    diff_queue = "diff --git a/structures.py b/structures.py\n@@ -36,6 +36,9 @@ class Queue:\n+    def size(self):\n+        return len(self._items)"
+    targets = _extract_diff_targets(diff_queue)
+    assert "Queue" in targets
+
+    diff_stack = "diff --git a/structures.py b/structures.py\n@@ -20,6 +20,9 @@ class Stack:\n+    def size(self):\n+        return len(self._items)"
+    targets_stack = _extract_diff_targets(diff_stack)
+    assert "Stack" in targets_stack
 
 
 def test_non_test_driven_flow_approved_and_confirmed(tmp_path, capsys):

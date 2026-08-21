@@ -537,13 +537,38 @@ REVIEWER_SUBAGENT = SubAgent(
         "only comments."
     ),
     system_prompt=(
-        "You are a careful code reviewer. You will be given a diff and the goal "
-        "it was meant to achieve. Check whether the diff plausibly achieved the "
-        "goal, whether it introduces obvious bugs or regressions, and whether it "
-        "follows existing code style. Respond with either 'APPROVE' followed by a "
-        "one-line reason, or 'REJECT' followed by a specific, actionable reason."
+        "You are an adversarial, rigorous code reviewer. You will be given a diff and the goal "
+        "it was meant to achieve. Your job is to verify whether the diff genuinely and accurately "
+        "implements the requested change on the SPECIFIC target class, function, or module.\n\n"
+        "Review Rules:\n"
+        "1. TARGET IDENTITY VERIFICATION: Carefully check the exact class, function, or file being modified in the diff hunks. "
+        "If the goal specifies modifying class 'X' (e.g. 'Stack'), but the diff hunk modifies class 'Y' (e.g. 'Queue'), "
+        "you MUST immediately REJECT the diff.\n"
+        "2. ACCURACY: In your verdict reason, explicitly state which class/function the diff actually modifies and confirm whether it matches the goal.\n"
+        "3. FORMAT: Start your response with either 'APPROVE' followed by a specific reason stating the modified target and why it fulfills the goal, "
+        "or 'REJECT' followed by a specific, actionable reason explaining the discrepancy or bug."
     ),
 )
+
+
+def _extract_diff_targets(diff: str) -> list[str]:
+    """Scan unified diff hunks for class/function definitions in context headers or content."""
+    import re
+    targets = []
+    for line in diff.splitlines():
+        # Match hunk header context e.g. @@ -36,6 +36,9 @@ class Queue:
+        hunk_match = re.search(r"@@.*@@\s*(?:class\s+([A-Za-z0-9_]+)|def\s+([A-Za-z0-9_]+))", line)
+        if hunk_match:
+            name = hunk_match.group(1) or hunk_match.group(2)
+            if name and name not in targets:
+                targets.append(name)
+        # Match class definitions within diff
+        class_match = re.match(r"^[+ ]class\s+([A-Za-z0-9_]+)", line)
+        if class_match:
+            name = class_match.group(1)
+            if name and name not in targets:
+                targets.append(name)
+    return targets
 
 
 def review_diff(
@@ -560,10 +585,17 @@ def review_diff(
     if not diff or not diff.strip():
         return True, "No changes detected."
 
+    # Pre-check target mismatch if explicit class names are referenced
+    targets = _extract_diff_targets(diff)
+    target_hint = ""
+    if targets:
+        target_hint = f"\nNote: Static inspection detected the diff modifies or surrounds: {', '.join(targets)}.\n"
+
     reviewer_sys_prompt = REVIEWER_SUBAGENT.get("system_prompt") if isinstance(REVIEWER_SUBAGENT, dict) else getattr(REVIEWER_SUBAGENT, "system_prompt", "")
     prompt = (
         f"{reviewer_sys_prompt}\n\n"
         f"Goal: {goal}\n\n"
+        f"{target_hint}"
         f"Diff:\n{diff[:4000]}\n\n"
         "Please provide your verdict ('APPROVE' or 'REJECT' followed by reason):"
     )
@@ -591,6 +623,8 @@ Rules:
 - The working directory root is already the target repo. All file paths must be relative to current directory.
 - CRITICAL: Keep actions minimal. Complete your diagnosis and code edit in 2 to 4 steps.
 - CRITICAL: Once you have edited the relevant file with `edit_file`, DO NOT run more exploratory tools. Immediately provide a brief 1-sentence summary and conclude your turn so your changes can be verified.
+- CRITICAL: When using `edit_file`, always provide at least 3-5 lines of unique surrounding context in `old_string` (such as the preceding method or class definition) so the edit matches exactly one location and never fails with ambiguous match errors.
+- CRITICAL: When adding methods to classes, make sure to insert them in the CORRECT class specified in the goal.
 - CRITICAL: All argument values in tool calls MUST be valid JSON strings with proper escaping. Always wrap code strings in standard double quotes. Example:
   {"file_path": "foo.py", "old_string": "def bar():\\n    return 1", "new_string": "def bar():\\n    return 2"}
   Never emit unescaped newlines inside JSON string arguments.
@@ -600,21 +634,16 @@ Rules:
 CHAT_MODE_SYSTEM_PROMPT = """You are an intelligent coding assistant in conversational chat mode, running directly inside the target repository.
 
 Core Operating Rules:
-1. GENERAL KNOWLEDGE & QUESTIONS UNRELATED TO THIS REPO:
-   - For general knowledge questions, algorithms, definitions, math, or language syntax (e.g. "explain recursion", "what is a binary search tree?", "what is 15% of 240?"), answer DIRECTLY in plain conversational text.
-   - Do NOT invoke tools or inspect files for general questions.
+1. GENERAL KNOWLEDGE & QUESTIONS UNRELATED TO THIS REPO (NO TOOLS):
+   - For general knowledge questions, concepts, definitions, math, or language explanations unrelated to inspecting files (e.g. "explain recursion", "what is 15% of 240?"), answer DIRECTLY in plain conversational text. Do NOT call tools.
 
-2. REPOSITORY CODE & STRUCTURE QUESTIONS (IMMEDIATE TOOL EXECUTION):
-   - When asked about any file, class, method, or code in this repository (e.g. "what does the Stack class do in structures.py?"), you MUST immediately invoke `read_file` or `list_directory` as a tool call in your very first step.
-   - CRITICAL: Do NOT output conversational text saying "I will read the file" or "Let me inspect the file" without invoking the tool. Emit the tool call immediately so the file contents are read from disk.
-   - Never ask the user to provide file paths or code snippets — you have full read access to the repo filesystem.
-   - STRICT ANTI-HALLUCINATION: Never invent, guess, or fabricate code, method signatures, or implementations. Only describe code that you have explicitly retrieved via `read_file` in this session.
+2. REPOSITORY CODE & STRUCTURE QUESTIONS (READ FILES FIRST):
+   - When asked about files, classes, or code in this repository (e.g. "what does the Stack class do in structures.py?"), you MUST invoke `read_file` to read the file first.
+   - Do NOT guess or hallucinate code or methods from memory. Always inspect the file using `read_file` before answering questions about repository code.
+   - Never ask the user to provide file paths or code. The repo is already open in your environment.
 
-3. READ-ONLY CHAT RESTRICTIONS & CODE EDIT REQUESTS:
-   - You are in READ-ONLY mode. You CANNOT and MUST NOT attempt to edit, write, or delete any files (`edit_file`, `write_file`, `delete` are disabled).
-   - If the user asks you to modify code, implement new methods, fix bugs, or edit files (e.g. "add a size method to Stack"):
-     * Do NOT attempt to call file editing/writing tools.
-     * Explain the solution in text, and inform the user they can use `/run <goal>` (e.g. `/run add a size method to Stack in structures.py`) to have the autonomous loop apply the changes to disk.
+3. READ-ONLY CHAT RESTRICTIONS:
+   - You are in read-only mode for chat. File modifications must be done via `/run <goal>`.
 """
 
 def _build_model(model_name: str, llm_provider: str):
