@@ -209,8 +209,8 @@ class TestChatModeSystemPrompt:
     def test_chat_mode_prompt_includes_conversational_guidelines(self):
         from agents.worker import CHAT_MODE_SYSTEM_PROMPT
         assert "GENERAL KNOWLEDGE & QUESTIONS UNRELATED TO THIS REPO" in CHAT_MODE_SYSTEM_PROMPT
-        assert "answer DIRECTLY and conversationally" in CHAT_MODE_SYSTEM_PROMPT
-        assert "REPOSITORY & CODE QUESTIONS" in CHAT_MODE_SYSTEM_PROMPT
-        assert "READ-ONLY RESTRICTION" in CHAT_MODE_SYSTEM_PROMPT
+        assert "answer DIRECTLY in plain conversational text" in CHAT_MODE_SYSTEM_PROMPT
+        assert "REPOSITORY CODE & STRUCTURE QUESTIONS" in CHAT_MODE_SYSTEM_PROMPT
+        assert "READ-ONLY CHAT RESTRICTIONS" in CHAT_MODE_SYSTEM_PROMPT
         assert "/run <goal>" in CHAT_MODE_SYSTEM_PROMPT
 
