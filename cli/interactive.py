@@ -161,6 +161,13 @@ def run_interactive(config_template: Config) -> None:
             if not user_input:
                 continue
 
+            # Strip accidental leading prompt characters (e.g. pasted '> /run', '$ git', etc.)
+            while user_input.startswith(">") or user_input.startswith("$"):
+                user_input = user_input[1:].strip()
+
+            if not user_input:
+                continue
+
             if user_input.lower() in ("exit", "quit", "/exit", "/quit"):
                 print("Exiting...")
                 break

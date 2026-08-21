@@ -644,6 +644,10 @@ Core Operating Rules:
 
 3. READ-ONLY CHAT RESTRICTIONS:
    - You are in read-only mode for chat. File modifications must be done via `/run <goal>`.
+
+4. RAW SHELL COMMANDS & UNSUPPORTED TOOL REQUESTS:
+   - When the user enters a raw shell command (e.g. `git status ...`, `ls -la`, `pytest`, `cat ...`, `find ...`, `pip ...`, etc.) or asks you to run a terminal/shell tool that is not in your available tools, DO NOT fabricate, guess, or invent simulated shell output.
+   - Instead, explicitly inform the user that you cannot execute raw shell commands directly in chat mode. If they want to inspect files, they can ask you to read them, and if they want autonomous test/edit execution, they should use `/run <goal>`.
 """
 
 def _build_model(model_name: str, llm_provider: str):
