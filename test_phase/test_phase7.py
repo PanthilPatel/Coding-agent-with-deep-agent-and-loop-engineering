@@ -806,7 +806,7 @@ class TestEndToEndSmoke:
         from langchain_core.tools import BaseTool
 
         tools = build_tool_registry(smoke_repo, "pytest", require_approval=False)
-        assert len(tools) == 10
+        assert len(tools) == 12
         for t in tools:
             assert isinstance(t, BaseTool)
 
@@ -889,4 +889,4 @@ class TestRegressionConsolidation:
         """No Phase 7 change should have altered the tool count."""
         from tools import build_tool_registry
         tools = build_tool_registry("/fake/repo", "pytest")
-        assert len(tools) == 10
+        assert len(tools) == 12

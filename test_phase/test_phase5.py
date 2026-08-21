@@ -155,8 +155,8 @@ class TestBanner:
         print_banner(sample_config)
         captured = capsys.readouterr()
         
-        # Readonly tool registry returns 4 tools: git_status, git_diff, git_log, list_directory
-        assert "Tools:        4" in captured.out
+        # Readonly tool registry returns 6 tools: git_status, git_diff, git_log, grep, run_command, list_directory
+        assert "Tools:        6" in captured.out
 
     
     def test_banner_shows_model_name(self, sample_config, capsys):

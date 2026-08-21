@@ -65,6 +65,11 @@ from tools.terminal import (
     list_directory as _list_directory,
     move_file as _move_file,
 )
+from tools.search_and_exec_tools import (
+    make_grep_tool,
+    make_safe_run_command_tool,
+    make_update_plan_tool,
+)
 
 # Known destructive patterns to override misdeclared or underdeclared risk tiers
 DESTRUCTIVE_COMMAND_PATTERNS = [
@@ -114,13 +119,15 @@ def build_tool_registry(
     """
     perm_harness = harness if harness is not None else PermissionHarness(interactive=False)
 
-    # 1. Base / Git / Test tools
+    # 1. Base / Git / Test / Search / Plan tools
     tools: List[BaseTool] = [
         make_run_tests_tool(repo_path=repo_path, test_cmd=test_cmd),
         make_git_status_tool(repo_path=repo_path),
         make_git_diff_tool(repo_path=repo_path),
         make_git_log_tool(repo_path=repo_path),
         make_git_commit_tool(repo_path=repo_path, require_approval=require_approval),
+        make_grep_tool(repo_path=repo_path),
+        make_update_plan_tool(),
     ]
 
     # 2. Phase 1 Terminal & Filesystem Tools guarded by PermissionHarness
@@ -214,13 +221,15 @@ def build_readonly_tool_registry(
     repo_path: str,
     harness: Optional[PermissionHarness] = None,
 ) -> list:
-    """Build and return the minimal read-only tool list for chat-turn agents.
+    """Build and return the read-only tool list for chat-turn agents.
 
-    Only includes tools that observe state and never mutate it:
+    Includes tools that observe state, search content, or run safe read-only commands:
       - list_directory  (browse repo structure)
       - git_status      (see what is staged/modified)
       - git_diff        (inspect current diff)
       - git_log         (review commit history)
+      - grep            (search file contents across the repo)
+      - run_command     (safe allowlist: git status/diff/log, pytest, ls, pwd)
 
     Explicitly excluded (all write / side-effect tools):
       run_tests, git_commit, execute_command, create_directory,
@@ -255,6 +264,8 @@ def build_readonly_tool_registry(
         make_git_status_tool(repo_path=repo_path),
         make_git_diff_tool(repo_path=repo_path),
         make_git_log_tool(repo_path=repo_path),
+        make_grep_tool(repo_path=repo_path),
+        make_safe_run_command_tool(repo_path=repo_path),
         list_directory,
     ]
 
@@ -263,6 +274,10 @@ __all__ = [
     # Registry builders
     "build_tool_registry",
     "build_readonly_tool_registry",
+    # Tools
+    "make_grep_tool",
+    "make_safe_run_command_tool",
+    "make_update_plan_tool",
     # Raw Phase 1 terminal tools
     "execute_command",
     "create_directory",

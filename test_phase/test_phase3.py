@@ -651,7 +651,7 @@ class TestPhase1Phase2BackwardCompat:
     def test_tool_registry_still_returns_five_tools(self):
         from tools import build_tool_registry
         tools = build_tool_registry("/fake/repo", "pytest")
-        assert len(tools) == 10
+        assert len(tools) == 12
 
     def test_config_has_all_fields(self, tmp_path):
         import os

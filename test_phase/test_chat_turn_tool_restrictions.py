@@ -97,6 +97,8 @@ class TestBuildReadonlyToolRegistry:
         "git_diff",
         "git_log",
         "list_directory",
+        "grep",
+        "run_command",
     }
 
     def setup_method(self):
