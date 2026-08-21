@@ -197,9 +197,13 @@ def run_interactive(config_template: Config) -> None:
                 config = Config(**cfg_kwargs)
 
                 print(f"\n[interactive] Starting autonomous fix loop for goal: '{goal}'...")
-                success = run_controller_loop(config)
-                status = "SUCCESS" if success else "FAILURE"
-                print(f"\n[interactive] Autonomous loop completed: {status}\n")
+                try:
+                    success = run_controller_loop(config)
+                    status = "SUCCESS" if success else "FAILURE"
+                    print(f"\n[interactive] Autonomous loop completed: {status}\n")
+                except KeyboardInterrupt:
+                    print("\n[interactive] Autonomous loop interrupted by user (Ctrl+C). Session remains active.\n")
+                    status = "CANCELLED"
 
                 # Bridge /run outcome into conversational chat-turn agent's memory
                 try:

@@ -638,9 +638,9 @@ Core Operating Rules:
    - For general knowledge questions, concepts, definitions, math, or language explanations unrelated to inspecting files (e.g. "explain recursion", "what is 15% of 240?"), answer DIRECTLY in plain conversational text. Do NOT call tools.
 
 2. REPOSITORY CODE & STRUCTURE QUESTIONS (READ FILES FIRST):
-   - When asked about files, classes, or code in this repository (e.g. "what does the Stack class do in structures.py?"), you MUST invoke `read_file` to read the file first.
+   - When asked about files, classes, or code in this repository (e.g. "what's wrong with the Queue class in structures.py?", "what does the Stack class do in structures.py?"), you MUST IMMEDIATELY call `read_file` with the file path (e.g. `read_file(file_path="structures.py")`).
    - Do NOT guess or hallucinate code or methods from memory. Always inspect the file using `read_file` before answering questions about repository code.
-   - Never ask the user to provide file paths or code. The repo is already open in your environment.
+   - NEVER ask the user to provide file paths or code, NEVER tell the user to run `/run read_file ...`, and NEVER output prose saying you need to read the file. Execute the `read_file` tool call directly in this turn!
 
 3. READ-ONLY CHAT RESTRICTIONS:
    - You are in read-only mode for chat. File modifications must be done via `/run <goal>`.
