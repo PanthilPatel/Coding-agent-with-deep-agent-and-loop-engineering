@@ -238,21 +238,31 @@ class PatchedChatOllama(ChatOllama):
         return result
 
     def _parse_fallback_tool_calls(self, response: BaseMessage) -> BaseMessage:
+        """Structured tool call parser for ChatOllama models.
+
+        Qwen2.5-Coder and similar models running via Ollama emit tool call
+        invocations as structured JSON payloads in response.content rather
+        than native OpenAI-style tool_calls fields in the response object.
+
+        This parser extracts, normalizes, and binds those structured tool calls
+        into response.tool_calls so downstream agents execute them reliably.
+        """
         if not isinstance(response, AIMessage):
             return response
 
+        # If already populated via native API, normalize parameter aliases
         if response.tool_calls:
             for tc in response.tool_calls:
                 args = tc.get("args", {})
                 name = tc.get("name")
                 if isinstance(args, dict):
-                    if name == "ls" and "path" not in args:
+                    if name in ("ls", "list_directory") and "path" not in args:
                         keys = [k for k in args.keys() if isinstance(k, str) and not k.startswith("arg")]
                         path_val = keys[0] if keys else "."
                         if path_val in ("/path/to/repo", "/repo", "/", ""):
                             path_val = "."
                         tc["args"] = {"path": path_val}
-                    elif name in ("read_file", "edit_file", "write_file") and "file_path" not in args:
+                    elif name in ("read_file", "edit_file", "write_file", "delete_file") and "file_path" not in args:
                         if "path" in args:
                             args["file_path"] = args.pop("path")
             return response
@@ -262,44 +272,41 @@ class PatchedChatOllama(ChatOllama):
             return response
 
         def _extract_json_str(text: str):
-            """Return the first brace-balanced JSON object substring, or None.
-
-            Strategy:
-              1. Fast path: look for a fully-closed ```json ... ``` fence.
-              2. Fast path: look for any ``` ... ``` fence whose body starts with '{'.
-              3. Brace-balanced scan: find the first '{' anywhere in the text,
-                 walk forward tracking string literals and nested brace depth to
-                 find the matching '}', regardless of fencing or surrounding prose.
-            """
-            # Fast path 1: fully-closed ```json fence
+            """Extract candidate JSON payload substring from response text."""
+            # Fast path 1: ```json ... ``` fence
             m = re.search(r"```json\s*([\s\S]*?)\s*```", text)
             if m:
-                candidate = m.group(1).strip()
-                if candidate.startswith("{"):
-                    return candidate
+                cand = m.group(1).strip()
+                if cand.startswith("{") or cand.startswith("["):
+                    return cand
 
-            # Fast path 2: fully-closed generic fence whose body looks like JSON
+            # Fast path 2: generic code fence
             m = re.search(r"```\s*([\s\S]*?)\s*```", text)
             if m:
-                candidate = m.group(1).strip()
-                if candidate.startswith("{"):
-                    return candidate
+                cand = m.group(1).strip()
+                if cand.startswith("{") or cand.startswith("["):
+                    return cand
 
-            # Fast path 3: unclosed ```json fence — grab everything after the marker
+            # Fast path 3: XML <tool_call> tags
+            m = re.search(r"<tool_call>\s*([\s\S]*?)\s*</tool_call>", text)
+            if m:
+                cand = m.group(1).strip()
+                if cand.startswith("{") or cand.startswith("["):
+                    return cand
+
+            # Fast path 4: unclosed ```json fence
             m = re.search(r"```json\s*([\s\S]+)", text)
             if m:
-                candidate = m.group(1).strip()
-                if candidate.startswith("{"):
-                    # Try brace-balance on the candidate to handle trailing prose
-                    balanced = _brace_balanced(candidate)
-                    if balanced:
-                        return balanced
+                cand = m.group(1).strip()
+                balanced = _brace_balanced(cand)
+                if balanced:
+                    return balanced
 
-            # Brace-balanced scan: find first '{' anywhere in text
+            # Scan for brace-balanced JSON object anywhere in text
             return _brace_balanced(text)
 
         def _brace_balanced(text: str):
-            """Find the first '{...}' that is brace-balanced, skipping string contents."""
+            """Find first brace-balanced JSON object, respecting quotes and escapes."""
             start = text.find("{")
             if start == -1:
                 return None
@@ -327,14 +334,13 @@ class PatchedChatOllama(ChatOllama):
             return None
 
         json_str = _extract_json_str(content)
-
         parsed_by_regex = False
         tool_calls = []
 
         if json_str:
             try:
+                # Pre-clean common JSON unescaped control chars if any
                 data = json.loads(json_str)
-                # Check if it's a list of tool calls or a single one
                 items = data if isinstance(data, list) else [data]
 
                 for idx, item in enumerate(items):
@@ -348,13 +354,13 @@ class PatchedChatOllama(ChatOllama):
                                 except Exception:
                                     pass
                             if isinstance(args, dict):
-                                if name == "ls" and "path" not in args:
+                                if name in ("ls", "list_directory") and "path" not in args:
                                     keys = [k for k in args.keys() if isinstance(k, str) and not k.startswith("arg")]
                                     path_val = keys[0] if keys else "."
                                     if path_val in ("/path/to/repo", "/repo", "/", ""):
                                         path_val = "."
                                     args = {"path": path_val}
-                                elif name in ("read_file", "edit_file", "write_file") and "file_path" not in args:
+                                elif name in ("read_file", "edit_file", "write_file", "delete_file") and "file_path" not in args:
                                     if "path" in args:
                                         args["file_path"] = args.pop("path")
                             tool_calls.append({
@@ -364,57 +370,56 @@ class PatchedChatOllama(ChatOllama):
                                 "type": "tool_call"
                             })
             except Exception as e:
-                # If strict JSON parse fails, try heuristic regex matching for edit_file / read_file
-                print(f"\n[patched_model] Strict JSON load failed: {e}. Attempting heuristic regex repair...")
+                # Robust regex-based fallback repair for unescaped code strings (e.g. multiline edit_file/write_file)
                 search_src = json_str or content
-                # Try to extract the tool name
                 tool_name_match = re.search(r'"name"\s*:\s*"([^"]+)"', search_src)
                 if tool_name_match:
                     tool_name = tool_name_match.group(1)
-                    if tool_name in ("edit_file", "read_file", "write_file"):
-                        args = {}
-                        fp_match = re.search(r'"file_path"\s*:\s*"([^"]+)"', search_src)
-                        if fp_match:
-                            args["file_path"] = fp_match.group(1)
+                    args = {}
+                    fp_match = re.search(r'"file_path"\s*:\s*"([^"]+)"', search_src)
+                    if fp_match:
+                        args["file_path"] = fp_match.group(1)
+                    elif re.search(r'"path"\s*:\s*"([^"]+)"', search_src):
+                        args["file_path"] = re.search(r'"path"\s*:\s*"([^"]+)"', search_src).group(1)
 
-                        if tool_name == "edit_file":
-                            old_match = re.search(r'"old_string"\s*:\s*"(.*?)"\s*,\s*"new_string"', search_src, re.DOTALL)
-                            new_match = re.search(r'"new_string"\s*:\s*"(.*?)"\s*(?:\}\s*\}|\}\s*\]|\}$)', search_src, re.DOTALL)
-                            if old_match and new_match:
+                    if tool_name == "edit_file":
+                        old_match = re.search(r'"old_string"\s*:\s*"(.*?)"\s*,\s*"new_string"', search_src, re.DOTALL)
+                        new_match = re.search(r'"new_string"\s*:\s*"(.*?)"\s*(?:\}\s*\}|\}\s*\]|\}$)', search_src, re.DOTALL)
+                        if old_match and new_match:
+                            args["old_string"] = old_match.group(1)
+                            args["new_string"] = new_match.group(1)
+                        else:
+                            old_match = re.search(r'"old_string"\s*:\s*"(.*?)"', search_src, re.DOTALL)
+                            new_match = re.search(r'"new_string"\s*:\s*"(.*?)"', search_src, re.DOTALL)
+                            if old_match:
                                 args["old_string"] = old_match.group(1)
+                            if new_match:
                                 args["new_string"] = new_match.group(1)
-                            else:
-                                old_match = re.search(r'"old_string"\s*:\s*"(.*?)"', search_src, re.DOTALL)
-                                new_match = re.search(r'"new_string"\s*:\s*"(.*?)"', search_src, re.DOTALL)
-                                if old_match:
-                                    args["old_string"] = old_match.group(1)
-                                if new_match:
-                                    args["new_string"] = new_match.group(1)
 
-                        if "file_path" in args:
-                            tool_calls.append({
-                                "name": tool_name,
-                                "args": args,
-                                "id": f"call_regex_{tool_name}",
-                                "type": "tool_call"
-                            })
-                            parsed_by_regex = True
+                    if args or tool_name in ("ls", "list_directory", "git_status", "git_diff", "git_log"):
+                        tool_calls.append({
+                            "name": tool_name,
+                            "args": args,
+                            "id": f"call_regex_{tool_name}",
+                            "type": "tool_call"
+                        })
+                        parsed_by_regex = True
 
         if tool_calls:
             response.tool_calls = tool_calls
             if parsed_by_regex:
-                print(f"\n[patched_model] Regex fallback parser successfully repaired tool calls: {tool_calls}")
+                print(f"\n[patched_model] Structured tool parser (regex repair) extracted tool calls: {tool_calls}")
             else:
-                print(f"\n[patched_model] Fallback parser successfully parsed tool calls: {tool_calls}")
+                print(f"\n[patched_model] Structured tool parser extracted tool calls: {tool_calls}")
         else:
-            # Warn if the response references a tool by name but we failed to extract a call —
-            # this makes the failure mode visible in logs instead of silently producing a no-op.
-            if re.search(r'"name"\s*:\s*"[^"]+"', content):
+            # Detect potential silent tool-call failures (e.g. model outputting tool intent in plain prose)
+            suspicious_tool_keywords = ["read_file", "edit_file", "write_file", "list_directory", "git_status", "git_diff"]
+            has_tool_name = re.search(r'"name"\s*:\s*"[^"]+"', content)
+            has_raw_keyword = any(f"`{kw}`" in content or f"'{kw}'" in content or f'"{kw}"' in content for kw in suspicious_tool_keywords)
+            if has_tool_name or (has_raw_keyword and "execute" not in content.lower()):
                 print(
-                    f"\n[patched_model] WARNING: Response content appears to reference a tool by name "
-                    f"(e.g. '\"name\": \"edit_file\"') but no valid tool_call could be extracted. "
-                    f"The LLM output will be treated as a plain text response — no tool will be executed. "
-                    f"Content snippet: {content[:300]!r}"
+                    f"\n[patched_model] NOTICE: Response text contains tool reference but no executable tool call was produced. "
+                    f"Treating as conversational text response. (Snippet: {content[:180]!r})"
                 )
 
         return response
