@@ -1,0 +1,142 @@
+{
+  "summary": {
+    "total_runs": 10,
+    "passed": 10,
+    "failed": 0,
+    "pass_rate_percent": 100.0,
+    "avg_duration_seconds": 85.96,
+    "total_iterations": 18
+  },
+  "results": [
+    {
+      "repo_name": "01_inventory_manager",
+      "goal": "Fix all bugs in source files so pytest passes. Do not modify test files.",
+      "passed": true,
+      "iterations": 2,
+      "duration_seconds": 72.17,
+      "tool_calls_count": {
+        "list_directory": 2
+      },
+      "error_message": null,
+      "subtasks_completed": 1,
+      "total_subtasks": 1
+    },
+    {
+      "repo_name": "02_string_utils",
+      "goal": "Fix all bugs in source files so pytest passes. Do not modify test files.",
+      "passed": true,
+      "iterations": 4,
+      "duration_seconds": 189.54,
+      "tool_calls_count": {
+        "list_directory": 3
+      },
+      "error_message": null,
+      "subtasks_completed": 1,
+      "total_subtasks": 1
+    },
+    {
+      "repo_name": "03_bank_account",
+      "goal": "Fix all bugs in source files so pytest passes. Do not modify test files.",
+      "passed": true,
+      "iterations": 2,
+      "duration_seconds": 71.63,
+      "tool_calls_count": {
+        "list_directory": 2
+      },
+      "error_message": null,
+      "subtasks_completed": 1,
+      "total_subtasks": 1
+    },
+    {
+      "repo_name": "04_linked_list",
+      "goal": "Fix all bugs in source files so pytest passes. Do not modify test files.",
+      "passed": true,
+      "iterations": 1,
+      "duration_seconds": 173.19,
+      "tool_calls_count": {
+        "list_directory": 2
+      },
+      "error_message": null,
+      "subtasks_completed": 1,
+      "total_subtasks": 1
+    },
+    {
+      "repo_name": "05_todo_manager",
+      "goal": "Fix all bugs in source files so pytest passes. Do not modify test files.",
+      "passed": true,
+      "iterations": 3,
+      "duration_seconds": 135.54,
+      "tool_calls_count": {
+        "list_directory": 3
+      },
+      "error_message": null,
+      "subtasks_completed": 1,
+      "total_subtasks": 1
+    },
+    {
+      "repo_name": "06_calculator",
+      "goal": "Fix all bugs in source files so pytest passes. Do not modify test files.",
+      "passed": true,
+      "iterations": 1,
+      "duration_seconds": 38.15,
+      "tool_calls_count": {
+        "list_directory": 1
+      },
+      "error_message": null,
+      "subtasks_completed": 1,
+      "total_subtasks": 1
+    },
+    {
+      "repo_name": "07_matrix_ops",
+      "goal": "Fix all bugs in source files so pytest passes. Do not modify test files.",
+      "passed": true,
+      "iterations": 1,
+      "duration_seconds": 58.39,
+      "tool_calls_count": {
+        "list_directory": 1
+      },
+      "error_message": null,
+      "subtasks_completed": 1,
+      "total_subtasks": 1
+    },
+    {
+      "repo_name": "08_password_validator",
+      "goal": "Fix all bugs in source files so pytest passes. Do not modify test files.",
+      "passed": true,
+      "iterations": 1,
+      "duration_seconds": 40.52,
+      "tool_calls_count": {
+        "list_directory": 1
+      },
+      "error_message": null,
+      "subtasks_completed": 1,
+      "total_subtasks": 1
+    },
+    {
+      "repo_name": "09_event_scheduler",
+      "goal": "Fix all bugs in source files so pytest passes. Do not modify test files.",
+      "passed": true,
+      "iterations": 2,
+      "duration_seconds": 52.23,
+      "tool_calls_count": {
+        "list_directory": 2
+      },
+      "error_message": null,
+      "subtasks_completed": 1,
+      "total_subtasks": 1
+    },
+    {
+      "repo_name": "10_shopping_cart",
+      "goal": "Fix all bugs in source files so pytest passes. Do not modify test files.",
+      "passed": true,
+      "iterations": 1,
+      "duration_seconds": 28.22,
+      "tool_calls_count": {
+        "list_directory": 1
+      },
+      "error_message": null,
+      "subtasks_completed": 1,
+      "total_subtasks": 1
+    }
+  ]
+}
