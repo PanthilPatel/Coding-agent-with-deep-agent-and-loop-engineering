@@ -18,20 +18,18 @@ from typing import Optional
 from config import Config
 from controller.loop import run as run_controller_loop
 from controller.permissions import PermissionHarness
-from tools import build_tool_registry
 from skills import list_skills
-from agents.worker import build_worker_agent, run_worker_turn
+from agents.worker import build_readonly_worker_agent, run_worker_turn
+from tools import build_readonly_tool_registry
 from langgraph.checkpoint.memory import MemorySaver
 
 
 def print_banner(config: Config) -> None:
     """Print the startup banner with real counts from registries and config."""
     repo_path = getattr(config, "local_repo_path", None) or getattr(config, "repo_path", "")
-    # Count Phase 2 tools
-    tool_count = len(build_tool_registry(
+    # Count Phase 2 tools (full registry, for banner display)
+    tool_count = len(build_readonly_tool_registry(
         repo_path=repo_path,
-        test_cmd=getattr(config, "test_cmd", "pytest"),
-        require_approval=getattr(config, "require_approval", False),
     ))
 
     # Count Phase 3 skills (if skills directory exists)
@@ -123,25 +121,27 @@ def run_interactive(config_template: Config) -> None:
         except Exception as e:
             print(f"[MCP] Failed to initialize: {e}\n")
 
-    # Build native + MCP tools
+    # Build read-only tools for chat turns (no edit_file, write_file, git_commit,
+    # execute_command, move_file, delete_file, or create_directory).
+    # /run's controller.loop.run() builds its own full-capability agent internally.
     repo_path = getattr(config_template, "local_repo_path", None) or getattr(config_template, "repo_path", "")
-    native_tools = build_tool_registry(
+    readonly_tools = build_readonly_tool_registry(
         repo_path=repo_path,
-        test_cmd=getattr(config_template, "test_cmd", "pytest"),
-        require_approval=getattr(config_template, "require_approval", False),
         harness=harness,
     )
-    extra_tools = native_tools + mcp_tools if mcp_tools else native_tools
 
     # Persistent in-memory checkpointer & stable session thread_id
     checkpointer = MemorySaver()
     session_thread_id = str(uuid.uuid4())
 
-    agent = build_worker_agent(
+    # Read-only chat-turn agent: uses ReadonlyFilesystemBackend which hard-blocks
+    # write/edit/delete at the backend layer, regardless of LLM phrasing.
+    # The full-write agent is NOT built here; /run creates its own inside loop.run().
+    agent = build_readonly_worker_agent(
         repo_path=repo_path,
         model_name=config_template.model_name,
         llm_provider=config_template.llm_provider,
-        extra_tools=extra_tools,
+        extra_tools=readonly_tools,
         checkpointer=checkpointer,
     )
 

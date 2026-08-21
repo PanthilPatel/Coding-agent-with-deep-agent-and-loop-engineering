@@ -210,9 +210,59 @@ def build_tool_registry(
     return tools
 
 
+def build_readonly_tool_registry(
+    repo_path: str,
+    harness: Optional[PermissionHarness] = None,
+) -> list:
+    """Build and return the minimal read-only tool list for chat-turn agents.
+
+    Only includes tools that observe state and never mutate it:
+      - list_directory  (browse repo structure)
+      - git_status      (see what is staged/modified)
+      - git_diff        (inspect current diff)
+      - git_log         (review commit history)
+
+    Explicitly excluded (all write / side-effect tools):
+      run_tests, git_commit, execute_command, create_directory,
+      move_file, delete_file.
+
+    The backend (ReadonlyFilesystemBackend) separately blocks write_file,
+    edit_file, and delete at the deepest layer. This registry exclusion is
+    an additional defence-in-depth measure.
+
+    Args:
+        repo_path: Absolute path to the target repository.
+        harness:   Optional PermissionHarness (read-only tools use 'auto' tier
+                   so it is largely a no-op, but accepted for consistency).
+
+    Returns:
+        A list of LangChain BaseTool instances.
+    """
+    perm_harness = harness if harness is not None else PermissionHarness(interactive=False)
+
+    @lc_tool
+    def list_directory(path: str = ".") -> dict:
+        """List contents of a directory (read-only, Tier: auto)."""
+        resolved_path = path if os.path.isabs(path) else os.path.join(repo_path, path)
+        return perm_harness.execute_guarded(
+            _list_directory,
+            "auto",
+            path=resolved_path,
+            tool_name="list_directory",
+        )
+
+    return [
+        make_git_status_tool(repo_path=repo_path),
+        make_git_diff_tool(repo_path=repo_path),
+        make_git_log_tool(repo_path=repo_path),
+        list_directory,
+    ]
+
+
 __all__ = [
-    # Registry builder
+    # Registry builders
     "build_tool_registry",
+    "build_readonly_tool_registry",
     # Raw Phase 1 terminal tools
     "execute_command",
     "create_directory",

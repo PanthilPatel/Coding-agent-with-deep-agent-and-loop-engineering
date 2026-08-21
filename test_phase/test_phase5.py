@@ -155,8 +155,8 @@ class TestBanner:
         print_banner(sample_config)
         captured = capsys.readouterr()
         
-        # Tool registry returns 10 tools (5 core + 5 terminal/filesystem)
-        assert "Tools:        10" in captured.out
+        # Readonly tool registry returns 4 tools: git_status, git_diff, git_log, list_directory
+        assert "Tools:        4" in captured.out
 
     
     def test_banner_shows_model_name(self, sample_config, capsys):
@@ -249,7 +249,7 @@ class TestREPLLoop:
         mock_run = MagicMock(return_value=True)
         mock_agent = MagicMock()
         
-        with patch("cli.interactive.build_worker_agent", return_value=mock_agent):
+        with patch("cli.interactive.build_readonly_worker_agent", return_value=mock_agent):
             with patch("builtins.input", mock_input):
                 with patch("cli.interactive.run_controller_loop", mock_run):
                     run_interactive(sample_config)
@@ -268,7 +268,7 @@ class TestREPLLoop:
         mock_run = MagicMock(return_value=True)
         mock_agent = MagicMock()
         
-        with patch("cli.interactive.build_worker_agent", return_value=mock_agent):
+        with patch("cli.interactive.build_readonly_worker_agent", return_value=mock_agent):
             with patch("builtins.input", mock_input):
                 with patch("cli.interactive.run_controller_loop", mock_run):
                     run_interactive(sample_config)
@@ -283,7 +283,7 @@ class TestREPLLoop:
         mock_run = MagicMock(return_value=True)
         mock_agent = MagicMock()
         
-        with patch("cli.interactive.build_worker_agent", return_value=mock_agent):
+        with patch("cli.interactive.build_readonly_worker_agent", return_value=mock_agent):
             with patch("builtins.input", mock_input):
                 with patch("cli.interactive.run_controller_loop", mock_run):
                     run_interactive(sample_config)
@@ -297,7 +297,7 @@ class TestREPLLoop:
         mock_run = MagicMock(return_value=True)
         mock_agent = MagicMock()
         
-        with patch("cli.interactive.build_worker_agent", return_value=mock_agent):
+        with patch("cli.interactive.build_readonly_worker_agent", return_value=mock_agent):
             with patch("builtins.input", mock_input):
                 with patch("cli.interactive.run_controller_loop", mock_run):
                     run_interactive(sample_config)
@@ -310,7 +310,7 @@ class TestREPLLoop:
         mock_run = MagicMock(return_value=True)
         mock_agent = MagicMock()
         
-        with patch("cli.interactive.build_worker_agent", return_value=mock_agent):
+        with patch("cli.interactive.build_readonly_worker_agent", return_value=mock_agent):
             with patch("builtins.input", mock_input):
                 with patch("cli.interactive.run_controller_loop", mock_run):
                     run_interactive(sample_config)
@@ -324,7 +324,7 @@ class TestREPLLoop:
         mock_run = MagicMock(return_value=True)
         mock_agent = MagicMock()
         
-        with patch("cli.interactive.build_worker_agent", return_value=mock_agent):
+        with patch("cli.interactive.build_readonly_worker_agent", return_value=mock_agent):
             with patch("builtins.input", mock_input):
                 with patch("cli.interactive.run_controller_loop", mock_run):
                     run_interactive(sample_config)
@@ -338,7 +338,7 @@ class TestREPLLoop:
             mock_run = MagicMock(return_value=True)
             mock_agent = MagicMock()
             
-            with patch("cli.interactive.build_worker_agent", return_value=mock_agent):
+            with patch("cli.interactive.build_readonly_worker_agent", return_value=mock_agent):
                 with patch("builtins.input", mock_input):
                     with patch("cli.interactive.run_controller_loop", mock_run):
                         run_interactive(sample_config)
@@ -368,7 +368,7 @@ class TestMCPShutdown:
         mock_registry_close = mock.AsyncMock()
         mock_agent = MagicMock()
         
-        with patch("cli.interactive.build_worker_agent", return_value=mock_agent):
+        with patch("cli.interactive.build_readonly_worker_agent", return_value=mock_agent):
             with patch("builtins.input", mock_input):
                 with patch("mcp_agent.registry.MCPRegistry.close", mock_registry_close):
                     with patch("mcp_agent.registry.MCPRegistry.initialize", mock.AsyncMock()):
@@ -393,7 +393,7 @@ class TestMCPShutdown:
         mock_registry_close = mock.AsyncMock(side_effect=RuntimeError("MCP Close Failed"))
         mock_agent = MagicMock()
         
-        with patch("cli.interactive.build_worker_agent", return_value=mock_agent):
+        with patch("cli.interactive.build_readonly_worker_agent", return_value=mock_agent):
             with patch("builtins.input", mock_input):
                 with patch("mcp_agent.registry.MCPRegistry.close", mock_registry_close):
                     with patch("mcp_agent.registry.MCPRegistry.initialize", mock.AsyncMock()):
@@ -427,7 +427,7 @@ class TestStateIsolation:
         mock_run = MagicMock(return_value=True)
         mock_agent = MagicMock()
         
-        with patch("cli.interactive.build_worker_agent", return_value=mock_agent):
+        with patch("cli.interactive.build_readonly_worker_agent", return_value=mock_agent):
             with patch("builtins.input", mock_input):
                 with patch("cli.interactive.run_controller_loop", mock_run):
                     run_interactive(sample_config)

@@ -189,6 +189,37 @@ class PatchedFilesystemBackend(FilesystemBackend):
             output="[System Notice]: Please use the 'execute_command' tool to run shell commands instead of backend 'execute'. Specify the command, cwd, and an appropriate risk_tier ('auto', 'confirm', or 'destructive').",
             exit_code=0
         )
+
+
+class ReadonlyFilesystemBackend(PatchedFilesystemBackend):
+    """A read-only variant of PatchedFilesystemBackend for use during chat turns.
+
+    All write operations (write, edit, delete) are hard-blocked at the backend
+    layer and return an informational error. Read operations (read, ls, grep)
+    are inherited unchanged from PatchedFilesystemBackend.
+
+    This ensures that plain chat-turn inputs — regardless of how they are
+    phrased — can never mutate files on disk, create checkpoints, or trigger
+    any commit path. No external guardrail is needed; the block is structural.
+    """
+
+    _CHAT_WRITE_ERROR = (
+        "[Chat mode] File modifications are not permitted during plain chat turns. "
+        "To make actual code changes, prefix your request with /run — e.g. "
+        "/run add a size method to Stack in structures.py"
+    )
+
+    def write(self, file_path: str, content: str, *args, **kwargs):
+        from deepagents.backends.protocol import WriteResult
+        return WriteResult(error=self._CHAT_WRITE_ERROR)
+
+    def edit(self, file_path: str, old_string: str, new_string: str, *args, **kwargs):
+        from deepagents.backends.protocol import EditResult
+        return EditResult(error=self._CHAT_WRITE_ERROR)
+
+    def delete(self, file_path: str, *args, **kwargs):
+        from deepagents.backends.protocol import DeleteResult
+        return DeleteResult(error=self._CHAT_WRITE_ERROR)
 from langchain_ollama import ChatOllama
 from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.messages import AIMessage, BaseMessage
@@ -685,6 +716,58 @@ def build_worker_agent(
         checkpointer=checkpointer,
     )
     return agent
+
+
+def build_readonly_worker_agent(
+    repo_path: str,
+    model_name: str = "qwen2.5-coder:7b",
+    llm_provider: str = "ollama",
+    extra_tools: list = None,
+    checkpointer=None,
+):
+    """Construct a read-only variant of the worker agent for use in chat turns.
+
+    Identical to build_worker_agent() except it uses ReadonlyFilesystemBackend
+    instead of PatchedFilesystemBackend. All write/edit/delete backend calls
+    are structurally blocked — the LLM may attempt them but they will always
+    return an error without touching disk.
+
+    Args:
+        repo_path:    Absolute path to the target repository (for AGENT.md and
+                      scoping read-only file access).
+        model_name:   LLM model identifier.
+        llm_provider: LLM provider string ('ollama', 'ollama_cloud', 'nvidia').
+        extra_tools:  Optional list of additional read-only tools to register.
+        checkpointer: Optional LangGraph checkpoint saver — should be the SAME
+                      instance as the full agent so chat-turn memory is shared.
+
+    Returns:
+        A LangGraph-compiled read-only agent.
+    """
+    model = _build_model(model_name, llm_provider)
+    backend = ReadonlyFilesystemBackend(root_dir=repo_path)
+
+    project_notes = load_agent_md(repo_path)
+    # Append a clear note to the system prompt so the LLM understands the mode
+    chat_mode_note = (
+        "\n\n## Chat Mode (Read-Only)\n"
+        "You are in conversational chat mode. You can answer questions, explain "
+        "code, and read files — but you CANNOT and MUST NOT attempt to edit, "
+        "write, or delete any file. File modification tools are disabled in this "
+        "mode. If the user wants actual code changes made, instruct them to "
+        "prefix their request with /run (e.g. /run add a size method to Stack)."
+    )
+    effective_prompt = WORKER_SYSTEM_PROMPT + project_notes + chat_mode_note
+
+    agent = create_deep_agent(
+        model=model,
+        tools=extra_tools if extra_tools else None,
+        system_prompt=effective_prompt,
+        backend=backend,
+        checkpointer=checkpointer,
+    )
+    return agent
+
 
 def run_worker_turn(
     agent,

@@ -62,7 +62,7 @@ def test_run_interactive_help_and_exit(tmp_path, capsys):
 
     mock_agent = MagicMock()
 
-    with patch("cli.interactive.build_worker_agent", return_value=mock_agent), \
+    with patch("cli.interactive.build_readonly_worker_agent", return_value=mock_agent), \
          patch("builtins.input", side_effect=["/help", "exit"]):
 
         run_interactive(cfg)
@@ -79,7 +79,7 @@ def test_run_interactive_single_turn_and_run_command(tmp_path, capsys):
 
     mock_agent = MagicMock()
 
-    with patch("cli.interactive.build_worker_agent", return_value=mock_agent), \
+    with patch("cli.interactive.build_readonly_worker_agent", return_value=mock_agent), \
          patch("cli.interactive.run_worker_turn", return_value="I inspected the repo."), \
          patch("cli.interactive.run_controller_loop", return_value=True) as mock_loop, \
          patch("builtins.input", side_effect=["what did you see?", "/run fix bugs", "exit"]):
