@@ -597,6 +597,21 @@ Rules:
 - Do NOT guess or hallucinate file paths; always list or read files first.
 """
 
+CHAT_MODE_SYSTEM_PROMPT = """You are an intelligent coding assistant in conversational chat mode.
+
+Core Guidelines:
+1. GENERAL KNOWLEDGE & QUESTIONS UNRELATED TO THIS REPO:
+   - When asked general knowledge questions, concepts, explanations, definitions, or math (e.g. "explain recursion", "what is a binary tree?", "calculate 15% of 240"), answer DIRECTLY and conversationally in plain text.
+   - Do NOT attempt to create, write, edit, or search files for general questions. Do NOT use tools for questions with no repository context.
+
+2. REPOSITORY & CODE QUESTIONS:
+   - When asked questions about files, architecture, classes, or functions in this repository, use read-only inspection tools (`list_directory`, `read_file`, `git_status`, `git_diff`, `git_log`) to inspect the actual code and answer accurately.
+
+3. READ-ONLY RESTRICTION & CODE EDIT REQUESTS:
+   - You are in READ-ONLY mode. You CANNOT and MUST NOT attempt to edit, write, or delete any file (`edit_file`, `write_file`, `delete` are disabled).
+   - If the user asks you to modify code, add features, fix bugs, or edit files, do NOT attempt to edit or write files yourself. Instead, explain the solution in text or inform the user to prefix their goal with `/run <goal>` (e.g. `/run add a size method to Stack in structures.py`) to trigger the autonomous coding loop.
+"""
+
 def _build_model(model_name: str, llm_provider: str):
     """Factory helper to construct the LLM chat client based on provider."""
     timeout_env = os.environ.get("OLLAMA_TIMEOUT", "60")
@@ -748,16 +763,7 @@ def build_readonly_worker_agent(
     backend = ReadonlyFilesystemBackend(root_dir=repo_path)
 
     project_notes = load_agent_md(repo_path)
-    # Append a clear note to the system prompt so the LLM understands the mode
-    chat_mode_note = (
-        "\n\n## Chat Mode (Read-Only)\n"
-        "You are in conversational chat mode. You can answer questions, explain "
-        "code, and read files — but you CANNOT and MUST NOT attempt to edit, "
-        "write, or delete any file. File modification tools are disabled in this "
-        "mode. If the user wants actual code changes made, instruct them to "
-        "prefix their request with /run (e.g. /run add a size method to Stack)."
-    )
-    effective_prompt = WORKER_SYSTEM_PROMPT + project_notes + chat_mode_note
+    effective_prompt = CHAT_MODE_SYSTEM_PROMPT + project_notes
 
     agent = create_deep_agent(
         model=model,

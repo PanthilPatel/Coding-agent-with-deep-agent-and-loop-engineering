@@ -1,4 +1,4 @@
-﻿"""Regression tests for chat-turn tool restrictions.
+"""Regression tests for chat-turn tool restrictions.
 
 Verifies that:
 1. ReadonlyFilesystemBackend blocks write, edit, and delete at the backend layer.
@@ -197,3 +197,20 @@ class TestInteractiveSessionUsesReadonlyAgent:
         assert found, (
             "cli/interactive.py must import build_readonly_worker_agent from agents.worker"
         )
+
+
+# ---------------------------------------------------------------------------
+# Chat Mode System Prompt tests
+# ---------------------------------------------------------------------------
+
+class TestChatModeSystemPrompt:
+    """Verify that CHAT_MODE_SYSTEM_PROMPT distinguishes general questions from repo actions."""
+
+    def test_chat_mode_prompt_includes_conversational_guidelines(self):
+        from agents.worker import CHAT_MODE_SYSTEM_PROMPT
+        assert "GENERAL KNOWLEDGE & QUESTIONS UNRELATED TO THIS REPO" in CHAT_MODE_SYSTEM_PROMPT
+        assert "answer DIRECTLY and conversationally" in CHAT_MODE_SYSTEM_PROMPT
+        assert "REPOSITORY & CODE QUESTIONS" in CHAT_MODE_SYSTEM_PROMPT
+        assert "READ-ONLY RESTRICTION" in CHAT_MODE_SYSTEM_PROMPT
+        assert "/run <goal>" in CHAT_MODE_SYSTEM_PROMPT
+
